@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/shared/theme/app_colors.dart';
+import '../../model/list_model.dart';
+
+class ListUserItem extends StatelessWidget {
+  final ListUser user;
+  final ListTab tab;
+  final VoidCallback onActionTap;
+
+  const ListUserItem({
+    super.key,
+    required this.user,
+    required this.tab,
+    required this.onActionTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: AppColors.rankListItemBg,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 22.r,
+            backgroundColor: AppColors.chipUnselected,
+            child: Icon(Icons.person, color: AppColors.textSecondary, size: 22.sp),
+          ),
+          SizedBox(width: 12.w),
+          Flexible(
+            flex: 1,
+            fit: FlexFit.tight,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.name,
+                  style: TextStyle(
+                    color: AppColors.black,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  tab == ListTab.following && user.followsYou
+                      ? 'Level ${user.level} · Follows you'
+                      : 'Level ${user.level}',
+                  style: TextStyle(
+                    color: AppColors.levelGrey,
+                    fontSize: 12.sp,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (tab == ListTab.followers)
+            SizedBox(
+              height: 32.h,
+              child: TextButton(
+                onPressed: onActionTap,
+                style: TextButton.styleFrom(
+                  backgroundColor: user.isFollowing
+                      ? AppColors.chipUnselected
+                      : AppColors.actionPink,
+                  foregroundColor:
+                      user.isFollowing ? AppColors.black : AppColors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                ),
+                child: Text(
+                  user.isFollowing ? 'Following' : 'Follow',
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            )
+          else
+            GestureDetector(
+              onTap: onActionTap,
+              child: Text(
+                'Following',
+                style: TextStyle(
+                  color: AppColors.black,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
