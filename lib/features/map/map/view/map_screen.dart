@@ -88,7 +88,11 @@ class _MapView extends StatelessWidget {
                       ),
                       if (mission != null) ...[
                         SizedBox(height: 12.h),
-                        MapMissionProgressCard(mission: mission),
+                        MapMissionProgressCard(
+                          mission: mission,
+                          onTap: () =>
+                              controller.openEventsProgressMap(context),
+                        ),
                       ],
                     ],
                   ),
@@ -106,6 +110,8 @@ class _MapView extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
                     child: MapLocationDetailCard(
                       location: mission.activeLocation,
+                      onTap: () =>
+                          controller.openActiveLocationDetails(context),
                     ),
                   ),
                 ),

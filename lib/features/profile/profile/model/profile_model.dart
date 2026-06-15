@@ -72,4 +72,6 @@ class ProfileModel {
       ProfileVisitTile(color: Color(0xFF8FA89A)),
     ],
   });
+
+  String get shareUrl => 'https://local.app/p/${name.toLowerCase().replaceAll(' ', '')}';
 }

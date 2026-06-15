@@ -4,13 +4,13 @@ import 'package:locals/shared/theme/app_colors.dart';
 
 class ViewProfileStatsRow extends StatelessWidget {
   final int visits;
-  final String pointsLabel;
+  final int followers;
   final int cities;
 
   const ViewProfileStatsRow({
     super.key,
     required this.visits,
-    required this.pointsLabel,
+    required this.followers,
     required this.cities,
   });
 
@@ -27,7 +27,7 @@ class ViewProfileStatsRow extends StatelessWidget {
         Flexible(
           flex: 1,
           fit: FlexFit.tight,
-          child: _StatCard(value: pointsLabel, label: 'POINTS'),
+          child: _StatCard(value: '$followers', label: 'FOLLOWERS'),
         ),
         SizedBox(width: 10.w),
         Flexible(

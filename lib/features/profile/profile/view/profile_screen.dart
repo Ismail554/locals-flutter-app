@@ -40,7 +40,7 @@ class _ProfileView extends StatelessWidget {
           child: Column(
             children: [
               ProfileTopActions(
-                onShare: () {},
+                onShare: () => controller.shareProfile(context),
                 onSettings: () => controller.openSettings(context),
               ),
               SizedBox(height: 16.h),

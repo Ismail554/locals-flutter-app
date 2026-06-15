@@ -105,12 +105,6 @@ class SettingsModel {
             icon: Icons.logout,
             label: 'Log out',
           ),
-          SettingsItem(
-            id: 'delete_account',
-            icon: Icons.delete_outline,
-            label: 'Delete account',
-            isDanger: true,
-          ),
         ],
       ),
     ],

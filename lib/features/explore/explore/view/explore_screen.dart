@@ -19,7 +19,7 @@ class ExploreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ExploreController(ExploreRepositoryImpl()),
+      create: (_) => ExploreController(ExploreRepositoryImpl.instance),
       child: const _ExploreView(),
     );
   }
@@ -67,14 +67,16 @@ class _ExploreView extends StatelessWidget {
               SizedBox(height: 24.h),
               ExploreFeaturedLocationsSection(
                 locations: state.featuredLocations,
-                onSeeAll: () {},
+                onSeeAll: () => controller.openFeaturedLocations(context),
+                onLocationTap: (id) =>
+                    controller.openLocationDetails(context, id),
               ),
               SizedBox(height: 24.h),
               ExploreNewLocalsSection(locals: state.newLocals),
               SizedBox(height: 24.h),
               ExploreFeaturedRoutesSection(
                 route: state.featuredRoute,
-                onAllEvents: () {},
+                onAllEvents: () => controller.openEventsRoutes(context),
               ),
             ],
           ),

@@ -227,21 +227,21 @@ class ExploreModel {
     ],
     this.featuredLocations = const [
       ExploreFeaturedLocation(
-        id: 'cafe',
+        id: 'cafe_del_born',
         category: 'CAFE',
         name: 'Café del Born',
         points: 50,
         imageColor: Color(0xFFD4C4B0),
       ),
       ExploreFeaturedLocation(
-        id: 'bar',
+        id: 'bar_marsella',
         category: 'BAR',
         name: 'Bar Marsella',
         points: 40,
         imageColor: Color(0xFFB8C8D8),
       ),
       ExploreFeaturedLocation(
-        id: 'park',
+        id: 'parc_guell',
         category: 'PARK',
         name: 'Parc Güell',
         points: 60,

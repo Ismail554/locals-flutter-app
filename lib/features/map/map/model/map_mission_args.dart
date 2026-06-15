@@ -5,12 +5,14 @@ class MapMissionArgs {
   final int completedCount;
   final int totalCount;
   final MapActiveLocation activeLocation;
+  final String? eventId;
 
   const MapMissionArgs({
     required this.city,
     required this.completedCount,
     required this.totalCount,
     required this.activeLocation,
+    this.eventId,
   });
 
   MapActiveMission toActiveMission() {
@@ -19,6 +21,7 @@ class MapMissionArgs {
       completedCount: completedCount,
       totalCount: totalCount,
       activeLocation: activeLocation,
+      eventId: eventId,
     );
   }
 }
@@ -28,12 +31,14 @@ class MapActiveMission {
   final int completedCount;
   final int totalCount;
   final MapActiveLocation activeLocation;
+  final String? eventId;
 
   const MapActiveMission({
     required this.city,
     required this.completedCount,
     required this.totalCount,
     required this.activeLocation,
+    this.eventId,
   });
 
   double get progress => completedCount / totalCount;
@@ -42,6 +47,7 @@ class MapActiveMission {
 }
 
 class MapActiveLocation {
+  final String? locationId;
   final String category;
   final String seal;
   final String name;
@@ -50,6 +56,7 @@ class MapActiveLocation {
   final Color imageColor;
 
   const MapActiveLocation({
+    this.locationId,
     required this.category,
     required this.seal,
     required this.name,
@@ -57,4 +64,16 @@ class MapActiveLocation {
     required this.points,
     required this.imageColor,
   });
+
+  String get resolvedLocationId =>
+      locationId ?? locationIdForName(name) ?? 'cafe_del_born';
 }
+
+const _locationIdsByName = <String, String>{
+  'Café del Born': 'cafe_del_born',
+  'Bar Marsella': 'bar_marsella',
+  'Forn Baluard': 'forn_baluard',
+  'Parc Güell': 'parc_guell',
+};
+
+String? locationIdForName(String name) => _locationIdsByName[name];

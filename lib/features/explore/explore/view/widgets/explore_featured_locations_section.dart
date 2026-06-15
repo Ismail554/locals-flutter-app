@@ -7,11 +7,13 @@ import 'explore_section_header.dart';
 class ExploreFeaturedLocationsSection extends StatelessWidget {
   final List<ExploreFeaturedLocation> locations;
   final VoidCallback onSeeAll;
+  final void Function(String locationId)? onLocationTap;
 
   const ExploreFeaturedLocationsSection({
     super.key,
     required this.locations,
     required this.onSeeAll,
+    this.onLocationTap,
   });
 
   @override
@@ -33,7 +35,11 @@ class ExploreFeaturedLocationsSection extends StatelessWidget {
             itemCount: locations.length,
             separatorBuilder: (_, __) => SizedBox(width: 12.w),
             itemBuilder: (context, index) {
-              return ExploreLocationCard(location: locations[index]);
+              final location = locations[index];
+              return GestureDetector(
+                onTap: () => onLocationTap?.call(location.id),
+                child: ExploreLocationCard(location: location),
+              );
             },
           ),
         ),

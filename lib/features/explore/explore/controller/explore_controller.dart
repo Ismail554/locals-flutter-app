@@ -1,19 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:locals/core/permissions/gallery_permission.dart';
+import '../../explore/service/story_upload_service.dart';
 import '../model/explore_model.dart';
 import '../repository/explore_repository.dart';
 import '../../find_locals/model/find_locals_args.dart';
+import '../../restaurant_view_details/model/restaurant_view_details_args.dart';
 import '../../story_view/model/story_view_args.dart';
 
 class ExploreController extends ChangeNotifier {
   final ExploreRepository repo;
-  ExploreModel state = ExploreModel();
+  final StoryUploadService storyUploadService;
+  ExploreModel state;
 
-  ExploreController(this.repo);
+  ExploreController(
+    this.repo, {
+    StoryUploadService? storyUploadService,
+  })  : storyUploadService = storyUploadService ?? StoryUploadService(),
+        state = ExploreModel(stories: repo.loadStories());
 
-  final _imagePicker = ImagePicker();
+  void openFeaturedLocations(BuildContext context) {
+    context.push('/featured_locations');
+  }
+
+  void openEventsRoutes(BuildContext context) {
+    context.push('/events_routes');
+  }
+
+  void openLocationDetails(BuildContext context, String locationId) {
+    context.push(
+      '/restaurant_view_details',
+      extra: RestaurantViewDetailsArgs(locationId: locationId),
+    );
+  }
 
   void openNotifications(BuildContext context) {
     context.push('/notification');
@@ -108,29 +126,11 @@ class ExploreController extends ChangeNotifier {
   }
 
   Future<void> _pickAndAddStoryImage(BuildContext context) async {
-    final hasPermission = await GalleryPermission.ensureGranted(context);
-    if (!hasPermission || !context.mounted) return;
+    final slide = await storyUploadService.pickFromGallery(context);
+    if (slide == null) return;
 
-    final image = await _imagePicker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 85,
-    );
-    if (image == null) return;
-
-    final slide = StorySlide(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      imagePath: image.path,
-      createdAt: DateTime.now(),
-    );
-
-    state = state.copyWith(
-      stories: state.stories.map((story) {
-        if (story.isYourStory) {
-          return story.copyWith(slides: [...story.slides, slide]);
-        }
-        return story;
-      }).toList(),
-    );
+    repo.addSlideToYourStory(slide);
+    state = state.copyWith(stories: repo.loadStories());
     notifyListeners();
 
     if (context.mounted) {
@@ -161,6 +161,7 @@ class ExploreController extends ChangeNotifier {
   }
 
   void _updateStories(List<ExploreStory> updated) {
+    repo.saveStories(updated);
     state = state.copyWith(stories: updated);
     notifyListeners();
   }

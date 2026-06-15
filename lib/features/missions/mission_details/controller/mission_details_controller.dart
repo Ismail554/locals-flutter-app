@@ -19,6 +19,7 @@ class MissionDetailsController extends ChangeNotifier {
         completedCount: 5,
         totalCount: 35,
         activeLocation: MapActiveLocation(
+          locationId: 'cafe_del_born',
           category: 'CAFE',
           seal: 'Seal',
           name: 'Café del Born',

@@ -34,7 +34,7 @@ class ViewProfileModel {
   final bool hasStory;
   final bool isFollowing;
   final int visits;
-  final String pointsLabel;
+  final int followers;
   final int cities;
   final ViewProfileTab selectedTab;
   final List<Color> photoColors;
@@ -48,7 +48,7 @@ class ViewProfileModel {
     this.hasStory = true,
     this.isFollowing = false,
     this.visits = 63,
-    this.pointsLabel = '9.1k',
+    this.followers = 456,
     this.cities = 3,
     this.selectedTab = ViewProfileTab.photos,
     this.photoColors = const [
@@ -105,7 +105,7 @@ class ViewProfileModel {
       hasStory: hasStory,
       isFollowing: isFollowing ?? this.isFollowing,
       visits: visits,
-      pointsLabel: pointsLabel,
+      followers: followers,
       cities: cities,
       selectedTab: selectedTab ?? this.selectedTab,
       photoColors: photoColors,

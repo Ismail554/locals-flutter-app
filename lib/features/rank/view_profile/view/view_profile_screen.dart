@@ -70,7 +70,7 @@ class _ViewProfileView extends StatelessWidget {
                     SizedBox(height: 16.h),
                     ViewProfileStatsRow(
                       visits: state.visits,
-                      pointsLabel: state.pointsLabel,
+                      followers: state.followers,
                       cities: state.cities,
                     ),
                     SizedBox(height: 20.h),

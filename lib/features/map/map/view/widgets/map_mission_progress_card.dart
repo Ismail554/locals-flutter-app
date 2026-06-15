@@ -5,27 +5,37 @@ import '../../model/map_mission_args.dart';
 
 class MapMissionProgressCard extends StatelessWidget {
   final MapActiveMission mission;
+  final VoidCallback? onTap;
 
-  const MapMissionProgressCard({super.key, required this.mission});
+  const MapMissionProgressCard({
+    super.key,
+    required this.mission,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 12.h),
-      decoration: BoxDecoration(
-        color: AppColors.white,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16.r),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 12,
-            offset: Offset(0, 2),
+        child: Ink(
+          width: double.infinity,
+          padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 12.h),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.cardShadow,
+                blurRadius: 12,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        children: [
+          child: Column(
+            children: [
           Row(
             children: [
               Icon(
@@ -94,7 +104,9 @@ class MapMissionProgressCard extends StatelessWidget {
               valueColor: const AlwaysStoppedAnimation(AppColors.actionPink),
             ),
           ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }

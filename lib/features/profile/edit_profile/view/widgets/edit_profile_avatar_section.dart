@@ -1,0 +1,65 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/shared/theme/app_colors.dart';
+
+class EditProfileAvatarSection extends StatelessWidget {
+  final Color avatarColor;
+  final VoidCallback onChangePhoto;
+
+  const EditProfileAvatarSection({
+    super.key,
+    required this.avatarColor,
+    required this.onChangePhoto,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            padding: EdgeInsets.all(4.w),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.actionPink, width: 3),
+            ),
+            child: CircleAvatar(
+              radius: 52.r,
+              backgroundColor: avatarColor,
+              child: Icon(
+                Icons.person,
+                size: 52.sp,
+                color: AppColors.white.withValues(alpha: 0.85),
+              ),
+            ),
+          ),
+          Positioned(
+            right: 4.w,
+            bottom: 4.h,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onChangePhoto,
+                borderRadius: BorderRadius.circular(20.r),
+                child: Container(
+                  width: 36.w,
+                  height: 36.w,
+                  decoration: const BoxDecoration(
+                    color: AppColors.actionPink,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.camera_alt_outlined,
+                    color: AppColors.white,
+                    size: 18.sp,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -47,5 +47,9 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Locals needs access to your photo library so you can post image stories.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Locals needs permission to save your share card photos to your library.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Locals needs camera access so you can capture photos for your share card and stories.</string>
 </dict>
 </plist>
