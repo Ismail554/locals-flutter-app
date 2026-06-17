@@ -40,9 +40,9 @@ class MapFiltersState {
   ];
 
   static const defaults = MapFiltersState(
-    selectedCategoryIds: {'bar', 'bakery', 'monument'},
+    selectedCategoryIds: {},
     placeType: PlaceTypeFilter.both,
-    visitStatus: VisitStatusFilter.unvisited,
+    visitStatus: VisitStatusFilter.both,
   );
 
   static const cleared = MapFiltersState(

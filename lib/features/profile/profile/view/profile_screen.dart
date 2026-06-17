@@ -44,7 +44,13 @@ class _ProfileView extends StatelessWidget {
                 onSettings: () => controller.openSettings(context),
               ),
               SizedBox(height: 16.h),
-              ProfileHeader(name: profile.name, location: profile.location),
+              ProfileHeader(
+                name: profile.name,
+                location: profile.location,
+                hasStory: controller.hasStory,
+                isStoryViewed: controller.isStoryViewed,
+                onAvatarTap: () => controller.openStory(context),
+              ),
               SizedBox(height: 20.h),
               ProfileLevelCard(
                 level: profile.level,
@@ -66,9 +72,15 @@ class _ProfileView extends StatelessWidget {
                 onBlocked: () => controller.openBlockedList(context),
               ),
               SizedBox(height: 24.h),
-              ProfileAchievementsSection(achievements: profile.achievements),
+              ProfileAchievementsSection(
+                achievements: profile.achievements,
+                onViewAll: () => controller.openAchievements(context),
+              ),
               SizedBox(height: 24.h),
-              ProfileLatestVisitsSection(visits: profile.latestVisits),
+              ProfileLatestVisitsSection(
+                visits: profile.latestVisits,
+                onVisitTap: (photo) => controller.openVisitImage(context, photo),
+              ),
             ],
           ),
         ),

@@ -27,14 +27,15 @@ class StoryViewerHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final slide = story.slides[slideIndex];
+    final slides = story.activeSlides;
+    final slide = slides[slideIndex];
 
     return Padding(
       padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 0),
       child: Column(
         children: [
           StoryProgressBar(
-            slideCount: story.slides.length,
+            slideCount: slides.length,
             currentIndex: slideIndex,
             progress: progress,
           ),
@@ -73,7 +74,9 @@ class StoryViewerHeader extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      _timeAgo(slide.createdAt),
+                      story.isYourStory
+                          ? slide.remainingLabel
+                          : _timeAgo(slide.createdAt),
                       style: TextStyle(
                         color: AppColors.white.withValues(alpha: 0.75),
                         fontSize: 12.sp,

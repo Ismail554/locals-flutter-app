@@ -51,6 +51,7 @@ class _SavedPlacesView extends StatelessWidget {
                   final place = controller.state.places[index];
                   return SavedPlaceCard(
                     place: place,
+                    onTap: () => controller.openPlaceDetails(context, place),
                     onBookmarkTap: () => controller.removePlace(place.id),
                   );
                 },

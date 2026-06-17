@@ -14,10 +14,12 @@ class PointsArgs {
   final String? locationCategory;
   final String? locationAddress;
   final Color? locationColor;
+  final String? locationId;
   final String? eventId;
 
   const PointsArgs({
     required this.locationName,
+    this.locationId,
     this.points = 50,
     this.cityName = 'Barcelona',
     this.cityProgress = 0.48,
@@ -43,7 +45,7 @@ class PointsArgs {
       totalCount: total,
       eventId: eventId,
       activeLocation: MapActiveLocation(
-        locationId: _locationIds[locationName],
+        locationId: locationId ?? _locationIds[locationName],
         category: locationCategory ?? meta?.$1 ?? 'LOCAL',
         seal: "locals' seal",
         name: locationName,
@@ -60,7 +62,7 @@ const _locationIds = <String, String>{
   'Bar Marsella': 'bar_marsella',
   'Forn Baluard': 'forn_baluard',
   'Parc Güell': 'parc_guell',
-  'Sagrada Família': 'cafe_del_born',
+  'Sagrada Família': 'sagrada_familia',
   'Casa Batlló': 'cafe_del_born',
 };
 

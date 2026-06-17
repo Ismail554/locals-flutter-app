@@ -67,6 +67,8 @@ class MapActiveLocation {
 
   String get resolvedLocationId =>
       locationId ?? locationIdForName(name) ?? 'cafe_del_born';
+
+  String get mapPinId => mapPinIdForLocationId(locationId ?? locationIdForName(name));
 }
 
 const _locationIdsByName = <String, String>{
@@ -77,3 +79,12 @@ const _locationIdsByName = <String, String>{
 };
 
 String? locationIdForName(String name) => _locationIdsByName[name];
+
+String mapPinIdForLocationId(String? locationId) {
+  if (locationId == null) return 'cafe_del_born';
+  return _locationIdsById[locationId] ?? locationId;
+}
+
+const _locationIdsById = <String, String>{
+  'sagrada_familia': 'sagrada',
+};

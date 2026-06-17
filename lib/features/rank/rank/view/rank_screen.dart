@@ -72,7 +72,12 @@ class _RankView extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 20.w),
                 child: RankPodium(
                   users: state.podium,
+                  hasStory: (user) => controller.hasStory(user.storyUserId),
+                  isStoryViewed: (user) =>
+                      controller.isStoryViewed(user.storyUserId),
                   onUserTap: (_) => controller.openViewProfile(context),
+                  onAvatarTap: (user) =>
+                      controller.onPodiumAvatarTap(context, user),
                 ),
               ),
             ),
@@ -85,9 +90,14 @@ class _RankView extends StatelessWidget {
                     final entry = state.entries[index];
                     return RankListItem(
                       entry: entry,
+                      hasStory: controller.hasStory(entry.storyUserId),
+                      isStoryViewed:
+                          controller.isStoryViewed(entry.storyUserId),
                       onTap: entry.isCurrentUser
                           ? null
                           : () => controller.openViewProfile(context),
+                      onAvatarTap: () =>
+                          controller.onListAvatarTap(context, entry),
                     );
                   },
                   childCount: state.entries.length,

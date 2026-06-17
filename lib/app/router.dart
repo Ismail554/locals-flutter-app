@@ -10,7 +10,7 @@ import '../features/login/set_new_password/view/set_new_password_screen.dart';
 import '../features/account_create/signup/view/signup_screen.dart';
 import '../features/account_create/verify_account_otp/view/verify_account_otp_screen.dart';
 import '../features/map/map/view/map_screen.dart';
-import '../features/map/map/model/map_mission_args.dart';
+import '../features/map/map/model/map_screen_args.dart';
 import '../features/explore/explore/view/explore_screen.dart';
 import '../features/missions/missions/view/missions_screen.dart';
 import '../features/rank/rank/view/rank_screen.dart';
@@ -19,6 +19,7 @@ import '../features/profile/settings/view/settings_screen.dart';
 import '../features/profile/privacy/view/privacy_screen.dart';
 import '../features/profile/blocked_list/view/blocked_list_screen.dart';
 import '../features/profile/my_map/view/my_map_screen.dart';
+import '../features/rank/view_profile/model/view_profile_args.dart';
 import '../features/rank/view_profile/view/view_profile_screen.dart';
 import '../features/missions/mission_details/view/mission_details_screen.dart';
 import '../features/profile/set_notification/view/set_notification_screen.dart';
@@ -98,9 +99,9 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/map',
           pageBuilder: (context, state) {
-            final missionArgs = state.extra as MapMissionArgs?;
+            final screenArgs = MapScreenArgs.fromExtra(state.extra);
             return NoTransitionPage(
-              child: MapScreen(missionArgs: missionArgs),
+              child: MapScreen(screenArgs: screenArgs),
             );
           },
         ),
@@ -124,56 +125,57 @@ final appRouter = GoRouter(
           pageBuilder: (context, state) =>
               const NoTransitionPage(child: ProfileScreen()),
         ),
-
-        GoRoute(
-          path: '/featured_locations',
-          builder: (context, state) => const FeaturedLocationsScreen(),
-        ),
-
-        GoRoute(
-          path: '/events_routes',
-          builder: (context, state) => const EventsRoutesScreen(),
-        ),
-
-        GoRoute(
-          path: '/join_event',
-          builder: (context, state) {
-            final args = state.extra as JoinEventArgs?;
-            return JoinEventScreen(args: args);
-          },
-        ),
-        GoRoute(
-          path: '/restaurant_view_details',
-          builder: (context, state) {
-            final args = state.extra as RestaurantViewDetailsArgs?;
-            return RestaurantViewDetailsScreen(args: args);
-          },
-        ),
-
-        GoRoute(
-          path: '/events_progress_map',
-          builder: (context, state) {
-            final args = state.extra as EventsProgressMapArgs?;
-            return EventsProgressMapScreen(args: args);
-          },
-        ),
-
-        GoRoute(
-          path: '/points',
-          builder: (context, state) {
-            final args = state.extra as PointsArgs?;
-            return PointsScreen(args: args);
-          },
-        ),
-
-        GoRoute(
-          path: '/share_card',
-          builder: (context, state) {
-            final args = state.extra as ShareCardArgs?;
-            return ShareCardScreen(args: args);
-          },
-        ),
       ],
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/featured_locations',
+      builder: (context, state) => const FeaturedLocationsScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/events_routes',
+      builder: (context, state) => const EventsRoutesScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/join_event',
+      builder: (context, state) {
+        final args = state.extra as JoinEventArgs?;
+        return JoinEventScreen(args: args);
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/restaurant_view_details',
+      builder: (context, state) {
+        final args = state.extra as RestaurantViewDetailsArgs?;
+        return RestaurantViewDetailsScreen(args: args);
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/events_progress_map',
+      builder: (context, state) {
+        final args = state.extra as EventsProgressMapArgs?;
+        return EventsProgressMapScreen(args: args);
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/points',
+      builder: (context, state) {
+        final args = state.extra as PointsArgs?;
+        return PointsScreen(args: args);
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/share_card',
+      builder: (context, state) {
+        final args = state.extra as ShareCardArgs?;
+        return ShareCardScreen(args: args);
+      },
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
@@ -243,7 +245,10 @@ final appRouter = GoRouter(
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
       path: '/view_profile',
-      builder: (context, state) => const ViewProfileScreen(),
+      builder: (context, state) {
+        final args = state.extra as ViewProfileArgs?;
+        return ViewProfileScreen(args: args);
+      },
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,

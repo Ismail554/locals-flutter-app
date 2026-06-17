@@ -1,19 +1,28 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
 class EditProfileAvatarSection extends StatelessWidget {
   final Color avatarColor;
+  final String? avatarImagePath;
+  final bool isLoading;
   final VoidCallback onChangePhoto;
 
   const EditProfileAvatarSection({
     super.key,
     required this.avatarColor,
+    this.avatarImagePath,
+    this.isLoading = false,
     required this.onChangePhoto,
   });
 
   @override
   Widget build(BuildContext context) {
+    final hasImage =
+        avatarImagePath != null && File(avatarImagePath!).existsSync();
+
     return Center(
       child: Stack(
         clipBehavior: Clip.none,
@@ -27,11 +36,15 @@ class EditProfileAvatarSection extends StatelessWidget {
             child: CircleAvatar(
               radius: 52.r,
               backgroundColor: avatarColor,
-              child: Icon(
-                Icons.person,
-                size: 52.sp,
-                color: AppColors.white.withValues(alpha: 0.85),
-              ),
+              backgroundImage:
+                  hasImage ? FileImage(File(avatarImagePath!)) : null,
+              child: hasImage
+                  ? null
+                  : Icon(
+                      Icons.person,
+                      size: 52.sp,
+                      color: AppColors.white.withValues(alpha: 0.85),
+                    ),
             ),
           ),
           Positioned(
@@ -40,20 +53,30 @@ class EditProfileAvatarSection extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: onChangePhoto,
+                onTap: isLoading ? null : onChangePhoto,
                 borderRadius: BorderRadius.circular(20.r),
                 child: Container(
                   width: 36.w,
                   height: 36.w,
-                  decoration: const BoxDecoration(
-                    color: AppColors.actionPink,
+                  decoration: BoxDecoration(
+                    color: isLoading
+                        ? AppColors.actionPink.withValues(alpha: 0.7)
+                        : AppColors.actionPink,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.camera_alt_outlined,
-                    color: AppColors.white,
-                    size: 18.sp,
-                  ),
+                  child: isLoading
+                      ? Padding(
+                          padding: EdgeInsets.all(8.w),
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.white,
+                          ),
+                        )
+                      : Icon(
+                          Icons.camera_alt_outlined,
+                          color: AppColors.white,
+                          size: 18.sp,
+                        ),
                 ),
               ),
             ),

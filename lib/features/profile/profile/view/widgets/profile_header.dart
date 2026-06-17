@@ -1,32 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/shared/components/story_avatar_ring.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
 class ProfileHeader extends StatelessWidget {
   final String name;
   final String location;
+  final bool hasStory;
+  final bool isStoryViewed;
+  final VoidCallback? onAvatarTap;
 
   const ProfileHeader({
     super.key,
     required this.name,
     required this.location,
+    this.hasStory = false,
+    this.isStoryViewed = false,
+    this.onAvatarTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final avatarSize = 96.w;
+    final avatar = StoryAvatarPlaceholder(
+      size: avatarSize,
+      backgroundColor: AppColors.chipUnselected,
+      iconColor: AppColors.textSecondary,
+    );
+
     return Column(
       children: [
-        Container(
-          padding: EdgeInsets.all(4.w),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.actionPink, width: 3),
-          ),
-          child: CircleAvatar(
-            radius: 48.r,
-            backgroundColor: AppColors.chipUnselected,
-            child: Icon(Icons.person, size: 48.sp, color: AppColors.textSecondary),
-          ),
+        GestureDetector(
+          onTap: hasStory ? onAvatarTap : null,
+          behavior: HitTestBehavior.opaque,
+          child: hasStory
+              ? StoryAvatarRing(
+                  size: avatarSize,
+                  hasStory: true,
+                  isViewed: isStoryViewed,
+                  child: avatar,
+                )
+              : SizedBox(width: avatarSize, height: avatarSize, child: avatar),
         ),
         SizedBox(height: 12.h),
         Text(

@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/shared/components/story_avatar_ring.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/explore_model.dart';
-import 'story_ring_style.dart';
 
 class FollowUserAvatar extends StatelessWidget {
   final ExploreStory? story;
@@ -20,18 +20,11 @@ class FollowUserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      padding: EdgeInsets.all(2.w),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: StoryRingStyle.borderColor(hasStory: _hasStory),
-          width: 2,
-        ),
-      ),
-      child: ClipOval(child: _AvatarContent(story: story)),
+    return StoryAvatarRing(
+      size: size,
+      hasStory: _hasStory,
+      isViewed: story?.isViewed ?? false,
+      child: _AvatarContent(story: story),
     );
   }
 }
@@ -43,7 +36,7 @@ class _AvatarContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (story == null || story!.slides.isEmpty) {
+    if (story == null || story!.activeSlides.isEmpty) {
       return CircleAvatar(
         backgroundColor: AppColors.chipUnselected,
         child: Icon(
@@ -54,7 +47,7 @@ class _AvatarContent extends StatelessWidget {
       );
     }
 
-    final slide = story!.slides.last;
+    final slide = story!.activeSlides.last;
     if (slide.imagePath != null) {
       return Image.file(
         File(slide.imagePath!),

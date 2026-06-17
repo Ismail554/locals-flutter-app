@@ -41,11 +41,6 @@ class _PrivacyDataView extends StatelessWidget {
               child: ProfileScreenHeader(
                 title: 'Privacy & Data',
                 onBack: () => context.pop(),
-                trailing: Icon(
-                  Icons.more_horiz,
-                  color: AppColors.black,
-                  size: 24.sp,
-                ),
               ),
             ),
             SizedBox(height: 24.h),

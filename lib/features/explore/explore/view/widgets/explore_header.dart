@@ -13,7 +13,7 @@ class ExploreHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const LocalsLogo(),
+        const LocalsLogo.black(),
         Material(
           color: Colors.transparent,
           child: InkWell(

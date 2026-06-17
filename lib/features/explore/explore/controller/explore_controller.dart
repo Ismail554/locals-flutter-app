@@ -4,6 +4,7 @@ import '../../explore/service/story_upload_service.dart';
 import '../model/explore_model.dart';
 import '../repository/explore_repository.dart';
 import '../../find_locals/model/find_locals_args.dart';
+import '../../join_event/model/join_event_args.dart';
 import '../../restaurant_view_details/model/restaurant_view_details_args.dart';
 import '../../story_view/model/story_view_args.dart';
 
@@ -30,6 +31,13 @@ class ExploreController extends ChangeNotifier {
     context.push(
       '/restaurant_view_details',
       extra: RestaurantViewDetailsArgs(locationId: locationId),
+    );
+  }
+
+  void openJoinEvent(BuildContext context, String eventId) {
+    context.push(
+      '/join_event',
+      extra: JoinEventArgs(eventId: eventId),
     );
   }
 
@@ -140,7 +148,7 @@ class ExploreController extends ChangeNotifier {
     }
   }
 
-  void openStoryViewer(BuildContext context, int initialIndex) {
+  Future<void> openStoryViewer(BuildContext context, int initialIndex) async {
     final storiesWithContent = state.stories
         .where((s) => s.hasStory)
         .toList();
@@ -150,7 +158,7 @@ class ExploreController extends ChangeNotifier {
     final viewerIndex = storiesWithContent.indexWhere((s) => s.id == story.id);
     if (viewerIndex < 0) return;
 
-    context.push(
+    await context.push(
       '/story_view',
       extra: StoryViewerArgs(
         stories: List<ExploreStory>.from(state.stories),
@@ -158,6 +166,9 @@ class ExploreController extends ChangeNotifier {
         onStoriesUpdated: _updateStories,
       ),
     );
+
+    state = state.copyWith(stories: repo.loadStories());
+    notifyListeners();
   }
 
   void _updateStories(List<ExploreStory> updated) {

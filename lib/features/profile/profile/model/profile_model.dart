@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:locals/shared/model/check_in_photo_model.dart';
 
 class ProfileAchievement {
   final String label;
@@ -12,10 +13,14 @@ class ProfileAchievement {
   });
 }
 
-class ProfileVisitTile {
-  final Color color;
-
-  const ProfileVisitTile({required this.color});
+class ProfileVisitTile extends CheckInPhoto {
+  const ProfileVisitTile({
+    required super.previewColor,
+    required super.locationName,
+    required super.timeAgo,
+    required super.caption,
+    required super.likes,
+  });
 }
 
 class ProfileModel {
@@ -64,12 +69,48 @@ class ProfileModel {
       ),
     ],
     this.latestVisits = const [
-      ProfileVisitTile(color: Color(0xFFD4A574)),
-      ProfileVisitTile(color: Color(0xFF7EB8DA)),
-      ProfileVisitTile(color: Color(0xFFE8A0A0)),
-      ProfileVisitTile(color: Color(0xFF9BB5CE)),
-      ProfileVisitTile(color: Color(0xFFC4B5A0)),
-      ProfileVisitTile(color: Color(0xFF8FA89A)),
+      ProfileVisitTile(
+        previewColor: Color(0xFFD4A574),
+        locationName: 'Cafe',
+        timeAgo: '2d ago',
+        caption: 'Best cortado in the Born.',
+        likes: 24,
+      ),
+      ProfileVisitTile(
+        previewColor: Color(0xFF7EB8DA),
+        locationName: 'Bakery',
+        timeAgo: '4d ago',
+        caption: 'Morning pastries run.',
+        likes: 18,
+      ),
+      ProfileVisitTile(
+        previewColor: Color(0xFFE8A0A0),
+        locationName: 'Restaurant',
+        timeAgo: '1w ago',
+        caption: 'Dinner with friends.',
+        likes: 31,
+      ),
+      ProfileVisitTile(
+        previewColor: Color(0xFF9BB5CE),
+        locationName: 'Park',
+        timeAgo: '1w ago',
+        caption: 'Sunset walk.',
+        likes: 12,
+      ),
+      ProfileVisitTile(
+        previewColor: Color(0xFFC4B5A0),
+        locationName: 'Market',
+        timeAgo: '2w ago',
+        caption: 'Fresh produce haul.',
+        likes: 9,
+      ),
+      ProfileVisitTile(
+        previewColor: Color(0xFF8FA89A),
+        locationName: 'Bar',
+        timeAgo: '3w ago',
+        caption: 'Friday night spot.',
+        likes: 42,
+      ),
     ],
   });
 

@@ -121,18 +121,22 @@ class _MapSearchViewState extends State<_MapSearchView> {
                 ],
               ),
               SizedBox(height: 24.h),
-              MapSearchSection(
-                icon: Icons.history,
-                title: 'RECENT',
-                items: state.recentSearches,
-                onItemTap: (value) => controller.selectSuggestion(context, value),
-              ),
-              SizedBox(height: 24.h),
+              if (state.recentSearches.isNotEmpty) ...[
+                MapSearchSection(
+                  icon: Icons.history,
+                  title: 'RECENT',
+                  items: state.recentSearches,
+                  onItemTap: (value) =>
+                      controller.selectSuggestion(context, value),
+                ),
+                SizedBox(height: 24.h),
+              ],
               MapSearchSection(
                 icon: Icons.trending_up,
                 title: 'TRENDING',
                 items: state.trendingSearches,
-                onItemTap: (value) => controller.selectSuggestion(context, value),
+                onItemTap: (value) =>
+                    controller.selectSuggestion(context, value),
               ),
             ],
           ),

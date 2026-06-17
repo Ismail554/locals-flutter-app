@@ -74,11 +74,14 @@ class _RestaurantViewDetailsView extends StatelessWidget {
                   SizedBox(height: 20.h),
                   RestaurantActionButtons(
                     hasVisited: restaurant.hasVisited,
-                    onBeenHereTap: controller.toggleVisited,
+                    onBeenHereTap: () => controller.checkIn(context),
                     onDirectionsTap: () => controller.openDirections(context),
                   ),
                   SizedBox(height: 24.h),
-                  RestaurantPhotosSection(photos: restaurant.photos),
+                  RestaurantPhotosSection(
+                    photos: restaurant.photos,
+                    onPhotoTap: (photo) => controller.openPhoto(context, photo),
+                  ),
                   SizedBox(height: 24.h),
                   RestaurantVisitorsSection(
                     visitorCount: restaurant.visitorCount,

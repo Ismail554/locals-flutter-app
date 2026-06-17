@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/features/explore/events_progress_map/model/events_progress_map_model.dart';
-import 'package:locals/features/map/map/view/widgets/map_background.dart';
-import 'package:locals/features/map/map/view/widgets/map_pin_marker.dart';
+import 'package:locals/shared/components/map/scrollable_map_canvas.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import 'event_progress_stop_card.dart';
 
@@ -108,32 +107,36 @@ class EventsProgressBottomPanel extends StatelessWidget {
   }
 }
 
-class EventsProgressMapView extends StatelessWidget {
+class EventsProgressMapView extends StatefulWidget {
   final EventsProgressMapModel state;
 
   const EventsProgressMapView({super.key, required this.state});
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final mapWidth = constraints.maxWidth;
-        final mapHeight = constraints.maxHeight;
+  State<EventsProgressMapView> createState() => _EventsProgressMapViewState();
+}
 
-        return Stack(
-          fit: StackFit.expand,
-          children: [
-            const MapBackground(),
-            ...state.pins.map((pin) {
-              return Positioned(
-                left: pin.x * mapWidth - 18.w,
-                top: pin.y * mapHeight - 24.h,
-                child: MapPinMarker(type: pin.type),
-              );
-            }),
-          ],
-        );
-      },
+class _EventsProgressMapViewState extends State<EventsProgressMapView> {
+  String? _selectedPinId;
+
+  void _onPinTap(String pinId) {
+    setState(() {
+      _selectedPinId = _selectedPinId == pinId ? null : pinId;
+    });
+  }
+
+  void _clearSelectedPin() {
+    if (_selectedPinId == null) return;
+    setState(() => _selectedPinId = null);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScrollableMapCanvas(
+      pins: widget.state.pins,
+      selectedPinId: _selectedPinId,
+      onPinTap: _onPinTap,
+      onBackgroundTap: _clearSelectedPin,
     );
   }
 }

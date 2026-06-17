@@ -9,25 +9,34 @@ class AppScaffold extends StatelessWidget {
 
   static const _tabPaths = ['/map', '/explore', '/missions', '/rank', '/profile'];
 
+  static bool _showsBottomBar(String location) {
+    final path = Uri.parse(location).path;
+    return _tabPaths.contains(path);
+  }
+
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     final index = _indexFromLocation(location);
+    final showBottomBar = _showsBottomBar(location);
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: BottomNavBar(
-        selectedIndex: index,
-        onSelected: (i) => _onTap(context, i),
-      ),
+      bottomNavigationBar: showBottomBar
+          ? BottomNavBar(
+              selectedIndex: index,
+              onSelected: (i) => _onTap(context, i),
+            )
+          : null,
     );
   }
 
   static int _indexFromLocation(String location) {
-    if (location.startsWith('/explore')) return 1;
-    if (location.startsWith('/missions')) return 2;
-    if (location.startsWith('/rank')) return 3;
-    if (location.startsWith('/profile')) return 4;
+    final path = Uri.parse(location).path;
+    if (path == '/explore') return 1;
+    if (path == '/missions') return 2;
+    if (path == '/rank') return 3;
+    if (path == '/profile') return 4;
     return 0;
   }
 

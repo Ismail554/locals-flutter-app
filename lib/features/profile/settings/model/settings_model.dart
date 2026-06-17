@@ -68,11 +68,11 @@ class SettingsModel {
             icon: Icons.person_outline,
             label: 'Edit Profile',
           ),
-          SettingsItem(
-            id: 'manage_subscription',
-            icon: Icons.workspace_premium_outlined,
-            label: 'Manage subscription',
-          ),
+          // SettingsItem(
+          //   id: 'manage_subscription',
+          //   icon: Icons.workspace_premium_outlined,
+          //   label: 'Manage subscription',
+          // ),
         ],
       ),
       SettingsSection(

@@ -5,8 +5,13 @@ import '../../model/profile_model.dart';
 
 class ProfileAchievementsSection extends StatelessWidget {
   final List<ProfileAchievement> achievements;
+  final VoidCallback? onViewAll;
 
-  const ProfileAchievementsSection({super.key, required this.achievements});
+  const ProfileAchievementsSection({
+    super.key,
+    required this.achievements,
+    this.onViewAll,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +29,16 @@ class ProfileAchievementsSection extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            Text(
-              'View all',
-              style: TextStyle(
-                color: AppColors.actionPink,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
+            GestureDetector(
+              onTap: onViewAll,
+              behavior: HitTestBehavior.opaque,
+              child: Text(
+                'View all',
+                style: TextStyle(
+                  color: AppColors.actionPink,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],

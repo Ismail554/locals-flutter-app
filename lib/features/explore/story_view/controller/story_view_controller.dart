@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../explore/model/explore_model.dart';
 import '../model/story_view_args.dart';
+import '../view/widgets/story_viewers_bottom_sheet.dart';
 
 class StoryViewController extends ChangeNotifier {
   final StoryViewerArgs args;
@@ -20,14 +21,26 @@ class StoryViewController extends ChangeNotifier {
   static const _tick = Duration(milliseconds: 50);
 
   StoryViewController(this.args) {
-    stories = args.stories.where((s) => s.hasStory).toList();
+    stories = args.stories
+        .where((s) => s.hasStory)
+        .map((s) => s.copyWith(slides: s.activeSlides))
+        .toList();
     storyIndex = args.initialStoryIndex.clamp(0, stories.length - 1);
+    if (!isYourStory) {
+      _recordCurrentUserAsViewer();
+    }
     _startTimer();
   }
 
+  List<StorySlide> get _currentSlides => currentStory.activeSlides;
+
   ExploreStory get currentStory => stories[storyIndex];
-  StorySlide get currentSlide => currentStory.slides[slideIndex];
+  StorySlide get currentSlide => _currentSlides[slideIndex];
   bool get isYourStory => currentStory.isYourStory;
+  int get viewerCount => currentStory.viewers.length;
+
+  static const _currentUserViewerId = 'you';
+  static const _currentUserViewerName = 'You';
 
   void _startTimer() {
     _timer?.cancel();
@@ -54,7 +67,7 @@ class StoryViewController extends ChangeNotifier {
   }
 
   void _goNext() {
-    if (slideIndex < currentStory.slides.length - 1) {
+    if (slideIndex < _currentSlides.length - 1) {
       slideIndex++;
       _markViewed();
       _startTimer();
@@ -81,7 +94,7 @@ class StoryViewController extends ChangeNotifier {
     }
     if (storyIndex > 0) {
       storyIndex--;
-      slideIndex = stories[storyIndex].slides.length - 1;
+      slideIndex = stories[storyIndex].activeSlides.length - 1;
       _startTimer();
       notifyListeners();
     }
@@ -112,8 +125,87 @@ class StoryViewController extends ChangeNotifier {
   }
 
   void _markViewed() {
+    if (!isYourStory) {
+      _recordCurrentUserAsViewer();
+    }
     if (currentStory.isViewed) return;
     stories[storyIndex] = currentStory.copyWith(isViewed: true);
+  }
+
+  void _recordCurrentUserAsViewer() {
+    final story = currentStory;
+    if (story.viewers.any((viewer) => viewer.id == _currentUserViewerId)) {
+      return;
+    }
+
+    stories[storyIndex] = story.copyWith(
+      viewers: [
+        StoryViewer(
+          id: _currentUserViewerId,
+          name: _currentUserViewerName,
+          viewedAt: DateTime.now(),
+          avatarColor: const Color(0xFF9BB5CE),
+        ),
+        ...story.viewers,
+      ],
+      isViewed: true,
+    );
+  }
+
+  Future<void> openViewersSheet(BuildContext context) async {
+    if (!isYourStory) return;
+
+    pause();
+    await StoryViewersBottomSheet.show(context, currentStory.viewers);
+    resume();
+  }
+
+  Future<void> deleteCurrentSlide(BuildContext context) async {
+    if (!isYourStory) return;
+
+    pause();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete this photo?'),
+        content: const Text(
+          'Only this story slide will be removed. Your other stories stay.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: Colors.red.shade700),
+            ),
+          ),
+        ],
+      ),
+    );
+    resume();
+
+    if (confirmed != true || !context.mounted) return;
+
+    final slides = List<StorySlide>.from(_currentSlides)..removeAt(slideIndex);
+
+    if (slides.isEmpty) {
+      stories[storyIndex] = currentStory.copyWith(slides: [], viewers: []);
+      _syncBack();
+      if (context.mounted) Navigator.of(context).pop();
+      return;
+    }
+
+    stories[storyIndex] = currentStory.copyWith(slides: slides);
+    if (slideIndex >= slides.length) {
+      slideIndex = slides.length - 1;
+    }
+    _syncBack();
+    _startTimer();
+    notifyListeners();
   }
 
   void close(BuildContext context) {

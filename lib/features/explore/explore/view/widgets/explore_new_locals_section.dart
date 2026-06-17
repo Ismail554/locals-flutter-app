@@ -6,8 +6,13 @@ import 'explore_section_header.dart';
 
 class ExploreNewLocalsSection extends StatelessWidget {
   final List<ExploreNewLocal> locals;
+  final void Function(String locationId)? onLocalTap;
 
-  const ExploreNewLocalsSection({super.key, required this.locals});
+  const ExploreNewLocalsSection({
+    super.key,
+    required this.locals,
+    this.onLocalTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +27,10 @@ class ExploreNewLocalsSection extends StatelessWidget {
         Column(
           children: [
             for (var i = 0; i < locals.length; i++) ...[
-              ExploreNewLocalItem(local: locals[i]),
+              ExploreNewLocalItem(
+                local: locals[i],
+                onTap: () => onLocalTap?.call(locals[i].id),
+              ),
               if (i < locals.length - 1) SizedBox(height: 10.h),
             ],
           ],

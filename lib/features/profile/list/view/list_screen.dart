@@ -75,7 +75,12 @@ class _ListView extends StatelessWidget {
                   return ListUserItem(
                     user: user,
                     tab: state.selectedTab,
+                    hasStory: controller.hasStory(user.id),
+                    isStoryViewed: controller.isStoryViewed(user.id),
                     onActionTap: () => controller.toggleFollow(user.id),
+                    onAvatarTap: () =>
+                        controller.openUserStory(context, user.id),
+                    onProfileTap: () => controller.openViewProfile(context),
                   );
                 },
               ),

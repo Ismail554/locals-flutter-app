@@ -7,12 +7,14 @@ class PodiumUser {
   final String name;
   final int score;
   final bool isCrowned;
+  final String? storyUserId;
 
   const PodiumUser({
     required this.rank,
     required this.name,
     required this.score,
     this.isCrowned = false,
+    this.storyUserId,
   });
 }
 
@@ -22,6 +24,7 @@ class RankEntry {
   final int level;
   final int score;
   final bool isCurrentUser;
+  final String? storyUserId;
 
   const RankEntry({
     required this.rank,
@@ -29,6 +32,7 @@ class RankEntry {
     required this.level,
     required this.score,
     this.isCurrentUser = false,
+    this.storyUserId,
   });
 }
 
@@ -43,11 +47,17 @@ class RankModel {
     this.selectedPeriod = RankPeriod.weekly,
     this.podium = const [
       PodiumUser(rank: 2, name: 'Marc B.', score: 11280),
-      PodiumUser(rank: 1, name: 'Marta', score: 12450, isCrowned: true),
+      PodiumUser(
+        rank: 1,
+        name: 'Marta',
+        score: 12450,
+        isCrowned: true,
+        storyUserId: 'marta',
+      ),
       PodiumUser(rank: 3, name: 'Júlia P.', score: 10720),
     ],
     this.entries = const [
-      RankEntry(rank: 4, name: 'Paul s.', level: 19, score: 9540),
+      RankEntry(rank: 4, name: 'Paul s.', level: 19, score: 9540, storyUserId: 'paul'),
       RankEntry(rank: 5, name: 'Núria T.', level: 18, score: 9100),
       RankEntry(rank: 6, name: 'You', level: 12, score: 6380, isCurrentUser: true),
       RankEntry(rank: 7, name: 'Pol', level: 11, score: 4380),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/shared/components/story_avatar_ring.dart';
 import 'package:locals/shared/theme/app_assets.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/rank_model.dart';
@@ -7,8 +8,18 @@ import '../../model/rank_model.dart';
 class RankPodium extends StatelessWidget {
   final List<PodiumUser> users;
   final ValueChanged<PodiumUser>? onUserTap;
+  final ValueChanged<PodiumUser>? onAvatarTap;
+  final bool Function(PodiumUser user)? hasStory;
+  final bool Function(PodiumUser user)? isStoryViewed;
 
-  const RankPodium({super.key, required this.users, this.onUserTap});
+  const RankPodium({
+    super.key,
+    required this.users,
+    this.onUserTap,
+    this.onAvatarTap,
+    this.hasStory,
+    this.isStoryViewed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +44,11 @@ class RankPodium extends StatelessWidget {
               barHeight: barSecond.h,
               avatarSize: 60.w,
               isFirst: false,
+              hasStory: hasStory?.call(second) ?? false,
+              isStoryViewed: isStoryViewed?.call(second) ?? false,
               onTap: onUserTap == null ? null : () => onUserTap!(second),
+              onAvatarTap:
+                  onAvatarTap == null ? null : () => onAvatarTap!(second),
             ),
           ),
           SizedBox(width: 16.w),
@@ -45,7 +60,11 @@ class RankPodium extends StatelessWidget {
               barHeight: barFirst.h,
               avatarSize: 80.w,
               isFirst: true,
+              hasStory: hasStory?.call(first) ?? false,
+              isStoryViewed: isStoryViewed?.call(first) ?? false,
               onTap: onUserTap == null ? null : () => onUserTap!(first),
+              onAvatarTap:
+                  onAvatarTap == null ? null : () => onAvatarTap!(first),
             ),
           ),
           SizedBox(width: 16.w),
@@ -57,7 +76,11 @@ class RankPodium extends StatelessWidget {
               barHeight: barThird.h,
               avatarSize: 60.w,
               isFirst: false,
+              hasStory: hasStory?.call(third) ?? false,
+              isStoryViewed: isStoryViewed?.call(third) ?? false,
               onTap: onUserTap == null ? null : () => onUserTap!(third),
+              onAvatarTap:
+                  onAvatarTap == null ? null : () => onAvatarTap!(third),
             ),
           ),
         ],
@@ -71,15 +94,20 @@ class _PodiumColumn extends StatelessWidget {
   final double barHeight;
   final double avatarSize;
   final bool isFirst;
-
+  final bool hasStory;
+  final bool isStoryViewed;
   final VoidCallback? onTap;
+  final VoidCallback? onAvatarTap;
 
   const _PodiumColumn({
     required this.user,
     required this.barHeight,
     required this.avatarSize,
     required this.isFirst,
+    required this.hasStory,
+    required this.isStoryViewed,
     this.onTap,
+    this.onAvatarTap,
   });
 
   @override
@@ -108,7 +136,16 @@ class _PodiumColumn extends StatelessWidget {
           SizedBox(height: 34.h),
 
         // Avatar
-        _PodiumAvatar(size: avatarSize, isFirst: isFirst),
+        GestureDetector(
+          onTap: hasStory ? onAvatarTap : onTap,
+          behavior: HitTestBehavior.opaque,
+          child: _PodiumAvatar(
+            size: avatarSize,
+            isFirst: isFirst,
+            hasStory: hasStory,
+            isStoryViewed: isStoryViewed,
+          ),
+        ),
         SizedBox(height: 8.h),
 
         // Name
@@ -184,26 +221,37 @@ class _PodiumColumn extends StatelessWidget {
 class _PodiumAvatar extends StatelessWidget {
   final double size;
   final bool isFirst;
+  final bool hasStory;
+  final bool isStoryViewed;
 
-  const _PodiumAvatar({required this.size, required this.isFirst});
+  const _PodiumAvatar({
+    required this.size,
+    required this.isFirst,
+    required this.hasStory,
+    required this.isStoryViewed,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final avatar = StoryAvatarPlaceholder(
+      size: size,
+      backgroundColor: AppColors.chipUnselected,
+      iconColor: AppColors.textSecondary,
+    );
+
+    if (hasStory) {
+      return StoryAvatarRing(
+        size: size,
+        hasStory: true,
+        isViewed: isStoryViewed,
+        child: avatar,
+      );
+    }
+
+    return SizedBox(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        color: AppColors.chipUnselected,
-        shape: BoxShape.circle,
-        border: isFirst
-            ? Border.all(color: AppColors.actionPink, width: 2.5)
-            : null,
-      ),
-      child: Icon(
-        Icons.person,
-        color: AppColors.textSecondary,
-        size: size * 0.5,
-      ),
+      child: avatar,
     );
   }
 }

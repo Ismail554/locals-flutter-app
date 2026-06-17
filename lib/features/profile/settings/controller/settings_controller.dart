@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/shared/components/premium_confirm_dialog.dart';
 import '../model/settings_model.dart';
 import '../repository/settings_repository.dart';
 
@@ -17,8 +18,8 @@ class SettingsController extends ChangeNotifier {
         context.push('/privacy');
       case 'edit_profile':
         context.push('/edit_profile');
-      case 'manage_subscription':
-        context.push('/manage_subscription');
+      // case 'manage_subscription':
+      //   context.push('/manage_subscription');
       case 'help':
         context.push('/help_support');
       case 'policy':
@@ -28,9 +29,15 @@ class SettingsController extends ChangeNotifier {
           const SnackBar(content: Text('Thanks for your feedback!')),
         );
       case 'logout':
-        context.go('/login');
+        confirmLogout(context);
       default:
         break;
     }
+  }
+
+  Future<void> confirmLogout(BuildContext context) async {
+    final shouldLogout = await PremiumConfirmDialog.showLogout(context);
+    if (!shouldLogout || !context.mounted) return;
+    context.go('/login');
   }
 }

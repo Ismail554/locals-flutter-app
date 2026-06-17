@@ -8,11 +8,13 @@ import 'explore_section_header.dart';
 class ExploreWeeklyRankingSection extends StatelessWidget {
   final List<ExploreRankingUser> users;
   final VoidCallback onSeeAll;
+  final void Function(ExploreRankingUser user)? onUserTap;
 
   const ExploreWeeklyRankingSection({
     super.key,
     required this.users,
     required this.onSeeAll,
+    this.onUserTap,
   });
 
   @override
@@ -37,7 +39,10 @@ class ExploreWeeklyRankingSection extends StatelessWidget {
           child: Column(
             children: [
               for (var i = 0; i < users.length; i++) ...[
-                ExploreRankingRow(user: users[i]),
+                ExploreRankingRow(
+                  user: users[i],
+                  onTap: () => onUserTap?.call(users[i]),
+                ),
                 if (i < users.length - 1)
                   Divider(
                     color: AppColors.borderGray.withValues(alpha: 0.5),

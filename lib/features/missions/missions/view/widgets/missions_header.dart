@@ -16,7 +16,7 @@ class MissionsHeader extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const LocalsLogo(),
+            const LocalsLogo.black(),
             TextButton.icon(
               onPressed: onAchievementsTap,
               icon: Icon(Icons.military_tech_outlined, color: AppColors.actionPink, size: 18.sp),

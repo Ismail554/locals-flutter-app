@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/shared/components/premium_confirm_dialog.dart';
 import '../model/privacy_data_model.dart';
 import '../repository/privacy_data_repository.dart';
 
@@ -22,30 +23,12 @@ class PrivacyDataController extends ChangeNotifier {
     context.push('/terms_of_use');
   }
 
-  void confirmDeleteAccount(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete account'),
-        content: const Text(
-          'This action cannot be undone. Are you sure you want to delete your account?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-              await repo.deleteAccount();
-              if (!context.mounted) return;
-              context.go('/login');
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
+  Future<void> confirmDeleteAccount(BuildContext context) async {
+    final shouldDelete = await PremiumConfirmDialog.showDeleteAccount(context);
+    if (!shouldDelete || !context.mounted) return;
+
+    await repo.deleteAccount();
+    if (!context.mounted) return;
+    context.go('/login');
   }
 }

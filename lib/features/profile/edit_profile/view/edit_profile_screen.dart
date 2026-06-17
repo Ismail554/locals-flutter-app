@@ -51,7 +51,9 @@ class _EditProfileView extends StatelessWidget {
                 children: [
                   EditProfileAvatarSection(
                     avatarColor: controller.state.avatarColor,
-                    onChangePhoto: controller.changePhoto,
+                    avatarImagePath: controller.state.avatarImagePath,
+                    isLoading: controller.isPickingPhoto,
+                    onChangePhoto: () => controller.changePhoto(context),
                   ),
                   SizedBox(height: 28.h),
                   EditProfileFormField(

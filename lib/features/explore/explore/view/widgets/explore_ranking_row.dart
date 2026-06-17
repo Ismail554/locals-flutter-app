@@ -5,8 +5,13 @@ import '../../model/explore_model.dart';
 
 class ExploreRankingRow extends StatelessWidget {
   final ExploreRankingUser user;
+  final VoidCallback? onTap;
 
-  const ExploreRankingRow({super.key, required this.user});
+  const ExploreRankingRow({
+    super.key,
+    required this.user,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +20,10 @@ class ExploreRankingRow extends StatelessWidget {
           (m) => '${m[1]},',
         );
 
-    return Padding(
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
       padding: EdgeInsets.symmetric(vertical: 10.h),
       child: Row(
         children: [
@@ -95,6 +103,7 @@ class ExploreRankingRow extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

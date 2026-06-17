@@ -8,7 +8,11 @@ class MapSearchController extends ChangeNotifier {
   MapSearchModel state;
 
   MapSearchController(this.repo, {String initialQuery = ''})
-      : state = MapSearchModel(query: initialQuery);
+      : state = MapSearchModel(
+          query: initialQuery,
+          recentSearches: repo.loadRecentSearches(),
+          trendingSearches: repo.loadTrendingSearches(),
+        );
 
   void setQuery(String value) {
     state = state.copyWith(query: value);
@@ -16,6 +20,7 @@ class MapSearchController extends ChangeNotifier {
   }
 
   void selectSuggestion(BuildContext context, String value) {
+    repo.addRecentSearch(value);
     context.pop(value);
   }
 

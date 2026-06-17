@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/shared/components/story_avatar_ring.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/explore_model.dart';
 import 'explore_your_story_avatar.dart';
-import 'story_ring_style.dart';
 
 class ExploreStoryItem extends StatelessWidget {
   final ExploreStory story;
@@ -15,11 +15,6 @@ class ExploreStoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = StoryRingStyle.borderColor(
-      hasStory: story.hasStory,
-      isViewed: story.isViewed,
-    );
-
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
@@ -29,15 +24,22 @@ class ExploreStoryItem extends StatelessWidget {
             if (story.isYourStory && !story.hasStory)
               ExploreYourStoryAvatar(size: 64.w)
             else
-              Container(
-                width: 64.w,
-                height: 64.w,
-                padding: EdgeInsets.all(2.w),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: borderColor, width: 2),
-                ),
-                child: ClipOval(child: _StoryThumbnail(story: story)),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  StoryAvatarRing(
+                    size: 64.w,
+                    hasStory: story.hasStory,
+                    isViewed: story.isViewed,
+                    child: _StoryThumbnail(story: story),
+                  ),
+                  if (story.isYourStory && story.hasStory)
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: _StoryViewerBadge(count: story.viewers.length),
+                    ),
+                ],
               ),
             SizedBox(height: 8.h),
             Text(
@@ -60,6 +62,44 @@ class ExploreStoryItem extends StatelessWidget {
   }
 }
 
+class _StoryViewerBadge extends StatelessWidget {
+  final int count;
+
+  const _StoryViewerBadge({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+      decoration: BoxDecoration(
+        color: AppColors.black.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.remove_red_eye_outlined,
+            color: AppColors.white,
+            size: 12.sp,
+          ),
+          if (count > 0) ...[
+            SizedBox(width: 3.w),
+            Text(
+              '$count',
+              style: TextStyle(
+                color: AppColors.white,
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _StoryThumbnail extends StatelessWidget {
   final ExploreStory story;
 
@@ -67,7 +107,7 @@ class _StoryThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (story.slides.isEmpty) {
+    if (story.activeSlides.isEmpty) {
       return CircleAvatar(
         backgroundColor: AppColors.chipUnselected,
         child: Icon(
@@ -78,7 +118,7 @@ class _StoryThumbnail extends StatelessWidget {
       );
     }
 
-    final slide = story.slides.last;
+    final slide = story.activeSlides.last;
     if (slide.imagePath != null) {
       return Image.file(
         File(slide.imagePath!),

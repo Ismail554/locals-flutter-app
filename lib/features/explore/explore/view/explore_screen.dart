@@ -54,6 +54,7 @@ class _ExploreView extends StatelessWidget {
               ExploreWeeklyRankingSection(
                 users: state.weeklyRanking,
                 onSeeAll: () => context.push('/rank'),
+                onUserTap: (_) => controller.openProfile(context),
               ),
               SizedBox(height: 24.h),
               ExploreFollowLocalsSection(
@@ -72,11 +73,18 @@ class _ExploreView extends StatelessWidget {
                     controller.openLocationDetails(context, id),
               ),
               SizedBox(height: 24.h),
-              ExploreNewLocalsSection(locals: state.newLocals),
+              ExploreNewLocalsSection(
+                locals: state.newLocals,
+                onLocalTap: (id) => controller.openLocationDetails(context, id),
+              ),
               SizedBox(height: 24.h),
               ExploreFeaturedRoutesSection(
                 route: state.featuredRoute,
                 onAllEvents: () => controller.openEventsRoutes(context),
+                onRouteTap: () => controller.openJoinEvent(
+                  context,
+                  state.featuredRoute.id,
+                ),
               ),
             ],
           ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:locals/core/media/avatar_picker_service.dart';
 import '../model/edit_profile_model.dart';
 import '../repository/edit_profile_repository.dart';
 
 class EditProfileController extends ChangeNotifier {
   final EditProfileRepository repo;
+  final AvatarPickerService avatarPickerService;
   EditProfileModel state = const EditProfileModel();
 
   final nameController = TextEditingController();
@@ -17,8 +19,12 @@ class EditProfileController extends ChangeNotifier {
   bool obscureConfirmPassword = true;
   bool isSaving = false;
   bool isChangingPassword = false;
+  bool isPickingPhoto = false;
 
-  EditProfileController(this.repo);
+  EditProfileController(
+    this.repo, {
+    AvatarPickerService? avatarPickerService,
+  }) : avatarPickerService = avatarPickerService ?? AvatarPickerService();
 
   Future<void> load() async {
     state = await repo.load();
@@ -50,6 +56,7 @@ class EditProfileController extends ChangeNotifier {
     await repo.saveProfile(
       name: nameController.text.trim(),
       location: locationController.text.trim(),
+      avatarImagePath: state.avatarImagePath,
     );
 
     state = state.copyWith(
@@ -107,8 +114,21 @@ class EditProfileController extends ChangeNotifier {
     }
   }
 
-  void changePhoto() {
-    // Placeholder for image picker integration.
+  Future<void> changePhoto(BuildContext context) async {
+    if (isPickingPhoto) return;
+
+    isPickingPhoto = true;
+    notifyListeners();
+
+    final imagePath = await avatarPickerService.pickFromGallery(context);
+
+    isPickingPhoto = false;
+
+    if (imagePath != null) {
+      state = state.copyWith(avatarImagePath: imagePath);
+    }
+
+    notifyListeners();
   }
 
   @override

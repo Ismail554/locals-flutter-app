@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/features/explore/explore/repository/explore_repository.dart';
+import 'package:locals/shared/story/user_story_launcher.dart';
 import '../../explore/model/explore_model.dart';
-import '../../story_view/model/story_view_args.dart';
 import '../model/find_locals_args.dart';
 import '../model/find_locals_model.dart';
 import '../repository/find_locals_repository.dart';
@@ -44,36 +45,20 @@ class FindLocalsController extends ChangeNotifier {
     context.push('/view_profile');
   }
 
-  bool hasStory(String userId) {
-    final index = state.stories.indexWhere((story) => story.id == userId);
-    if (index < 0) return false;
-    return state.stories[index].hasStory;
-  }
+  bool hasStory(String userId) => UserStoryLauncher.hasStory(userId);
+
+  bool isStoryViewed(String userId) => UserStoryLauncher.isViewed(userId);
 
   ExploreStory? storyForUser(String userId) {
-    final index = state.stories.indexWhere((story) => story.id == userId);
-    if (index < 0) return null;
-    final story = state.stories[index];
-    return story.hasStory ? story : null;
+    final story = UserStoryLauncher.storyFor(userId);
+    return story != null && story.hasStory ? story : null;
   }
 
-  void openUserStory(BuildContext context, String userId) {
+  Future<void> openUserStory(BuildContext context, String userId) async {
     if (!hasStory(userId)) return;
 
-    final storiesWithContent =
-        state.stories.where((story) => story.hasStory).toList();
-    final viewerIndex =
-        storiesWithContent.indexWhere((story) => story.id == userId);
-    if (viewerIndex < 0) return;
-
-    context.push(
-      '/story_view',
-      extra: StoryViewerArgs(
-        stories: List<ExploreStory>.from(state.stories),
-        initialStoryIndex: viewerIndex,
-        onStoriesUpdated: _updateStories,
-      ),
-    );
+    await UserStoryLauncher.open(context, userId);
+    _updateStories(ExploreRepositoryImpl.instance.loadStories());
   }
 
   void _updateStories(List<ExploreStory> updated) {

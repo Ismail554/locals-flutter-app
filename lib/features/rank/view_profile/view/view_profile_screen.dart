@@ -6,6 +6,7 @@ import 'package:locals/shared/components/profile_screen_header.dart';
 import 'package:locals/shared/components/profile_segmented_control.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/view_profile_controller.dart';
+import '../model/view_profile_args.dart';
 import '../model/view_profile_model.dart';
 import '../repository/view_profile_repository.dart';
 import 'widgets/view_profile_achievements_tab.dart';
@@ -16,12 +17,17 @@ import 'widgets/view_profile_photos_tab.dart';
 import 'widgets/view_profile_stats_row.dart';
 
 class ViewProfileScreen extends StatelessWidget {
-  const ViewProfileScreen({super.key});
+  final ViewProfileArgs? args;
+
+  const ViewProfileScreen({super.key, this.args});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ViewProfileController(ViewProfileRepositoryImpl()),
+      create: (_) => ViewProfileController(
+        ViewProfileRepositoryImpl(),
+        userId: args?.userId,
+      ),
       child: const _ViewProfileView(),
     );
   }
@@ -59,7 +65,9 @@ class _ViewProfileView extends StatelessWidget {
                       name: state.name,
                       level: state.level,
                       location: state.location,
-                      hasStory: state.hasStory,
+                      hasStory: controller.hasStory,
+                      isStoryViewed: controller.isStoryViewed,
+                      onAvatarTap: () => controller.openStory(context),
                     ),
                     SizedBox(height: 20.h),
                     ViewProfileActionButtons(
@@ -97,7 +105,9 @@ class _ViewProfileView extends StatelessWidget {
                     SizedBox(height: 20.h),
                     switch (state.selectedTab) {
                       ViewProfileTab.photos => ViewProfilePhotosTab(
-                          photoColors: state.photoColors,
+                          photos: state.photos,
+                          onPhotoTap: (photo) =>
+                              controller.openPhoto(context, photo),
                         ),
                       ViewProfileTab.map => ViewProfileMapTab(
                           pins: state.mapPins,

@@ -7,11 +7,13 @@ import 'explore_section_header.dart';
 class ExploreFeaturedRoutesSection extends StatelessWidget {
   final ExploreFeaturedRoute route;
   final VoidCallback onAllEvents;
+  final VoidCallback? onRouteTap;
 
   const ExploreFeaturedRoutesSection({
     super.key,
     required this.route,
     required this.onAllEvents,
+    this.onRouteTap,
   });
 
   @override
@@ -26,7 +28,7 @@ class ExploreFeaturedRoutesSection extends StatelessWidget {
           onAction: onAllEvents,
         ),
         SizedBox(height: 12.h),
-        ExploreRouteCard(route: route),
+        ExploreRouteCard(route: route, onTap: onRouteTap),
       ],
     );
   }

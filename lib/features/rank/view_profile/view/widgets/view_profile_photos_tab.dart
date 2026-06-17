@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/shared/model/check_in_photo_model.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
 class ViewProfilePhotosTab extends StatelessWidget {
-  final List<Color> photoColors;
+  final List<CheckInPhoto> photos;
+  final ValueChanged<CheckInPhoto> onPhotoTap;
 
-  const ViewProfilePhotosTab({super.key, required this.photoColors});
+  const ViewProfilePhotosTab({
+    super.key,
+    required this.photos,
+    required this.onPhotoTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +19,7 @@ class ViewProfilePhotosTab extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '${photoColors.length} CHECK-IN PHOTOS',
+          '${photos.length} CHECK-IN PHOTOS',
           style: TextStyle(
             color: AppColors.levelGrey,
             fontSize: 12.sp,
@@ -31,17 +37,25 @@ class ViewProfilePhotosTab extends StatelessWidget {
             mainAxisSpacing: 8.h,
             childAspectRatio: 1,
           ),
-          itemCount: photoColors.length,
+          itemCount: photos.length,
           itemBuilder: (context, index) {
-            return Container(
-              decoration: BoxDecoration(
-                color: photoColors[index],
+            final photo = photos[index];
+            return Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => onPhotoTap(photo),
                 borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Icon(
-                Icons.image_outlined,
-                color: AppColors.white.withValues(alpha: 0.5),
-                size: 24.sp,
+                child: Ink(
+                  decoration: BoxDecoration(
+                    color: photo.previewColor,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Icon(
+                    Icons.image_outlined,
+                    color: AppColors.white.withValues(alpha: 0.5),
+                    size: 24.sp,
+                  ),
+                ),
               ),
             );
           },

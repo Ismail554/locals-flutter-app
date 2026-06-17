@@ -5,25 +5,19 @@ class MapSearchModel {
 
   const MapSearchModel({
     this.query = '',
-    this.recentSearches = const [
-      'Bunkers del Carmel',
-      'Café del Born',
-      'Vermouth',
-    ],
-    this.trendingSearches = const [
-      'Sant Antoni',
-      'Modernist',
-      'Sunset spots',
-      'Tapas',
-      'Vermouth bars',
-    ],
+    this.recentSearches = const [],
+    this.trendingSearches = const [],
   });
 
-  MapSearchModel copyWith({String? query}) {
+  MapSearchModel copyWith({
+    String? query,
+    List<String>? recentSearches,
+    List<String>? trendingSearches,
+  }) {
     return MapSearchModel(
       query: query ?? this.query,
-      recentSearches: recentSearches,
-      trendingSearches: trendingSearches,
+      recentSearches: recentSearches ?? this.recentSearches,
+      trendingSearches: trendingSearches ?? this.trendingSearches,
     );
   }
 }

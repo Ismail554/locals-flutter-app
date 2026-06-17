@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:locals/features/map/map/model/map_model.dart';
+import 'package:locals/shared/model/map_pin_info.dart';
+import 'package:locals/shared/model/map_pin_tag.dart';
+import 'package:locals/shared/model/check_in_photo_model.dart';
 
 enum ViewProfileTab { photos, map, achievements }
 
@@ -15,52 +17,96 @@ class ViewProfileAchievement {
   });
 }
 
-class ViewProfileMapPin {
-  final double x;
-  final double y;
-  final MapPinType type;
-
-  const ViewProfileMapPin({
-    required this.x,
-    required this.y,
-    required this.type,
-  });
-}
-
 class ViewProfileModel {
   final String name;
   final int level;
   final String location;
   final bool hasStory;
   final bool isFollowing;
+  final String? storyUserId;
   final int visits;
   final int followers;
   final int cities;
   final ViewProfileTab selectedTab;
-  final List<Color> photoColors;
+  final List<CheckInPhoto> photos;
   final List<ViewProfileAchievement> achievements;
-  final List<ViewProfileMapPin> mapPins;
+  final List<MapPinInfo> mapPins;
 
   const ViewProfileModel({
     this.name = 'Marta',
     this.level = 18,
     this.location = 'Barcelona',
     this.hasStory = true,
+    this.storyUserId = 'marta',
     this.isFollowing = false,
     this.visits = 63,
     this.followers = 456,
     this.cities = 3,
     this.selectedTab = ViewProfileTab.photos,
-    this.photoColors = const [
-      Color(0xFFD4A574),
-      Color(0xFF7EB8DA),
-      Color(0xFFE8A0A0),
-      Color(0xFF9BB5CE),
-      Color(0xFFC4B5A0),
-      Color(0xFF8FA89A),
-      Color(0xFFB8C8D8),
-      Color(0xFFD8C8B8),
-      Color(0xFFA8B8C8),
+    this.photos = const [
+      CheckInPhoto(
+        previewColor: Color(0xFFD4A574),
+        locationName: 'Cafe',
+        timeAgo: '2d ago',
+        caption: 'Best cortado in the Born.',
+        likes: 24,
+      ),
+      CheckInPhoto(
+        previewColor: Color(0xFF7EB8DA),
+        locationName: 'Bakery',
+        timeAgo: '4d ago',
+        caption: 'Morning pastries run.',
+        likes: 18,
+      ),
+      CheckInPhoto(
+        previewColor: Color(0xFFE8A0A0),
+        locationName: 'Restaurant',
+        timeAgo: '1w ago',
+        caption: 'Dinner with friends.',
+        likes: 31,
+      ),
+      CheckInPhoto(
+        previewColor: Color(0xFF9BB5CE),
+        locationName: 'Park',
+        timeAgo: '1w ago',
+        caption: 'Sunset walk.',
+        likes: 12,
+      ),
+      CheckInPhoto(
+        previewColor: Color(0xFFC4B5A0),
+        locationName: 'Market',
+        timeAgo: '2w ago',
+        caption: 'Fresh produce haul.',
+        likes: 9,
+      ),
+      CheckInPhoto(
+        previewColor: Color(0xFF8FA89A),
+        locationName: 'Bar',
+        timeAgo: '3w ago',
+        caption: 'Friday night spot.',
+        likes: 42,
+      ),
+      CheckInPhoto(
+        previewColor: Color(0xFFB8C8D8),
+        locationName: 'Cafe',
+        timeAgo: '3w ago',
+        caption: 'Quiet corner table.',
+        likes: 15,
+      ),
+      CheckInPhoto(
+        previewColor: Color(0xFFD8C8B8),
+        locationName: 'Bakery',
+        timeAgo: '1mo ago',
+        caption: 'Weekend brunch.',
+        likes: 27,
+      ),
+      CheckInPhoto(
+        previewColor: Color(0xFFA8B8C8),
+        locationName: 'Restaurant',
+        timeAgo: '1mo ago',
+        caption: 'New tasting menu.',
+        likes: 36,
+      ),
     ],
     this.achievements = const [
       ViewProfileAchievement(
@@ -85,12 +131,60 @@ class ViewProfileModel {
       ),
     ],
     this.mapPins = const [
-      ViewProfileMapPin(x: 0.22, y: 0.18, type: MapPinType.red),
-      ViewProfileMapPin(x: 0.72, y: 0.14, type: MapPinType.greyStar),
-      ViewProfileMapPin(x: 0.48, y: 0.28, type: MapPinType.greyDot),
-      ViewProfileMapPin(x: 0.35, y: 0.42, type: MapPinType.darkStar),
-      ViewProfileMapPin(x: 0.62, y: 0.38, type: MapPinType.red),
-      ViewProfileMapPin(x: 0.18, y: 0.55, type: MapPinType.greyStar),
+      MapPinInfo(
+        id: 'cafe_del_born',
+        name: 'Café del Born',
+        level: 12,
+        x: 0.22,
+        y: 0.18,
+        tag: MapPinTag.business,
+        visited: true,
+      ),
+      MapPinInfo(
+        id: 'parc_guell',
+        name: 'Parc Güell',
+        level: 8,
+        x: 0.72,
+        y: 0.14,
+        tag: MapPinTag.pointOfInterest,
+        visited: false,
+      ),
+      MapPinInfo(
+        id: 'forn_baluard',
+        name: 'Forn Baluard',
+        level: 6,
+        x: 0.48,
+        y: 0.28,
+        tag: MapPinTag.business,
+        visited: false,
+      ),
+      MapPinInfo(
+        id: 'casa_batllo',
+        name: 'Casa Batlló',
+        level: 16,
+        x: 0.35,
+        y: 0.42,
+        tag: MapPinTag.sponsoredOrEvent,
+        visited: true,
+      ),
+      MapPinInfo(
+        id: 'bar_marsella',
+        name: 'Bar Marsella',
+        level: 10,
+        x: 0.62,
+        y: 0.38,
+        tag: MapPinTag.business,
+        visited: true,
+      ),
+      MapPinInfo(
+        id: 'sagrada',
+        name: 'Sagrada Família',
+        level: 18,
+        x: 0.18,
+        y: 0.55,
+        tag: MapPinTag.pointOfInterest,
+        visited: false,
+      ),
     ],
   });
 
@@ -103,12 +197,13 @@ class ViewProfileModel {
       level: level,
       location: location,
       hasStory: hasStory,
+      storyUserId: storyUserId,
       isFollowing: isFollowing ?? this.isFollowing,
       visits: visits,
       followers: followers,
       cities: cities,
       selectedTab: selectedTab ?? this.selectedTab,
-      photoColors: photoColors,
+      photos: photos,
       achievements: achievements,
       mapPins: mapPins,
     );

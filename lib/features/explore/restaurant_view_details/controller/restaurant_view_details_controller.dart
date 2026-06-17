@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:locals/features/map/map/model/map_screen_args.dart';
+import 'package:locals/shared/components/image_view/image_view_dialog.dart';
 import '../model/restaurant_view_details_args.dart';
 import '../model/restaurant_view_details_model.dart';
 import '../repository/restaurant_view_details_repository.dart';
@@ -28,9 +31,25 @@ class RestaurantViewDetailsController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void checkIn(BuildContext context) {
+    if (!restaurant.hasVisited) {
+      restaurant = restaurant.copyWith(hasVisited: true);
+      notifyListeners();
+    }
+
+    context.push(
+      '/points',
+      extra: restaurant.toPointsArgs(),
+    );
+  }
+
   void openDirections(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Opening directions to ${restaurant.address}')),
+    context.go(
+      '/map',
+      extra: MapScreenArgs(
+        focusedPinId: restaurant.mapPinId,
+        highlightedLocation: restaurant.toMapLocation(),
+      ),
     );
   }
 
@@ -42,5 +61,17 @@ class RestaurantViewDetailsController extends ChangeNotifier {
       imageColor: restaurant.heroColor,
       shareUrl: restaurant.shareUrl,
     );
+  }
+
+  void openPhoto(BuildContext context, RestaurantPhoto photo) {
+    ImageViewDialog.show(
+      context,
+      photo.toCheckInPhoto(_formatCategory(restaurant.category)),
+    );
+  }
+
+  String _formatCategory(String category) {
+    if (category.isEmpty) return category;
+    return category[0] + category.substring(1).toLowerCase();
   }
 }

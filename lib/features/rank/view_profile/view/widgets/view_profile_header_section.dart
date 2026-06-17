@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/shared/components/story_avatar_ring.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
 class ViewProfileHeaderSection extends StatelessWidget {
@@ -7,6 +8,8 @@ class ViewProfileHeaderSection extends StatelessWidget {
   final int level;
   final String location;
   final bool hasStory;
+  final bool isStoryViewed;
+  final VoidCallback? onAvatarTap;
 
   const ViewProfileHeaderSection({
     super.key,
@@ -14,38 +17,32 @@ class ViewProfileHeaderSection extends StatelessWidget {
     required this.level,
     required this.location,
     required this.hasStory,
+    this.isStoryViewed = false,
+    this.onAvatarTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final avatarSize = 96.w;
+    final avatar = StoryAvatarPlaceholder(
+      size: avatarSize,
+      backgroundColor: AppColors.chipUnselected,
+      iconColor: AppColors.textSecondary,
+    );
+
     return Column(
       children: [
-        Container(
-          width: 96.w,
-          height: 96.w,
-          padding: EdgeInsets.all(3.w),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: hasStory
-                ? const LinearGradient(
-                    colors: [Color(0xFFEA4D70), Color(0xFFFF8FA3)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )
-                : null,
-            border: hasStory
-                ? null
-                : Border.all(color: AppColors.borderGray, width: 2),
-            color: hasStory ? null : AppColors.chipUnselected,
-          ),
-          child: CircleAvatar(
-            backgroundColor: AppColors.chipUnselected,
-            child: Icon(
-              Icons.person,
-              color: AppColors.textSecondary,
-              size: 44.sp,
-            ),
-          ),
+        GestureDetector(
+          onTap: hasStory ? onAvatarTap : null,
+          behavior: HitTestBehavior.opaque,
+          child: hasStory
+              ? StoryAvatarRing(
+                  size: avatarSize,
+                  hasStory: true,
+                  isViewed: isStoryViewed,
+                  child: avatar,
+                )
+              : SizedBox(width: avatarSize, height: avatarSize, child: avatar),
         ),
         SizedBox(height: 12.h),
         Text(

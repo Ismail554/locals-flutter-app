@@ -2,7 +2,11 @@ import '../model/edit_profile_model.dart';
 
 abstract class EditProfileRepository {
   Future<EditProfileModel> load();
-  Future<void> saveProfile({required String name, required String location});
+  Future<void> saveProfile({
+    required String name,
+    required String location,
+    String? avatarImagePath,
+  });
   Future<bool> changePassword({
     required String currentPassword,
     required String newPassword,
@@ -10,14 +14,23 @@ abstract class EditProfileRepository {
 }
 
 class EditProfileRepositoryImpl implements EditProfileRepository {
+  EditProfileModel _profile = const EditProfileModel();
+
   @override
-  Future<EditProfileModel> load() async => const EditProfileModel();
+  Future<EditProfileModel> load() async => _profile;
 
   @override
   Future<void> saveProfile({
     required String name,
     required String location,
-  }) async {}
+    String? avatarImagePath,
+  }) async {
+    _profile = _profile.copyWith(
+      name: name,
+      location: location,
+      avatarImagePath: avatarImagePath,
+    );
+  }
 
   @override
   Future<bool> changePassword({

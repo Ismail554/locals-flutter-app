@@ -5,8 +5,13 @@ import 'package:locals/shared/theme/app_colors.dart';
 
 class RestaurantPhotosSection extends StatelessWidget {
   final List<RestaurantPhoto> photos;
+  final ValueChanged<RestaurantPhoto> onPhotoTap;
 
-  const RestaurantPhotosSection({super.key, required this.photos});
+  const RestaurantPhotosSection({
+    super.key,
+    required this.photos,
+    required this.onPhotoTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,17 +34,25 @@ class RestaurantPhotosSection extends StatelessWidget {
             itemCount: photos.length,
             separatorBuilder: (_, __) => SizedBox(width: 10.w),
             itemBuilder: (context, index) {
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(14.r),
-                child: SizedBox(
-                  width: 100.w,
-                  height: 100.h,
-                  child: ColoredBox(
-                    color: photos[index].color,
-                    child: Icon(
-                      Icons.image_outlined,
-                      color: AppColors.white.withValues(alpha: 0.5),
-                      size: 28.sp,
+              final photo = photos[index];
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => onPhotoTap(photo),
+                  borderRadius: BorderRadius.circular(14.r),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14.r),
+                    child: SizedBox(
+                      width: 100.w,
+                      height: 100.h,
+                      child: ColoredBox(
+                        color: photo.color,
+                        child: Icon(
+                          Icons.image_outlined,
+                          color: AppColors.white.withValues(alpha: 0.5),
+                          size: 28.sp,
+                        ),
+                      ),
                     ),
                   ),
                 ),

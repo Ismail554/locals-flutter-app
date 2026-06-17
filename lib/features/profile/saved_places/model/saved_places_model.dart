@@ -20,16 +20,16 @@ class SavedPlacesModel {
   const SavedPlacesModel({
     this.places = const [
       SavedPlace(
-        id: 'cafe',
+        id: 'cafe_del_born',
         category: 'CAFE',
         name: 'Café del Born',
         imageColor: Color(0xFFD4C4B0),
       ),
       SavedPlace(
-        id: 'cafe2',
-        category: 'CAFE',
-        name: 'Café del Born',
-        imageColor: Color(0xFFC8B8A8),
+        id: 'forn_baluard',
+        category: 'BAKERY',
+        name: 'Forn Baluard',
+        imageColor: Color(0xFFE8D8C8),
       ),
     ],
   });

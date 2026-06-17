@@ -1,6 +1,22 @@
 import 'package:flutter/material.dart';
 
+class StoryViewer {
+  final String id;
+  final String name;
+  final DateTime viewedAt;
+  final Color avatarColor;
+
+  const StoryViewer({
+    required this.id,
+    required this.name,
+    required this.viewedAt,
+    this.avatarColor = const Color(0xFFD4A574),
+  });
+}
+
 class StorySlide {
+  static const storyLifetime = Duration(hours: 24);
+
   final String id;
   final String? imagePath;
   final Color? placeholderColor;
@@ -12,6 +28,24 @@ class StorySlide {
     this.placeholderColor,
     required this.createdAt,
   });
+
+  DateTime get expiresAt => createdAt.add(storyLifetime);
+
+  bool get isExpired => DateTime.now().isAfter(expiresAt);
+
+  Duration get timeRemaining {
+    final remaining = expiresAt.difference(DateTime.now());
+    return remaining.isNegative ? Duration.zero : remaining;
+  }
+
+  String get remainingLabel {
+    final remaining = timeRemaining;
+    if (remaining == Duration.zero) return 'Expired';
+    if (remaining.inMinutes < 1) return 'Expiring soon';
+    if (remaining.inHours < 1) return '${remaining.inMinutes}m left';
+    if (remaining.inHours < 24) return '${remaining.inHours}h left';
+    return '${remaining.inDays}d left';
+  }
 
   StorySlide copyWith({
     String? imagePath,
@@ -34,6 +68,7 @@ class ExploreStory {
   final bool isViewed;
   final bool isLikedByMe;
   final int likeCount;
+  final List<StoryViewer> viewers;
 
   const ExploreStory({
     required this.id,
@@ -43,15 +78,20 @@ class ExploreStory {
     this.isViewed = false,
     this.isLikedByMe = false,
     this.likeCount = 0,
+    this.viewers = const [],
   });
 
-  bool get hasStory => slides.isNotEmpty;
+  List<StorySlide> get activeSlides =>
+      slides.where((slide) => !slide.isExpired).toList();
+
+  bool get hasStory => activeSlides.isNotEmpty;
 
   ExploreStory copyWith({
     List<StorySlide>? slides,
     bool? isViewed,
     bool? isLikedByMe,
     int? likeCount,
+    List<StoryViewer>? viewers,
   }) {
     return ExploreStory(
       id: id,
@@ -61,6 +101,7 @@ class ExploreStory {
       isViewed: isViewed ?? this.isViewed,
       isLikedByMe: isLikedByMe ?? this.isLikedByMe,
       likeCount: likeCount ?? this.likeCount,
+      viewers: viewers ?? this.viewers,
     );
   }
 }
@@ -119,12 +160,14 @@ class ExploreFeaturedLocation {
 }
 
 class ExploreNewLocal {
+  final String id;
   final String category;
   final String name;
   final String address;
   final Color imageColor;
 
   const ExploreNewLocal({
+    required this.id,
     required this.category,
     required this.name,
     required this.address,
@@ -133,12 +176,14 @@ class ExploreNewLocal {
 }
 
 class ExploreFeaturedRoute {
+  final String id;
   final String label;
   final String title;
   final String subtitle;
   final Color imageColor;
 
   const ExploreFeaturedRoute({
+    required this.id,
     required this.label,
     required this.title,
     required this.subtitle,
@@ -147,63 +192,66 @@ class ExploreFeaturedRoute {
 }
 
 class ExploreModel {
-  static final List<ExploreStory> defaultStories = [
-    const ExploreStory(id: 'you', name: 'Your story', isYourStory: true),
-    ExploreStory(
-      id: 'marta',
-      name: 'Marta',
-      slides: [
-        StorySlide(
-          id: 'm1',
-          placeholderColor: const Color(0xFFD4A574),
-          createdAt: DateTime(2026, 6, 12, 9, 30),
-        ),
-        StorySlide(
-          id: 'm2',
-          placeholderColor: const Color(0xFF7EB8DA),
-          createdAt: DateTime(2026, 6, 12, 9, 31),
-        ),
-      ],
-      likeCount: 24,
-    ),
-    ExploreStory(
-      id: 'aina',
-      name: 'Aina',
-      slides: [
-        StorySlide(
-          id: 'a1',
-          placeholderColor: const Color(0xFFE8A0A0),
-          createdAt: DateTime(2026, 6, 12, 8, 15),
-        ),
-      ],
-      likeCount: 12,
-    ),
-    ExploreStory(
-      id: 'joan',
-      name: 'Joan',
-      slides: [
-        StorySlide(
-          id: 'j1',
-          placeholderColor: const Color(0xFFC8D8B8),
-          createdAt: DateTime(2026, 6, 11, 20, 0),
-        ),
-      ],
-      isViewed: true,
-      likeCount: 8,
-    ),
-    ExploreStory(
-      id: 'paul',
-      name: 'Paul',
-      slides: [
-        StorySlide(
-          id: 'p1',
-          placeholderColor: const Color(0xFFB8C8D8),
-          createdAt: DateTime(2026, 6, 11, 18, 45),
-        ),
-      ],
-      likeCount: 5,
-    ),
-  ];
+  static List<ExploreStory> get defaultStories {
+    final now = DateTime.now();
+    return [
+      const ExploreStory(id: 'you', name: 'Your story', isYourStory: true),
+      ExploreStory(
+        id: 'marta',
+        name: 'Marta',
+        slides: [
+          StorySlide(
+            id: 'm1',
+            placeholderColor: const Color(0xFFD4A574),
+            createdAt: now.subtract(const Duration(hours: 2)),
+          ),
+          StorySlide(
+            id: 'm2',
+            placeholderColor: const Color(0xFF7EB8DA),
+            createdAt: now.subtract(const Duration(hours: 1, minutes: 45)),
+          ),
+        ],
+        likeCount: 24,
+      ),
+      ExploreStory(
+        id: 'aina',
+        name: 'Aina',
+        slides: [
+          StorySlide(
+            id: 'a1',
+            placeholderColor: const Color(0xFFE8A0A0),
+            createdAt: now.subtract(const Duration(hours: 5)),
+          ),
+        ],
+        likeCount: 12,
+      ),
+      ExploreStory(
+        id: 'joan',
+        name: 'Joan',
+        slides: [
+          StorySlide(
+            id: 'j1',
+            placeholderColor: const Color(0xFFC8D8B8),
+            createdAt: now.subtract(const Duration(hours: 10)),
+          ),
+        ],
+        isViewed: true,
+        likeCount: 8,
+      ),
+      ExploreStory(
+        id: 'paul',
+        name: 'Paul',
+        slides: [
+          StorySlide(
+            id: 'p1',
+            placeholderColor: const Color(0xFFB8C8D8),
+            createdAt: now.subtract(const Duration(hours: 18)),
+          ),
+        ],
+        likeCount: 5,
+      ),
+    ];
+  }
 
   final List<ExploreStory> stories;
   final List<ExploreRankingUser> weeklyRanking;
@@ -250,12 +298,14 @@ class ExploreModel {
     ],
     this.newLocals = const [
       ExploreNewLocal(
+        id: 'forn_baluard',
         category: 'BAKERY',
         name: 'Forn Baluard',
         address: 'Carrer del Baluard 38',
         imageColor: Color(0xFFE8D8C8),
       ),
       ExploreNewLocal(
+        id: 'sagrada_familia',
         category: 'MONUMENT',
         name: 'Sagrada Família',
         address: 'Carrer de Mallorca 401',
@@ -263,6 +313,7 @@ class ExploreModel {
       ),
     ],
     this.featuredRoute = const ExploreFeaturedRoute(
+      id: 'modernist_weekend',
       label: 'SPONSORED ROUTE',
       title: 'Modernist Trail',
       subtitle: '7 stops · 500 pts',

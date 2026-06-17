@@ -3,7 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:locals/features/explore/events_progress_map/model/events_progress_map_args.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_args.dart';
 import '../../filters/model/filters_model.dart';
-import '../model/map_mission_args.dart';
+import '../../search/repository/map_search_repository.dart';
+import '../model/map_screen_args.dart';
 import '../model/map_model.dart';
 import '../repository/map_repository.dart';
 
@@ -11,9 +12,11 @@ class MapController extends ChangeNotifier {
   final MapRepository repo;
   MapModel state;
 
-  MapController(this.repo, {MapMissionArgs? missionArgs})
+  MapController(this.repo, {MapScreenArgs? screenArgs})
       : state = MapModel(
-          activeMission: missionArgs?.toActiveMission(),
+          activeMission: screenArgs?.mission?.toActiveMission(),
+          selectedPinId: screenArgs?.focusedPinId,
+          highlightedLocation: screenArgs?.highlightedLocation,
         );
 
   void setSearchQuery(String value) {
@@ -26,12 +29,26 @@ class MapController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void onPinTap(String pinId) {
+    state = state.copyWith(
+      selectedPinId: state.selectedPinId == pinId ? null : pinId,
+    );
+    notifyListeners();
+  }
+
+  void clearSelectedPin() {
+    if (state.selectedPinId == null) return;
+    state = state.copyWith(clearSelectedPin: true);
+    notifyListeners();
+  }
+
   Future<void> openSearch(BuildContext context) async {
     final result = await context.push<String>(
       '/map_search',
       extra: state.searchQuery,
     );
     if (result != null && result.trim().isNotEmpty) {
+      MapSearchRepositoryImpl().addRecentSearch(result.trim());
       setSearchQuery(result.trim());
     }
   }
@@ -53,7 +70,8 @@ class MapController extends ChangeNotifier {
   }
 
   void openActiveLocationDetails(BuildContext context) {
-    final location = state.activeMission?.activeLocation;
+    final location =
+        state.highlightedLocation ?? state.activeMission?.activeLocation;
     if (location == null) return;
 
     context.push(

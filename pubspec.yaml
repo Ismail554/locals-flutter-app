@@ -63,6 +63,8 @@ flutter:
   assets:
     - assets/logo/
     - assets/onboard/
+    - assets/visited/
+    - assets/unvisited/
 
 
   # The following line ensures that the Material Icons font is

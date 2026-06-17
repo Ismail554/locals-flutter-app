@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:locals/features/map/map/model/map_model.dart';
+import 'package:locals/shared/model/map_pin_info.dart';
+import 'package:locals/shared/model/map_pin_tag.dart';
 
 class EventProgressStop {
   final int number;
@@ -27,25 +28,13 @@ class EventProgressStop {
   }
 }
 
-class EventProgressMapPin {
-  final double x;
-  final double y;
-  final MapPinType type;
-
-  const EventProgressMapPin({
-    required this.x,
-    required this.y,
-    required this.type,
-  });
-}
-
 class EventsProgressMapModel {
   final String eventId;
   final String title;
   final int totalStops;
   final int completedStops;
   final List<EventProgressStop> stops;
-  final List<EventProgressMapPin> pins;
+  final List<MapPinInfo> pins;
 
   const EventsProgressMapModel({
     required this.eventId,
@@ -92,13 +81,69 @@ class EventsProgressMapModel {
   }
 
   static const _defaultPins = [
-    EventProgressMapPin(x: 0.22, y: 0.18, type: MapPinType.red),
-    EventProgressMapPin(x: 0.72, y: 0.14, type: MapPinType.greyStar),
-    EventProgressMapPin(x: 0.48, y: 0.28, type: MapPinType.greyDot),
-    EventProgressMapPin(x: 0.35, y: 0.42, type: MapPinType.darkStar),
-    EventProgressMapPin(x: 0.62, y: 0.38, type: MapPinType.red),
-    EventProgressMapPin(x: 0.18, y: 0.55, type: MapPinType.greyStar),
-    EventProgressMapPin(x: 0.78, y: 0.52, type: MapPinType.greyStar),
+    MapPinInfo(
+      id: 'cafe_del_born',
+      name: 'Café del Born',
+      level: 12,
+      x: 0.22,
+      y: 0.18,
+      tag: MapPinTag.business,
+      visited: true,
+    ),
+    MapPinInfo(
+      id: 'parc_guell',
+      name: 'Parc Güell',
+      level: 8,
+      x: 0.72,
+      y: 0.14,
+      tag: MapPinTag.pointOfInterest,
+      visited: false,
+    ),
+    MapPinInfo(
+      id: 'forn_baluard',
+      name: 'Forn Baluard',
+      level: 6,
+      x: 0.48,
+      y: 0.28,
+      tag: MapPinTag.business,
+      visited: false,
+    ),
+    MapPinInfo(
+      id: 'casa_batllo',
+      name: 'Casa Batlló',
+      level: 16,
+      x: 0.35,
+      y: 0.42,
+      tag: MapPinTag.sponsoredOrEvent,
+      visited: true,
+    ),
+    MapPinInfo(
+      id: 'bar_marsella',
+      name: 'Bar Marsella',
+      level: 10,
+      x: 0.62,
+      y: 0.38,
+      tag: MapPinTag.business,
+      visited: true,
+    ),
+    MapPinInfo(
+      id: 'sagrada',
+      name: 'Sagrada Família',
+      level: 18,
+      x: 0.18,
+      y: 0.55,
+      tag: MapPinTag.pointOfInterest,
+      visited: false,
+    ),
+    MapPinInfo(
+      id: 'modernist_trail',
+      name: 'Modernist Trail',
+      level: 14,
+      x: 0.78,
+      y: 0.52,
+      tag: MapPinTag.sponsoredOrEvent,
+      visited: false,
+    ),
   ];
 
   static EventsProgressMapModel byEventId(String eventId) {

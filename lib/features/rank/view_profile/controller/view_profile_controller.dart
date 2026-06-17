@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:locals/shared/components/image_view/image_view_dialog.dart';
+import 'package:locals/shared/model/check_in_photo_model.dart';
+import 'package:locals/shared/story/user_story_launcher.dart';
 import '../model/view_profile_model.dart';
 import '../repository/view_profile_repository.dart';
 
 class ViewProfileController extends ChangeNotifier {
   final ViewProfileRepository repo;
-  ViewProfileModel state = const ViewProfileModel();
+  ViewProfileModel state;
 
-  ViewProfileController(this.repo);
+  ViewProfileController(this.repo, {String? userId})
+      : state = repo.load(userId ?? 'marta');
+
+  bool get hasStory => UserStoryLauncher.hasStory(state.storyUserId);
+
+  bool get isStoryViewed => UserStoryLauncher.isViewed(state.storyUserId);
 
   void selectTab(ViewProfileTab tab) {
     state = state.copyWith(selectedTab: tab);
@@ -36,5 +44,16 @@ class ViewProfileController extends ChangeNotifier {
         ],
       ),
     );
+  }
+
+  void openPhoto(BuildContext context, CheckInPhoto photo) {
+    ImageViewDialog.show(context, photo);
+  }
+
+  Future<void> openStory(BuildContext context) async {
+    final storyUserId = state.storyUserId;
+    if (storyUserId == null || !hasStory) return;
+    await UserStoryLauncher.open(context, storyUserId);
+    notifyListeners();
   }
 }

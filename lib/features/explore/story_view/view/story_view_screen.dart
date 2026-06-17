@@ -5,6 +5,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/story_view_controller.dart';
 import '../model/story_view_args.dart';
 import 'widgets/story_reaction_bar.dart';
+import 'widgets/story_viewer_insights_bar.dart';
 import 'widgets/story_slide_image.dart';
 import 'widgets/story_viewer_header.dart';
 
@@ -114,7 +115,21 @@ class _StoryViewBodyState extends State<_StoryViewBody> {
                   size: 96.sp,
                 ),
               ),
-            if (!controller.isYourStory)
+            if (controller.isYourStory)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: SafeArea(
+                  top: false,
+                  child: StoryViewerInsightsBar(
+                    viewerCount: controller.viewerCount,
+                    onViewersTap: () => controller.openViewersSheet(context),
+                    onDelete: () => controller.deleteCurrentSlide(context),
+                  ),
+                ),
+              )
+            else if (!controller.isYourStory)
               Positioned(
                 left: 0,
                 right: 0,
