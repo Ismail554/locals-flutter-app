@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class NeumorphicBackButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -25,7 +26,7 @@ class NeumorphicBackButton extends StatelessWidget {
           Icon(Icons.arrow_back_ios_new, size: 16.sp, color: AppColors.black),
           SizedBox(width: 4.w),
           Text(
-            'Back',
+            context.l10n.commonBack,
             style: TextStyle(
               color: AppColors.black,
               fontSize: 14.sp,

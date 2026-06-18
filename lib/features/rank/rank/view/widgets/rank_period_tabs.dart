@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/rank_model.dart';
 
@@ -13,14 +14,15 @@ class RankPeriodTabs extends StatelessWidget {
     required this.onSelected,
   });
 
-  static const _labels = {
-    RankPeriod.weekly: 'Weekly',
-    RankPeriod.monthly: 'Monthly',
-    RankPeriod.allTime: 'All-time',
-  };
-
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final labels = {
+      RankPeriod.weekly: l10n.rankPeriodWeekly,
+      RankPeriod.monthly: l10n.rankPeriodMonthly,
+      RankPeriod.allTime: l10n.rankPeriodAllTime,
+    };
+
     return Row(
       children: RankPeriod.values.map((period) {
         final isSelected = period == selected;
@@ -45,8 +47,7 @@ class RankPeriodTabs extends StatelessWidget {
                       )
                     : null,
                 child: Text(
-                  _labels[period]!,
-                  textAlign: TextAlign.center,
+                  labels[period]!,
                   style: TextStyle(
                     color: isSelected ? AppColors.actionPink : AppColors.black,
                     fontSize: 14.sp,

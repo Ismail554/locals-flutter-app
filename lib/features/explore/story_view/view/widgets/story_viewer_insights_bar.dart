@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class StoryViewerInsightsBar extends StatelessWidget {
   final int viewerCount;
@@ -56,7 +57,7 @@ class StoryViewerInsightsBar extends StatelessWidget {
           const Spacer(),
           IconButton(
             onPressed: onDelete,
-            tooltip: 'Delete this story',
+            tooltip: context.l10n.storyDeleteTooltip,
             icon: Icon(
               Icons.delete_outline,
               color: AppColors.white,

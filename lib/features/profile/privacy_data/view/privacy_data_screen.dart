@@ -9,6 +9,7 @@ import '../repository/privacy_data_repository.dart';
 import 'widgets/privacy_delete_account_button.dart';
 import 'widgets/privacy_encryption_banner.dart';
 import 'widgets/privacy_legal_links.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class PrivacyDataScreen extends StatelessWidget {
   const PrivacyDataScreen({super.key});
@@ -29,7 +30,6 @@ class _PrivacyDataView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<PrivacyDataController>();
-    final state = controller.state;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -39,7 +39,7 @@ class _PrivacyDataView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Privacy & Data',
+                title: context.l10n.privacyDataTitle,
                 onBack: () => context.pop(),
               ),
             ),
@@ -52,8 +52,8 @@ class _PrivacyDataView extends StatelessWidget {
                 child: Column(
                   children: [
                     PrivacyEncryptionBanner(
-                      title: state.encryptionTitle,
-                      subtitle: state.encryptionSubtitle,
+                      title: context.l10n.privacyDataEncryptedTitle,
+                      subtitle: context.l10n.privacyDataEncryptedSubtitle,
                     ),
                     SizedBox(height: 16.h),
                     PrivacyDeleteAccountButton(

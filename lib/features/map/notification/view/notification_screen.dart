@@ -7,6 +7,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/notification_controller.dart';
 import '../repository/notification_repository.dart';
 import 'widgets/notification_card.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
@@ -35,7 +36,7 @@ class _NotificationView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Notifications',
+                title: context.l10n.notificationsTitle,
                 onBack: () => context.pop(),
               ),
             ),

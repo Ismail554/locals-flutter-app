@@ -11,6 +11,7 @@ import '../repository/signup_repository.dart';
 import 'widgets/signup_form_fields.dart';
 import 'widgets/signup_header.dart';
 import 'widgets/signup_login_footer.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
@@ -70,7 +71,7 @@ class _SignupView extends StatelessWidget {
                   ),
                   SizedBox(height: 24.h),
                   PrimaryButton(
-                    label: 'Create account',
+                    label: context.l10n.signupButton,
                     onPressed: () => controller.createAccount(context),
                   ),
                   SizedBox(height: 24.h),

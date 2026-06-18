@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class VerifyOtpResendRow extends StatelessWidget {
   final VoidCallback onResend;
@@ -13,13 +14,13 @@ class VerifyOtpResendRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "Didn't receive code? ",
+          '${context.l10n.otpDidntReceiveCode} ',
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
         GestureDetector(
           onTap: onResend,
           child: Text(
-            'Resend',
+            context.l10n.otpResend,
             style: TextStyle(
               color: AppColors.primaryPink,
               fontSize: 14.sp,

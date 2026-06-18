@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/components/locals_logo.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class OnboardTopBar extends StatelessWidget {
   final bool showSkip;
@@ -29,7 +30,7 @@ class OnboardTopBar extends StatelessWidget {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: Text(
-              'Skip',
+              context.l10n.onboardSkip,
               style: TextStyle(
                 color: AppColors.onboardGrey,
                 fontSize: 16.sp,

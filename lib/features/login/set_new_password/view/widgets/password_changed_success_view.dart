@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class PasswordChangedSuccessView extends StatelessWidget {
   const PasswordChangedSuccessView({super.key});
@@ -41,7 +42,7 @@ class PasswordChangedSuccessView extends StatelessWidget {
           ),
           SizedBox(height: 32.h),
           Text(
-            'Password Changed',
+            context.l10n.setPasswordSuccessTitle,
             style: TextStyle(
               color: AppColors.white,
               fontSize: 28.sp,
@@ -50,7 +51,7 @@ class PasswordChangedSuccessView extends StatelessWidget {
           ),
           SizedBox(height: 12.h),
           Text(
-            'Your password has been changed successfully.',
+            context.l10n.setPasswordSuccessMessage,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.primaryPink,

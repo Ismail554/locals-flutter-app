@@ -7,6 +7,7 @@ import '../../find_locals/model/find_locals_args.dart';
 import '../../join_event/model/join_event_args.dart';
 import '../../restaurant_view_details/model/restaurant_view_details_args.dart';
 import '../../story_view/model/story_view_args.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ExploreController extends ChangeNotifier {
   final ExploreRepository repo;
@@ -111,12 +112,12 @@ class ExploreController extends ChangeNotifier {
           children: [
             ListTile(
               leading: const Icon(Icons.play_circle_outline),
-              title: const Text('View your story'),
+              title: Text(context.l10n.exploreViewYourStory),
               onTap: () => Navigator.pop(context, 'view'),
             ),
             ListTile(
               leading: const Icon(Icons.add_photo_alternate_outlined),
-              title: const Text('Add photo'),
+              title: Text(context.l10n.exploreAddPhoto),
               onTap: () => Navigator.pop(context, 'add'),
             ),
           ],
@@ -143,7 +144,7 @@ class ExploreController extends ChangeNotifier {
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Story added')),
+        SnackBar(content: Text(context.l10n.snackbarStoryAdded)),
       );
     }
   }

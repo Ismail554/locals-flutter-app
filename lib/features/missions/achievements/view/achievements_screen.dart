@@ -8,6 +8,7 @@ import '../controller/achievements_controller.dart';
 import '../repository/achievements_repository.dart';
 import 'widgets/achievement_grid_card.dart';
 import 'widgets/achievements_progress_card.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class AchievementsScreen extends StatelessWidget {
   const AchievementsScreen({super.key});
@@ -36,7 +37,7 @@ class _AchievementsView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Achievements',
+                title: context.l10n.achievementsTitle,
                 onBack: () => context.pop(),
               ),
             ),

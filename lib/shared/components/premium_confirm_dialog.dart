@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
 enum PremiumConfirmStyle { standard, destructive }
@@ -19,7 +20,7 @@ class PremiumConfirmDialog {
     final result = await showGeneralDialog<bool>(
       context: context,
       barrierDismissible: true,
-      barrierLabel: 'Dismiss',
+      barrierLabel: context.l10n.commonDismiss,
       barrierColor: AppColors.black.withValues(alpha: 0.45),
       transitionDuration: const Duration(milliseconds: 280),
       pageBuilder: (context, animation, secondaryAnimation) {
@@ -55,25 +56,27 @@ class PremiumConfirmDialog {
   }
 
   static Future<bool> showLogout(BuildContext context) {
+    final l10n = context.l10n;
     return show(
       context,
       icon: Icons.logout_rounded,
-      title: 'Log out?',
-      message:
-          'You will need to sign in again to access your profile, missions, and saved places.',
-      confirmLabel: 'Log out',
+      title: l10n.dialogLogoutTitle,
+      message: l10n.dialogLogoutMessage,
+      confirmLabel: l10n.dialogLogoutConfirm,
+      cancelLabel: l10n.commonCancel,
       style: PremiumConfirmStyle.standard,
     );
   }
 
   static Future<bool> showDeleteAccount(BuildContext context) {
+    final l10n = context.l10n;
     return show(
       context,
       icon: Icons.delete_forever_rounded,
-      title: 'Delete account?',
-      message:
-          'This permanently removes your profile, progress, and saved data. This action cannot be undone.',
-      confirmLabel: 'Delete account',
+      title: l10n.dialogDeleteAccountTitle,
+      message: l10n.dialogDeleteAccountMessage,
+      confirmLabel: l10n.dialogDeleteAccountConfirm,
+      cancelLabel: l10n.commonCancel,
       style: PremiumConfirmStyle.destructive,
     );
   }

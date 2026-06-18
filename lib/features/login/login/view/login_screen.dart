@@ -12,6 +12,7 @@ import 'widgets/login_form_fields.dart';
 import 'widgets/login_options_row.dart';
 import 'widgets/login_signup_footer.dart';
 import 'widgets/login_welcome_header.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -76,7 +77,7 @@ class _LoginView extends StatelessWidget {
                   ),
                   SizedBox(height: 24.h),
                   PrimaryButton(
-                    label: 'Log in',
+                    label: context.l10n.loginButton,
                     onPressed: () => controller.login(context),
                   ),
                   SizedBox(height: 24.h),

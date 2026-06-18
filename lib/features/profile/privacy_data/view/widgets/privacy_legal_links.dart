@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class PrivacyLegalLinks extends StatelessWidget {
   final VoidCallback onPrivacyPolicy;
@@ -27,12 +28,12 @@ class PrivacyLegalLinks extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: onPrivacyPolicy,
-          child: Text('Privacy policy', style: linkStyle),
+          child: Text(context.l10n.privacyPolicyLink, style: linkStyle),
         ),
         SizedBox(width: 32.w),
         GestureDetector(
           onTap: onTermsOfUse,
-          child: Text('Terms of use', style: linkStyle),
+          child: Text(context.l10n.termsOfUseLink, style: linkStyle),
         ),
       ],
     );

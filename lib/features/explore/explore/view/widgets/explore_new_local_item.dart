@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/explore_model.dart';
 
@@ -48,7 +49,7 @@ class ExploreNewLocalItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'NEW · ${local.category}',
+                    context.l10n.exploreNewCategory(local.category),
                     style: TextStyle(
                       color: AppColors.actionPink,
                       fontSize: 11.sp,

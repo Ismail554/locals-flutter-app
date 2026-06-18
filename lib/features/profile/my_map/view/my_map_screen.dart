@@ -10,6 +10,7 @@ import '../controller/my_map_controller.dart';
 import '../model/my_map_model.dart';
 import '../repository/my_map_repository.dart';
 import 'widgets/my_map_legend.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class MyMapScreen extends StatelessWidget {
   const MyMapScreen({super.key});
@@ -39,7 +40,7 @@ class _MyMapView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'My map',
+                title: context.l10n.myMapTitle,
                 onBack: () => context.pop(),
               ),
             ),
@@ -49,15 +50,15 @@ class _MyMapView extends StatelessWidget {
               child: ProfileSegmentedControl(
                 options: [
                   ProfileSegmentOption(
-                    label: 'All',
+                    label: context.l10n.myMapFilterAll,
                     value: MyMapFilter.all.name,
                   ),
                   ProfileSegmentOption(
-                    label: 'visited · ${state.visitedCount}',
+                    label: context.l10n.myMapFilterVisited(state.visitedCount),
                     value: MyMapFilter.visited.name,
                   ),
                   ProfileSegmentOption(
-                    label: 'Unvisited · ${state.unvisitedCount}',
+                    label: context.l10n.myMapFilterUnvisited(state.unvisitedCount),
                     value: MyMapFilter.unvisited.name,
                   ),
                 ],

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/core/permissions/camera_permission.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ShareCardCameraScreen extends StatefulWidget {
   const ShareCardCameraScreen({super.key});
@@ -34,7 +35,7 @@ class _ShareCardCameraScreenState extends State<ShareCardCameraScreen> {
       final cameras = await availableCameras();
       if (cameras.isEmpty) {
         setState(() {
-          _errorMessage = 'No camera available on this device.';
+          _errorMessage = context.l10n.cameraNoAvailable;
           _initializing = false;
         });
         return;
@@ -66,7 +67,7 @@ class _ShareCardCameraScreenState extends State<ShareCardCameraScreen> {
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _errorMessage = 'Could not open the camera. Please try again.';
+        _errorMessage = context.l10n.cameraCouldNotOpen;
         _initializing = false;
       });
     }
@@ -91,7 +92,7 @@ class _ShareCardCameraScreenState extends State<ShareCardCameraScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to capture photo')),
+          SnackBar(content: Text(context.l10n.snackbarCaptureFailed)),
         );
       }
     } finally {

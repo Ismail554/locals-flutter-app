@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/explore_model.dart';
 import 'follow_user_avatar.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ExploreFollowCard extends StatelessWidget {
   final ExploreFollowUser user;
@@ -84,7 +85,7 @@ class ExploreFollowCard extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        user.isFollowing ? 'Following' : 'Follow',
+                        user.isFollowing ? context.l10n.commonFollowing : context.l10n.commonFollow,
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.w600,

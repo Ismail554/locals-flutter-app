@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/shared/model/legal_document_section.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
@@ -19,7 +20,7 @@ class LegalDocumentBody extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
       children: [
         Text(
-          'Last updated: $lastUpdated',
+          context.l10n.legalLastUpdated(lastUpdated),
           style: TextStyle(
             color: AppColors.textSecondary,
             fontSize: 13.sp,

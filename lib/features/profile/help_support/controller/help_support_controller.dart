@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../model/help_support_model.dart';
 import '../repository/help_support_repository.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class HelpSupportController extends ChangeNotifier {
   final HelpSupportRepository repo;
@@ -25,7 +26,7 @@ class HelpSupportController extends ChangeNotifier {
 
     if (message.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please write a message')),
+        SnackBar(content: Text(context.l10n.helpWriteMessage)),
       );
       return;
     }
@@ -60,11 +61,11 @@ class HelpSupportController extends ChangeNotifier {
     if (launched) {
       messageController.clear();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Opening email app')),
+        SnackBar(content: Text(context.l10n.helpOpeningEmail)),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open email app')),
+        SnackBar(content: Text(context.l10n.helpCouldNotOpenEmail)),
       );
     }
   }

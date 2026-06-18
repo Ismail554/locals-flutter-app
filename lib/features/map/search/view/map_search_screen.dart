@@ -5,6 +5,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/map_search_controller.dart';
 import '../repository/map_search_repository.dart';
 import 'widgets/map_search_section.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class MapSearchScreen extends StatelessWidget {
   final String initialQuery;
@@ -91,7 +92,7 @@ class _MapSearchViewState extends State<_MapSearchView> {
                           color: AppColors.black,
                         ),
                         decoration: InputDecoration(
-                          hintText: 'Search locals & places',
+                          hintText: context.l10n.mapSearchHint,
                           hintStyle: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 14.sp,
@@ -110,7 +111,7 @@ class _MapSearchViewState extends State<_MapSearchView> {
                   TextButton(
                     onPressed: () => controller.cancel(context),
                     child: Text(
-                      'Cancel',
+                      context.l10n.commonCancel,
                       style: TextStyle(
                         color: AppColors.actionPink,
                         fontSize: 15.sp,
@@ -124,7 +125,7 @@ class _MapSearchViewState extends State<_MapSearchView> {
               if (state.recentSearches.isNotEmpty) ...[
                 MapSearchSection(
                   icon: Icons.history,
-                  title: 'RECENT',
+                  title: context.l10n.mapSearchRecent,
                   items: state.recentSearches,
                   onItemTap: (value) =>
                       controller.selectSuggestion(context, value),
@@ -133,7 +134,7 @@ class _MapSearchViewState extends State<_MapSearchView> {
               ],
               MapSearchSection(
                 icon: Icons.trending_up,
-                title: 'TRENDING',
+                title: context.l10n.mapSearchTrending,
                 items: state.trendingSearches,
                 onItemTap: (value) =>
                     controller.selectSuggestion(context, value),

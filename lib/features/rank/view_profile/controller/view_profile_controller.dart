@@ -4,6 +4,7 @@ import 'package:locals/shared/model/check_in_photo_model.dart';
 import 'package:locals/shared/story/user_story_launcher.dart';
 import '../model/view_profile_model.dart';
 import '../repository/view_profile_repository.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ViewProfileController extends ChangeNotifier {
   final ViewProfileRepository repo;
@@ -30,16 +31,16 @@ class ViewProfileController extends ChangeNotifier {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Block user'),
-        content: Text('Block ${state.name}? They will not be able to see your profile.'),
+        title: Text(context.l10n.blockUserTitle),
+        content: Text(context.l10n.blockUserMessage(state.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Block'),
+            child: Text(context.l10n.blockUserConfirm),
           ),
         ],
       ),

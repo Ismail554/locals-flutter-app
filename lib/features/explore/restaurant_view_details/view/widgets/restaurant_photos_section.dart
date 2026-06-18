@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_model.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class RestaurantPhotosSection extends StatelessWidget {
   final List<RestaurantPhoto> photos;
@@ -19,7 +20,7 @@ class RestaurantPhotosSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Photos',
+          context.l10n.restaurantPhotos,
           style: TextStyle(
             color: AppColors.black,
             fontSize: 18.sp,

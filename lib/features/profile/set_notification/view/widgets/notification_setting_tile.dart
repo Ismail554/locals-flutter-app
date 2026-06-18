@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
-import '../../model/set_notification_model.dart';
 
 class NotificationSettingTile extends StatelessWidget {
-  final NotificationSetting setting;
+  final String title;
+  final String subtitle;
+  final bool enabled;
   final ValueChanged<bool> onChanged;
 
   const NotificationSettingTile({
     super.key,
-    required this.setting,
+    required this.title,
+    required this.subtitle,
+    required this.enabled,
     required this.onChanged,
   });
 
@@ -30,7 +33,7 @@ class NotificationSettingTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  setting.title,
+                  title,
                   style: TextStyle(
                     color: AppColors.black,
                     fontSize: 15.sp,
@@ -39,7 +42,7 @@ class NotificationSettingTile extends StatelessWidget {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  setting.subtitle,
+                  subtitle,
                   style: TextStyle(
                     color: AppColors.levelGrey,
                     fontSize: 13.sp,
@@ -49,7 +52,7 @@ class NotificationSettingTile extends StatelessWidget {
             ),
           ),
           Switch(
-            value: setting.enabled,
+            value: enabled,
             onChanged: onChanged,
             activeThumbColor: AppColors.white,
             activeTrackColor: AppColors.actionPink,

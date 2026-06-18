@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class RestaurantVisitorsSection extends StatelessWidget {
   final int visitorCount;
@@ -22,7 +23,7 @@ class RestaurantVisitorsSection extends StatelessWidget {
         Row(
           children: [
             Text(
-              'Visitors',
+              context.l10n.restaurantVisitors,
               style: TextStyle(
                 color: AppColors.black,
                 fontSize: 18.sp,

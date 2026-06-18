@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/mission_details_model.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class MissionDetailsHeaderCard extends StatelessWidget {
   final MissionDetailsModel mission;
@@ -59,7 +60,7 @@ class MissionDetailsHeaderCard extends StatelessWidget {
                 flex: 1,
                 fit: FlexFit.tight,
                 child: _InfoBox(
-                  label: 'REWARD',
+                  label: context.l10n.statReward,
                   value: '+${mission.reward}',
                 ),
               ),
@@ -68,7 +69,7 @@ class MissionDetailsHeaderCard extends StatelessWidget {
                 flex: 1,
                 fit: FlexFit.tight,
                 child: _InfoBox(
-                  label: 'STOPS',
+                  label: context.l10n.statStops,
                   value: '${mission.totalStops}',
                 ),
               ),
@@ -77,7 +78,7 @@ class MissionDetailsHeaderCard extends StatelessWidget {
                 flex: 1,
                 fit: FlexFit.tight,
                 child: _InfoBox(
-                  label: 'LEVEL',
+                  label: context.l10n.statLevel,
                   value: mission.level,
                 ),
               ),

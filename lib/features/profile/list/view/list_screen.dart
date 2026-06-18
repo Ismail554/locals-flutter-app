@@ -9,6 +9,7 @@ import '../controller/list_controller.dart';
 import '../model/list_model.dart';
 import '../repository/list_repository.dart';
 import 'widgets/list_user_item.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ListScreen extends StatelessWidget {
   const ListScreen({super.key});
@@ -38,7 +39,7 @@ class _ListView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'List',
+                title: context.l10n.listTitle,
                 onBack: () => context.pop(),
                 trailing: Icon(Icons.more_horiz, color: AppColors.black, size: 24.sp),
               ),
@@ -49,11 +50,11 @@ class _ListView extends StatelessWidget {
               child: ProfileSegmentedControl(
                 options: [
                   ProfileSegmentOption(
-                    label: 'Followers · ${state.followersCount}',
+                    label: context.l10n.listFollowersCount(state.followersCount),
                     value: ListTab.followers.name,
                   ),
                   ProfileSegmentOption(
-                    label: 'Following · ${state.followingCount}',
+                    label: context.l10n.listFollowingCount(state.followingCount),
                     value: ListTab.following.name,
                   ),
                 ],

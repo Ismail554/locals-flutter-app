@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/manage_subscription_model.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SubscriptionBillingSection extends StatelessWidget {
   final List<BillingHistoryItem> items;
@@ -14,7 +15,7 @@ class SubscriptionBillingSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'BILLING HISTORY',
+          context.l10n.subscriptionBillingHistory,
           style: TextStyle(
             color: AppColors.levelGrey,
             fontSize: 12.sp,

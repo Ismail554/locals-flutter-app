@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ShareCardPreview extends StatelessWidget {
   final Color previewColor;
@@ -64,7 +65,7 @@ class ShareCardPreview extends StatelessWidget {
                       ),
                       SizedBox(height: 8.h),
                       Text(
-                        'Tap to capture',
+                        context.l10n.shareCardTapToCapture,
                         style: TextStyle(
                           color: AppColors.white.withValues(alpha: 0.8),
                           fontSize: 13.sp,

@@ -7,6 +7,7 @@ import 'package:locals/shared/components/profile_screen_header.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/terms_of_use_controller.dart';
 import '../repository/terms_of_use_repository.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class TermsOfUseScreen extends StatelessWidget {
   const TermsOfUseScreen({super.key});
@@ -35,7 +36,7 @@ class _TermsOfUseView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Terms of use',
+                title: context.l10n.termsOfUseTitle,
                 onBack: () => context.pop(),
               ),
             ),

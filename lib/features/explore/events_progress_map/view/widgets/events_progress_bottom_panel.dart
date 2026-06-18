@@ -4,6 +4,7 @@ import 'package:locals/features/explore/events_progress_map/model/events_progres
 import 'package:locals/shared/components/map/scrollable_map_canvas.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import 'event_progress_stop_card.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class EventsProgressBottomPanel extends StatelessWidget {
   final EventsProgressMapModel state;
@@ -37,7 +38,7 @@ class EventsProgressBottomPanel extends StatelessWidget {
           Row(
             children: [
               Text(
-                'Progress',
+                context.l10n.commonProgress,
                 style: TextStyle(
                   color: AppColors.black,
                   fontSize: 16.sp,
@@ -93,7 +94,7 @@ class EventsProgressBottomPanel extends StatelessWidget {
                 ),
               ),
               child: Text(
-                state.canCheckIn ? 'Check in next stop' : 'Route complete',
+                state.canCheckIn ? context.l10n.eventCheckInNextStop : context.l10n.eventRouteComplete,
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w700,

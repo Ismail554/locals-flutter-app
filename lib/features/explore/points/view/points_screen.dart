@@ -8,6 +8,7 @@ import '../model/points_args.dart';
 import '../repository/points_repository.dart';
 import 'widgets/points_city_progress.dart';
 import 'widgets/points_success_icon.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class PointsScreen extends StatelessWidget {
   final PointsArgs? args;
@@ -49,7 +50,7 @@ class _PointsView extends StatelessWidget {
               const PointsSuccessIcon(),
               SizedBox(height: 24.h),
               Text(
-                'CHECK-IN CONFIRMED',
+                context.l10n.checkInConfirmed,
                 style: TextStyle(
                   color: AppColors.white.withValues(alpha: 0.85),
                   fontSize: 13.sp,
@@ -68,7 +69,7 @@ class _PointsView extends StatelessWidget {
                 ),
               ),
               Text(
-                'POINTS',
+                context.l10n.statPoints,
                 style: TextStyle(
                   color: AppColors.white.withValues(alpha: 0.85),
                   fontSize: 14.sp,
@@ -78,7 +79,7 @@ class _PointsView extends StatelessWidget {
               ),
               SizedBox(height: 32.h),
               Text(
-                '${state.locationName} is yours.',
+                context.l10n.checkInLocationYours(state.locationName),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.white,
@@ -88,7 +89,7 @@ class _PointsView extends StatelessWidget {
               ),
               SizedBox(height: 8.h),
               Text(
-                'Another local added to your map.',
+                context.l10n.checkInAddedToMap,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.white.withValues(alpha: 0.55),
@@ -114,7 +115,7 @@ class _PointsView extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Share moment',
+                    context.l10n.checkInShareMoment,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w700,
@@ -138,7 +139,7 @@ class _PointsView extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Continue exploring',
+                    context.l10n.checkInContinueExploring,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w600,

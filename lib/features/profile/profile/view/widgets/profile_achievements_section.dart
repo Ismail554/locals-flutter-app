@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/profile_model.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ProfileAchievementsSection extends StatelessWidget {
   final List<ProfileAchievement> achievements;
@@ -22,7 +23,7 @@ class ProfileAchievementsSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Recent achievements',
+              context.l10n.profileRecentAchievements,
               style: TextStyle(
                 color: AppColors.black,
                 fontSize: 16.sp,
@@ -33,7 +34,7 @@ class ProfileAchievementsSection extends StatelessWidget {
               onTap: onViewAll,
               behavior: HitTestBehavior.opaque,
               child: Text(
-                'View all',
+                context.l10n.commonViewAll,
                 style: TextStyle(
                   color: AppColors.actionPink,
                   fontSize: 14.sp,

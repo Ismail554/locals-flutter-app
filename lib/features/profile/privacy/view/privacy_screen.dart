@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
+import 'package:locals/core/localization/privacy_l10n.dart';
 import 'package:locals/shared/components/profile_screen_header.dart';
 import 'package:locals/shared/components/profile_segmented_control.dart';
 import 'package:locals/shared/theme/app_colors.dart';
@@ -28,6 +30,7 @@ class _PrivacyView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = context.watch<PrivacyController>();
     final state = controller.state;
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -37,7 +40,7 @@ class _PrivacyView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Privacy',
+                title: l10n.privacyTitle,
                 onBack: () => context.pop(),
               ),
             ),
@@ -49,10 +52,10 @@ class _PrivacyView extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
                 children: [
                   PrivacySettingRow(
-                    label: state.profileVisibility.label,
+                    label: PrivacyL10n.sectionLabel(l10n, state.profileVisibility),
                     options: state.profileVisibility.options
                         .map((o) => ProfileSegmentOption(
-                              label: o.label,
+                              label: PrivacyL10n.optionLabel(l10n, o.id),
                               value: o.id,
                             ))
                         .toList(),
@@ -62,10 +65,10 @@ class _PrivacyView extends StatelessWidget {
                   ),
                   SizedBox(height: 24.h),
                   PrivacySettingRow(
-                    label: state.photoVisibility.label,
+                    label: PrivacyL10n.sectionLabel(l10n, state.photoVisibility),
                     options: state.photoVisibility.options
                         .map((o) => ProfileSegmentOption(
-                              label: o.label,
+                              label: PrivacyL10n.optionLabel(l10n, o.id),
                               value: o.id,
                             ))
                         .toList(),
@@ -74,10 +77,10 @@ class _PrivacyView extends StatelessWidget {
                   ),
                   SizedBox(height: 24.h),
                   PrivacySettingRow(
-                    label: state.locationPermission.label,
+                    label: PrivacyL10n.sectionLabel(l10n, state.locationPermission),
                     options: state.locationPermission.options
                         .map((o) => ProfileSegmentOption(
-                              label: o.label,
+                              label: PrivacyL10n.optionLabel(l10n, o.id),
                               value: o.id,
                             ))
                         .toList(),
@@ -87,10 +90,11 @@ class _PrivacyView extends StatelessWidget {
                   ),
                   SizedBox(height: 24.h),
                   PrivacySettingRow(
-                    label: state.leaderboardVisibility.label,
+                    label:
+                        PrivacyL10n.sectionLabel(l10n, state.leaderboardVisibility),
                     options: state.leaderboardVisibility.options
                         .map((o) => ProfileSegmentOption(
-                              label: o.label,
+                              label: PrivacyL10n.optionLabel(l10n, o.id),
                               value: o.id,
                             ))
                         .toList(),

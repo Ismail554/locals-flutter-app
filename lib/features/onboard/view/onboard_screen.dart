@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
+import 'package:locals/core/localization/onboard_l10n.dart';
 import 'package:locals/shared/components/onboard_page_indicator.dart';
 import 'package:locals/shared/components/primary_button.dart';
 import 'package:locals/shared/components/secondary_outlined_button.dart';
@@ -11,9 +13,14 @@ import 'widgets/onboard_carousel_page.dart';
 import 'widgets/onboard_location_page.dart';
 import 'widgets/onboard_top_bar.dart';
 
-class OnboardScreen extends StatelessWidget {
+class OnboardScreen extends StatefulWidget {
   const OnboardScreen({super.key});
 
+  @override
+  State<OnboardScreen> createState() => _OnboardScreenState();
+}
+
+class _OnboardScreenState extends State<OnboardScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -23,14 +30,40 @@ class OnboardScreen extends StatelessWidget {
   }
 }
 
-class _OnboardView extends StatelessWidget {
+class _OnboardView extends StatefulWidget {
   const _OnboardView();
+
+  @override
+  State<_OnboardView> createState() => _OnboardViewState();
+}
+
+class _OnboardViewState extends State<_OnboardView> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final controller = context.read<OnboardController>();
+    if (controller.state.pages.isNotEmpty) return;
+
+    final pages = OnboardL10n.buildPages(context.l10n);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      controller.initPages(pages);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<OnboardController>();
+    if (controller.state.pages.isEmpty) {
+      return const Scaffold(
+        backgroundColor: AppColors.darkBackground,
+        body: SizedBox.shrink(),
+      );
+    }
+
     final currentPage = controller.state.pages[controller.state.currentPage];
     final isLocationPage = currentPage.isLocationPage;
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
@@ -76,7 +109,7 @@ class _OnboardView extends StatelessWidget {
                   if (isLocationPage) ...[
                     SizedBox(height: 12.h),
                     SecondaryOutlinedButton(
-                      label: 'Not now',
+                      label: l10n.onboardNotNow,
                       onPressed: () => controller.notNowPressed(context),
                     ),
                   ],

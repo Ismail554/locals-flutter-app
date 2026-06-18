@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class AchievementsProgressCard extends StatelessWidget {
   final int unlockedCount;
@@ -29,7 +30,7 @@ class AchievementsProgressCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'UNLOCKED',
+            context.l10n.achievementsUnlocked,
             style: TextStyle(
               color: AppColors.white.withValues(alpha: 0.85),
               fontSize: 11.sp,
@@ -64,7 +65,7 @@ class AchievementsProgressCard extends StatelessWidget {
           ),
           SizedBox(height: 14.h),
           Text(
-            'Keep visiting to unlock more.',
+            context.l10n.achievementsKeepVisiting,
             style: TextStyle(
               color: AppColors.white.withValues(alpha: 0.85),
               fontSize: 14.sp,

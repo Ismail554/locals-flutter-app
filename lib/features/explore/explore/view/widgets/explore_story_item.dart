@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/components/story_avatar_ring.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import '../../model/explore_model.dart';
 import 'explore_your_story_avatar.dart';
 
@@ -43,7 +44,7 @@ class ExploreStoryItem extends StatelessWidget {
               ),
             SizedBox(height: 8.h),
             Text(
-              story.name,
+              story.isYourStory ? context.l10n.exploreYourStory : story.name,
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

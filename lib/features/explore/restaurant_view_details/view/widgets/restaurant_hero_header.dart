@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_model.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
@@ -161,7 +162,7 @@ class _SealTag extends StatelessWidget {
           Icon(Icons.star, color: AppColors.white, size: 12.sp),
           SizedBox(width: 4.w),
           Text(
-            "locals' seal",
+            context.l10n.restaurantLocalsSeal,
             style: TextStyle(
               color: AppColors.white,
               fontSize: 11.sp,

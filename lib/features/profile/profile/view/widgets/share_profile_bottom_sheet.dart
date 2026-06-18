@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/components/share/share_bottom_sheet_shell.dart';
 import 'package:locals/shared/components/share/share_link_row.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ShareProfileBottomSheet extends StatelessWidget {
   final String name;
@@ -42,7 +43,7 @@ class ShareProfileBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: ShareBottomSheetShell(
-        title: 'Share your profile',
+        title: context.l10n.shareProfileTitle,
         children: [
           Container(
             padding: EdgeInsets.all(12.w),

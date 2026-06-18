@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../model/explore_model.dart';
 import 'explore_location_card.dart';
 import 'explore_section_header.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ExploreFeaturedLocationsSection extends StatelessWidget {
   final List<ExploreFeaturedLocation> locations;
@@ -23,8 +24,8 @@ class ExploreFeaturedLocationsSection extends StatelessWidget {
       children: [
         ExploreSectionHeader(
           icon: Icons.photo_outlined,
-          title: 'FEATURED LOCATIONS',
-          actionLabel: 'See all',
+          title: context.l10n.exploreFeaturedLocations,
+          actionLabel: context.l10n.commonSeeAll,
           onAction: onSeeAll,
         ),
         SizedBox(height: 12.h),

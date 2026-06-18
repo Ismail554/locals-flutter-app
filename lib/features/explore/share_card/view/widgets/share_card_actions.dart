@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ShareCardActions extends StatelessWidget {
   final bool isConfirmed;
@@ -38,7 +39,7 @@ class ShareCardActions extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onRetake,
                 icon: Icon(Icons.refresh, size: 18.sp),
-                label: const Text('Retake'),
+                label: Text(context.l10n.shareCardRetake),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.levelGrey,
                   side: const BorderSide(color: AppColors.borderGray),
@@ -59,7 +60,7 @@ class ShareCardActions extends StatelessWidget {
                   isConfirmed ? Icons.check_circle : Icons.check_circle_outline,
                   size: 18.sp,
                 ),
-                label: const Text('Confirm'),
+                label: Text(context.l10n.shareCardConfirm),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: hasImage
                       ? AppColors.actionPink
@@ -89,7 +90,7 @@ class ShareCardActions extends StatelessWidget {
               fit: FlexFit.tight,
               child: _SecondaryActionButton(
                 icon: Icons.add_circle_outline,
-                label: 'Add to Story',
+                label: context.l10n.shareCardAddToStory,
                 onTap: onAddToStory,
               ),
             ),
@@ -100,10 +101,10 @@ class ShareCardActions extends StatelessWidget {
               child: _SecondaryActionButton(
                 icon: isSaved ? Icons.check_circle_outline : Icons.download_outlined,
                 label: isSaving
-                    ? 'Saving...'
+                    ? context.l10n.shareCardSaving
                     : isSaved
-                        ? 'Saved'
-                        : 'Save Image',
+                        ? context.l10n.shareCardSaved
+                        : context.l10n.shareCardSaveImage,
                 onTap: hasImage && !isSaving ? onSaveImage : null,
               ),
             ),
@@ -123,7 +124,7 @@ class ShareCardActions extends StatelessWidget {
               ),
             ),
             child: Text(
-              'Done',
+              context.l10n.commonDone,
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w700,

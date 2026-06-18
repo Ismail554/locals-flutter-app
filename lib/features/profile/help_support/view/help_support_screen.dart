@@ -8,6 +8,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/help_support_controller.dart';
 import '../repository/help_support_repository.dart';
 import 'widgets/help_email_field.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({super.key});
@@ -38,7 +39,7 @@ class _HelpSupportView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Help & Support',
+                title: context.l10n.helpSupportTitle,
                 onBack: () => context.pop(),
               ),
             ),
@@ -50,19 +51,19 @@ class _HelpSupportView extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
                 children: [
                   HelpEmailField(
-                    label: 'Subject',
+                    label: context.l10n.helpSubjectLabel,
                     controller: controller.subjectController,
                   ),
                   SizedBox(height: 16.h),
                   HelpEmailField(
-                    label: 'Message',
+                    label: context.l10n.helpMessageLabel,
                     controller: controller.messageController,
                     maxLines: 8,
-                    hint: 'Describe your issue or question...',
+                    hint: context.l10n.helpMessageHint,
                   ),
                   SizedBox(height: 24.h),
                   PrimaryButton(
-                    label: controller.isSending ? 'Sending...' : 'Send',
+                    label: controller.isSending ? context.l10n.helpSending : context.l10n.helpSend,
                     onPressed: controller.isSending
                         ? () {}
                         : () => controller.sendEmail(context),

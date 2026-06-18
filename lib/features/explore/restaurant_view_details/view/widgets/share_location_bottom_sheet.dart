@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/components/share/share_bottom_sheet_shell.dart';
 import 'package:locals/shared/components/share/share_link_row.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ShareLocationBottomSheet extends StatelessWidget {
   final String category;
@@ -42,7 +43,7 @@ class ShareLocationBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: ShareBottomSheetShell(
-        title: 'Share the location',
+        title: context.l10n.shareLocationTitle,
         children: [
           Container(
             padding: EdgeInsets.all(12.w),

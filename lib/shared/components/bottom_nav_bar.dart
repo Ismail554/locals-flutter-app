@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
 class BottomNavBar extends StatelessWidget {
@@ -12,16 +13,24 @@ class BottomNavBar extends StatelessWidget {
     required this.onSelected,
   });
 
-  static const _items = [
-    _NavItem(Icons.map_outlined, 'Map'),
-    _NavItem(Icons.explore_outlined, 'Explore'),
-    _NavItem(Icons.adjust_outlined, 'Missions'),
-    _NavItem(Icons.emoji_events_outlined, 'Rank'),
-    _NavItem(Icons.account_circle_outlined, 'Profile'),
+  static const _icons = [
+    Icons.map_outlined,
+    Icons.explore_outlined,
+    Icons.adjust_outlined,
+    Icons.emoji_events_outlined,
+    Icons.account_circle_outlined,
   ];
 
   @override
   Widget build(BuildContext context) {
+    final labels = [
+      context.l10n.navMap,
+      context.l10n.navExplore,
+      context.l10n.navMissions,
+      context.l10n.navRank,
+      context.l10n.navProfile,
+    ];
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -44,10 +53,10 @@ class BottomNavBar extends StatelessWidget {
           height: 72.h,
           width: double.infinity,
           child: Row(
-            children: List.generate(_items.length, (index) {
-              final item = _items[index];
+            children: List.generate(_icons.length, (index) {
               final isSelected = index == selectedIndex;
-              final color = isSelected ? AppColors.navActive : AppColors.navInactive;
+              final color =
+                  isSelected ? AppColors.navActive : AppColors.navInactive;
 
               return Flexible(
                 flex: 1,
@@ -57,8 +66,9 @@ class BottomNavBar extends StatelessWidget {
                   child: InkWell(
                     onTap: () => onSelected(index),
                     borderRadius: BorderRadius.only(
-                      topLeft: index == 0 ? Radius.circular(16.r) : Radius.zero,
-                      topRight: index == _items.length - 1
+                      topLeft:
+                          index == 0 ? Radius.circular(16.r) : Radius.zero,
+                      topRight: index == _icons.length - 1
                           ? Radius.circular(16.r)
                           : Radius.zero,
                     ),
@@ -69,19 +79,20 @@ class BottomNavBar extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Icon(
-                            item.icon,
+                            _icons[index],
                             color: color,
                             size: 26.sp,
                           ),
                           SizedBox(height: 4.h),
                           Text(
-                            item.label,
+                            labels[index],
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: color,
                               fontSize: 12.sp,
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                              fontWeight:
+                                  isSelected ? FontWeight.w600 : FontWeight.w400,
                               height: 1.2,
                             ),
                           ),
@@ -97,11 +108,4 @@ class BottomNavBar extends StatelessWidget {
       ),
     );
   }
-}
-
-class _NavItem {
-  final IconData icon;
-  final String label;
-
-  const _NavItem(this.icon, this.label);
 }

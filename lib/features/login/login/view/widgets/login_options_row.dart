@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class LoginOptionsRow extends StatelessWidget {
   final bool rememberMe;
@@ -37,7 +38,7 @@ class LoginOptionsRow extends StatelessWidget {
               ),
               SizedBox(width: 8.w),
               Text(
-                'Remember me',
+                context.l10n.loginRememberMe,
                 style: TextStyle(fontSize: 13.sp, color: AppColors.black),
               ),
             ],
@@ -46,7 +47,7 @@ class LoginOptionsRow extends StatelessWidget {
         TextButton(
           onPressed: onForgotPassword,
           child: Text(
-            'Forgot password?',
+            context.l10n.loginForgotPassword,
             style: TextStyle(
               color: AppColors.primaryPink,
               fontSize: 13.sp,

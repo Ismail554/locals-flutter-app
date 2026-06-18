@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ProfileActionGrid extends StatelessWidget {
   final VoidCallback onMyMap;
@@ -25,13 +26,13 @@ class ProfileActionGrid extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: _ActionPill(icon: Icons.location_on_outlined, label: 'My Map', onTap: onMyMap),
+              child: _ActionPill(icon: Icons.location_on_outlined, label: context.l10n.profileMyMap, onTap: onMyMap),
             ),
             SizedBox(width: 10.w),
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: _ActionPill(icon: Icons.people_outline, label: 'Followers', onTap: onFollowers),
+              child: _ActionPill(icon: Icons.people_outline, label: context.l10n.profileFollowers, onTap: onFollowers),
             ),
           ],
         ),
@@ -41,13 +42,13 @@ class ProfileActionGrid extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: _ActionPill(icon: Icons.bookmark_outline, label: 'Saved place', onTap: onSavedPlace),
+              child: _ActionPill(icon: Icons.bookmark_outline, label: context.l10n.profileSavedPlace, onTap: onSavedPlace),
             ),
             SizedBox(width: 10.w),
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: _ActionPill(icon: Icons.block_outlined, label: 'Blocked', onTap: onBlocked),
+              child: _ActionPill(icon: Icons.block_outlined, label: context.l10n.profileBlocked, onTap: onBlocked),
             ),
           ],
         ),

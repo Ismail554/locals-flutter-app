@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SubscriptionSettingsCard extends StatelessWidget {
   final bool autoRenew;
@@ -33,7 +34,7 @@ class SubscriptionSettingsCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Auto-renew',
+                        context.l10n.subscriptionAutoRenew,
                         style: TextStyle(
                           color: AppColors.black,
                           fontSize: 15.sp,
@@ -41,7 +42,7 @@ class SubscriptionSettingsCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Will renew automatically each month',
+                        context.l10n.subscriptionAutoRenewDesc,
                         style: TextStyle(
                           color: AppColors.levelGrey,
                           fontSize: 12.sp,
@@ -76,7 +77,7 @@ class SubscriptionSettingsCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Upgrade to Yearly',
+                        context.l10n.subscriptionUpgradeYearly,
                         style: TextStyle(
                           color: AppColors.black,
                           fontSize: 15.sp,
@@ -94,7 +95,7 @@ class SubscriptionSettingsCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Switch',
+                  context.l10n.subscriptionSwitch,
                   style: TextStyle(
                     color: AppColors.actionPink,
                     fontSize: 14.sp,
@@ -108,7 +109,7 @@ class SubscriptionSettingsCard extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(vertical: 16.h),
             child: Text(
-              'Cancel subscription',
+              context.l10n.subscriptionCancel,
               style: TextStyle(
                 color: AppColors.actionPink,
                 fontSize: 14.sp,

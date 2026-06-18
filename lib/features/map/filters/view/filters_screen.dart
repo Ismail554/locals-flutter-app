@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/shared/components/profile_screen_header.dart';
 import 'package:locals/shared/components/profile_segmented_control.dart';
 import 'package:locals/shared/theme/app_colors.dart';
@@ -36,6 +37,7 @@ class _FiltersView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = context.watch<FiltersController>();
     final state = controller.state;
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -45,12 +47,12 @@ class _FiltersView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Filters',
+                title: l10n.filtersTitle,
                 onBack: () => context.pop(),
                 trailing: TextButton(
                   onPressed: controller.reset,
                   child: Text(
-                    'Reset',
+                    l10n.filtersReset,
                     style: TextStyle(
                       color: AppColors.actionPink,
                       fontSize: 15.sp,
@@ -74,16 +76,22 @@ class _FiltersView extends StatelessWidget {
                       onToggle: controller.toggleCategory,
                     ),
                     SizedBox(height: 24.h),
-                    const FiltersSectionLabel(label: 'TYPE'),
+                    FiltersSectionLabel(label: l10n.filtersType),
                     SizedBox(height: 12.h),
                     ProfileSegmentedControl(
-                      options: const [
+                      options: [
                         ProfileSegmentOption(
-                          label: 'Businesses',
+                          label: l10n.filtersBusinesses,
                           value: 'businesses',
                         ),
-                        ProfileSegmentOption(label: 'Herbs', value: 'herbs'),
-                        ProfileSegmentOption(label: 'Both', value: 'both'),
+                        ProfileSegmentOption(
+                          label: l10n.filtersHerbs,
+                          value: 'herbs',
+                        ),
+                        ProfileSegmentOption(
+                          label: l10n.filtersBoth,
+                          value: 'both',
+                        ),
                       ],
                       selectedValue: state.placeType.name,
                       onChanged: (value) => controller.setPlaceType(
@@ -91,19 +99,22 @@ class _FiltersView extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 24.h),
-                    const FiltersSectionLabel(label: 'STATUS'),
+                    FiltersSectionLabel(label: l10n.filtersStatus),
                     SizedBox(height: 12.h),
                     ProfileSegmentedControl(
-                      options: const [
+                      options: [
                         ProfileSegmentOption(
-                          label: 'Visited',
+                          label: l10n.filtersVisited,
                           value: 'visited',
                         ),
                         ProfileSegmentOption(
-                          label: 'Unvisited',
+                          label: l10n.filtersUnvisited,
                           value: 'unvisited',
                         ),
-                        ProfileSegmentOption(label: 'Both', value: 'both'),
+                        ProfileSegmentOption(
+                          label: l10n.filtersBoth,
+                          value: 'both',
+                        ),
                       ],
                       selectedValue: state.visitStatus.name,
                       onChanged: (value) => controller.setVisitStatus(

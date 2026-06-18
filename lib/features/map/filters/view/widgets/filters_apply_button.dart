@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class FiltersApplyButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -23,7 +24,7 @@ class FiltersApplyButton extends StatelessWidget {
           ),
         ),
         child: Text(
-          'Apply filters',
+          context.l10n.filtersApply,
           style: TextStyle(
             fontSize: 16.sp,
             fontWeight: FontWeight.w700,

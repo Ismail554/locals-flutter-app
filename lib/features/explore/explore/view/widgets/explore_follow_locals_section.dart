@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../model/explore_model.dart';
 import 'explore_follow_card.dart';
 import 'explore_section_header.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ExploreFollowLocalsSection extends StatelessWidget {
   final List<ExploreFollowUser> users;
@@ -29,8 +30,8 @@ class ExploreFollowLocalsSection extends StatelessWidget {
       children: [
         ExploreSectionHeader(
           icon: Icons.person_add_outlined,
-          title: 'FIND LOCALS TO FOLLOW',
-          actionLabel: 'See all',
+          title: context.l10n.exploreFindLocalsToFollow,
+          actionLabel: context.l10n.commonSeeAll,
           onAction: onSeeAll,
         ),
         SizedBox(height: 12.h),

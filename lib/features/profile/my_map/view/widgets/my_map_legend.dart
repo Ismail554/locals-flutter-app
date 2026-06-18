@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_assets.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class MyMapLegend extends StatelessWidget {
   const MyMapLegend({super.key});
@@ -14,12 +15,12 @@ class MyMapLegend extends StatelessWidget {
       children: [
         _LegendItem(
           assetPath: AppAssets.visitedBusiness,
-          label: 'Visited',
+          label: context.l10n.myMapLegendVisited,
         ),
         SizedBox(width: 16.w),
         _LegendItem(
           assetPath: AppAssets.unvisitedBusiness,
-          label: 'Unvisited',
+          label: context.l10n.myMapLegendUnvisited,
         ),
       ],
     );

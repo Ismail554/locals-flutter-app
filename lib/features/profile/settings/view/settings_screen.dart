@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
+import 'package:locals/core/localization/locale_controller.dart';
 import 'package:locals/shared/components/profile_screen_header.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/settings_controller.dart';
@@ -26,6 +28,9 @@ class _SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<SettingsController>();
+    // Rebuild when app locale changes.
+    context.watch<LocaleController>();
+    final sections = controller.sectionsFor(context);
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -35,7 +40,7 @@ class _SettingsView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Settings',
+                title: context.l10n.settingsTitle,
                 onBack: () => context.pop(),
               ),
             ),
@@ -45,10 +50,10 @@ class _SettingsView extends StatelessWidget {
               fit: FlexFit.tight,
               child: ListView.separated(
                 padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                itemCount: controller.state.sections.length,
+                itemCount: sections.length,
                 separatorBuilder: (_, __) => SizedBox(height: 24.h),
                 itemBuilder: (context, index) {
-                  final section = controller.state.sections[index];
+                  final section = sections[index];
                   return SettingsSectionCard(
                     section: section,
                     onItemTap: (id) => controller.handleItemTap(context, id),

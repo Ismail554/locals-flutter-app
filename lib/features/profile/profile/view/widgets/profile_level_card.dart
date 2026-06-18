@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ProfileLevelCard extends StatelessWidget {
   final int level;
@@ -47,7 +48,7 @@ class ProfileLevelCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'POINTS',
+                    context.l10n.statPoints,
                     style: TextStyle(
                       color: AppColors.white.withValues(alpha: 0.7),
                       fontSize: 10.sp,

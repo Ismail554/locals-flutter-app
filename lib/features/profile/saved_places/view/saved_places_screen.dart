@@ -7,6 +7,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/saved_places_controller.dart';
 import '../repository/saved_places_repository.dart';
 import 'widgets/saved_place_card.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SavedPlacesScreen extends StatelessWidget {
   const SavedPlacesScreen({super.key});
@@ -35,7 +36,7 @@ class _SavedPlacesView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Saved places',
+                title: context.l10n.savedPlacesTitle,
                 onBack: () => context.pop(),
               ),
             ),

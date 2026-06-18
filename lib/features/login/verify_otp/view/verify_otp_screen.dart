@@ -10,6 +10,7 @@ import '../repository/verify_otp_repository.dart';
 import 'widgets/otp_input_row.dart';
 import 'widgets/verify_otp_hint_text.dart';
 import 'widgets/verify_otp_resend_row.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class VerifyOtpScreen extends StatelessWidget {
   const VerifyOtpScreen({super.key});
@@ -35,9 +36,9 @@ class _VerifyOtpView extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AuthScreenHeader(
-            title: 'Reset your password',
-            subtitle: 'Use the same mail that you used to create the account',
+          AuthScreenHeader(
+            title: context.l10n.otpResetPasswordTitle,
+            subtitle: context.l10n.otpResetPasswordSubtitle,
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 0),
@@ -53,7 +54,7 @@ class _VerifyOtpView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Verify',
+                    context.l10n.otpVerifyHeader,
                     style: TextStyle(
                       color: AppColors.black,
                       fontSize: 16.sp,
@@ -70,7 +71,7 @@ class _VerifyOtpView extends StatelessWidget {
                   const VerifyOtpHintText(),
                   const Spacer(),
                   PrimaryButton(
-                    label: 'Verify OTP',
+                    label: context.l10n.otpVerifyButton,
                     onPressed: () => controller.verifyOtp(context),
                   ),
                   SizedBox(height: 20.h),

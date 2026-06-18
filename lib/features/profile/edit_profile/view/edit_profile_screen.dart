@@ -10,6 +10,7 @@ import '../repository/edit_profile_repository.dart';
 import 'widgets/edit_profile_avatar_section.dart';
 import 'widgets/edit_profile_form_field.dart';
 import 'widgets/edit_profile_password_section.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class EditProfileScreen extends StatelessWidget {
   const EditProfileScreen({super.key});
@@ -38,7 +39,7 @@ class _EditProfileView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Edit profile',
+                title: context.l10n.editProfileTitle,
                 onBack: () => context.pop(),
               ),
             ),
@@ -57,17 +58,17 @@ class _EditProfileView extends StatelessWidget {
                   ),
                   SizedBox(height: 28.h),
                   EditProfileFormField(
-                    label: 'Name',
+                    label: context.l10n.editProfileName,
                     controller: controller.nameController,
                   ),
                   SizedBox(height: 16.h),
                   EditProfileFormField(
-                    label: 'Location',
+                    label: context.l10n.editProfileLocation,
                     controller: controller.locationController,
                   ),
                   SizedBox(height: 24.h),
                   PrimaryButton(
-                    label: 'Save changes',
+                    label: context.l10n.editProfileSaveChanges,
                     onPressed: () => controller.saveChanges(context),
                   ),
                   SizedBox(height: 32.h),

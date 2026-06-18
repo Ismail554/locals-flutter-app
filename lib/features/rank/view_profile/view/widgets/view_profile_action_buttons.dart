@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ViewProfileActionButtons extends StatelessWidget {
   final bool isFollowing;
@@ -35,7 +36,7 @@ class ViewProfileActionButtons extends StatelessWidget {
                 elevation: 4,
               ),
               child: Text(
-                isFollowing ? 'Following' : 'Follow',
+                isFollowing ? context.l10n.commonFollowing : context.l10n.commonFollow,
                 style: TextStyle(
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w600,
@@ -60,7 +61,7 @@ class ViewProfileActionButtons extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Block',
+                context.l10n.commonBlock,
                 style: TextStyle(
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w600,

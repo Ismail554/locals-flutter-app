@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:locals/core/media/avatar_picker_service.dart';
 import '../model/edit_profile_model.dart';
 import '../repository/edit_profile_repository.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class EditProfileController extends ChangeNotifier {
   final EditProfileRepository repo;
@@ -69,7 +70,7 @@ class EditProfileController extends ChangeNotifier {
 
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile updated')),
+      SnackBar(content: Text(context.l10n.snackbarProfileUpdated)),
     );
   }
 
@@ -82,7 +83,7 @@ class EditProfileController extends ChangeNotifier {
 
     if (newPass != confirm) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
+        SnackBar(content: Text(context.l10n.snackbarPasswordsNoMatch)),
       );
       return;
     }
@@ -105,11 +106,11 @@ class EditProfileController extends ChangeNotifier {
       newPasswordController.clear();
       confirmPasswordController.clear();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password changed')),
+        SnackBar(content: Text(context.l10n.snackbarPasswordChanged)),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not change password')),
+        SnackBar(content: Text(context.l10n.snackbarPasswordChangeFailed)),
       );
     }
   }

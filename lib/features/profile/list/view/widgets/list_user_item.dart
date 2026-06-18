@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/components/story_avatar_ring.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/list_model.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ListUserItem extends StatelessWidget {
   final ListUser user;
@@ -76,8 +77,8 @@ class ListUserItem extends StatelessWidget {
                     ),
                     Text(
                       tab == ListTab.following && user.followsYou
-                          ? 'Level ${user.level} · Follows you'
-                          : 'Level ${user.level}',
+                          ? context.l10n.listLevelFollowsYou(user.level)
+                          : context.l10n.commonLevel(user.level),
                       style: TextStyle(
                         color: AppColors.levelGrey,
                         fontSize: 12.sp,
@@ -103,7 +104,7 @@ class ListUserItem extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      user.isFollowing ? 'Following' : 'Follow',
+                      user.isFollowing ? context.l10n.commonFollowing : context.l10n.commonFollow,
                       style: TextStyle(
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w600,
@@ -115,7 +116,7 @@ class ListUserItem extends StatelessWidget {
                 GestureDetector(
                   onTap: onActionTap,
                   child: Text(
-                    'Following',
+                    context.l10n.commonFollowing,
                     style: TextStyle(
                       color: AppColors.black,
                       fontSize: 14.sp,

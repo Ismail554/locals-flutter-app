@@ -10,6 +10,7 @@ import 'widgets/subscription_billing_section.dart';
 import 'widgets/subscription_payment_card.dart';
 import 'widgets/subscription_plan_card.dart';
 import 'widgets/subscription_settings_card.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ManageSubscriptionScreen extends StatelessWidget {
   const ManageSubscriptionScreen({super.key});
@@ -40,7 +41,7 @@ class _ManageSubscriptionView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Manage Subscription',
+                title: context.l10n.subscriptionTitle,
                 onBack: () => context.pop(),
               ),
             ),

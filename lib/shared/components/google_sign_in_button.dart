@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_assets.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class GoogleSignInButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -36,7 +37,7 @@ class GoogleSignInButton extends StatelessWidget {
               ),
               SizedBox(width: 10.w),
               Text(
-                'Google',
+                context.l10n.authGoogle,
                 style: TextStyle(
                   color: AppColors.black,
                   fontSize: 15.sp,

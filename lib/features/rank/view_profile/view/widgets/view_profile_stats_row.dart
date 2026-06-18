@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ViewProfileStatsRow extends StatelessWidget {
   final int visits;
@@ -21,19 +22,19 @@ class ViewProfileStatsRow extends StatelessWidget {
         Flexible(
           flex: 1,
           fit: FlexFit.tight,
-          child: _StatCard(value: '$visits', label: 'VISITS'),
+          child: _StatCard(value: '$visits', label: context.l10n.statVisits),
         ),
         SizedBox(width: 10.w),
         Flexible(
           flex: 1,
           fit: FlexFit.tight,
-          child: _StatCard(value: '$followers', label: 'FOLLOWERS'),
+          child: _StatCard(value: '$followers', label: context.l10n.statFollowers),
         ),
         SizedBox(width: 10.w),
         Flexible(
           flex: 1,
           fit: FlexFit.tight,
-          child: _StatCard(value: '$cities', label: 'CITIES'),
+          child: _StatCard(value: '$cities', label: context.l10n.statCities),
         ),
       ],
     );

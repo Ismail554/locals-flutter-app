@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SubscriptionPlanCard extends StatelessWidget {
   final String planName;
@@ -35,7 +36,7 @@ class SubscriptionPlanCard extends StatelessWidget {
               Icon(Icons.workspace_premium, color: AppColors.white, size: 16.sp),
               SizedBox(width: 6.w),
               Text(
-                'Current plan',
+                context.l10n.subscriptionCurrentPlan,
                 style: TextStyle(
                   color: AppColors.white.withValues(alpha: 0.9),
                   fontSize: 13.sp,
@@ -67,7 +68,7 @@ class SubscriptionPlanCard extends StatelessWidget {
               Icon(Icons.check_circle_outline, color: AppColors.white, size: 16.sp),
               SizedBox(width: 6.w),
               Text(
-                'All premium features unlocked',
+                context.l10n.subscriptionPremiumUnlocked,
                 style: TextStyle(
                   color: AppColors.white.withValues(alpha: 0.95),
                   fontSize: 13.sp,

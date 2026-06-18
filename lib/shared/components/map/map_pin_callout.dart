@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
 class MapPinCallout extends StatelessWidget {
@@ -47,7 +48,7 @@ class MapPinCallout extends StatelessWidget {
               ),
               SizedBox(height: 2.h),
               Text(
-                'Level $level',
+                context.l10n.commonLevel(level),
                 style: TextStyle(
                   color: AppColors.actionPink,
                   fontSize: 12.sp,

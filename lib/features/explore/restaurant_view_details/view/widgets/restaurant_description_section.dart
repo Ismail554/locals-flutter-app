@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class RestaurantDescriptionSection extends StatelessWidget {
   final String shortDescription;
@@ -48,7 +49,7 @@ class RestaurantDescriptionSection extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                isExpanded ? 'Show less' : 'Show more',
+                isExpanded ? context.l10n.commonShowLess : context.l10n.commonShowMore,
                 style: TextStyle(
                   color: AppColors.actionPink,
                   fontSize: 14.sp,

@@ -11,6 +11,7 @@ import '../repository/share_card_repository.dart';
 import 'widgets/share_card_actions.dart';
 import 'widgets/share_card_preview.dart';
 import 'widgets/share_card_stats_row.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ShareCardScreen extends StatelessWidget {
   final ShareCardArgs? args;
@@ -49,7 +50,7 @@ class _ShareCardView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Share card',
+                title: context.l10n.shareCardTitle,
                 onBack: () => context.pop(),
               ),
             ),

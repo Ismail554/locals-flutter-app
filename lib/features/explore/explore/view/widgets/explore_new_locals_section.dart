@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../model/explore_model.dart';
 import 'explore_new_local_item.dart';
 import 'explore_section_header.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ExploreNewLocalsSection extends StatelessWidget {
   final List<ExploreNewLocal> locals;
@@ -21,7 +22,7 @@ class ExploreNewLocalsSection extends StatelessWidget {
       children: [
         ExploreSectionHeader(
           icon: Icons.explore_outlined,
-          title: 'NEW LOCALS',
+          title: context.l10n.exploreNewLocals,
         ),
         SizedBox(height: 12.h),
         Column(

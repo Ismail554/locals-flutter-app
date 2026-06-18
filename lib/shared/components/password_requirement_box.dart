@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class PasswordRequirementBox extends StatelessWidget {
   final List<String> requirements;
@@ -20,7 +21,7 @@ class PasswordRequirementBox extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Password must contain:',
+            context.l10n.authPasswordMustContain,
             style: TextStyle(
               color: AppColors.black,
               fontSize: 14.sp,

@@ -15,6 +15,7 @@ import 'widgets/view_profile_header_section.dart';
 import 'widgets/view_profile_map_tab.dart';
 import 'widgets/view_profile_photos_tab.dart';
 import 'widgets/view_profile_stats_row.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ViewProfileScreen extends StatelessWidget {
   final ViewProfileArgs? args;
@@ -49,7 +50,7 @@ class _ViewProfileView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: "${state.name}'s profile",
+                title: context.l10n.viewProfileTitle(state.name),
                 onBack: () => context.pop(),
               ),
             ),
@@ -83,17 +84,17 @@ class _ViewProfileView extends StatelessWidget {
                     ),
                     SizedBox(height: 20.h),
                     ProfileSegmentedControl(
-                      options: const [
+                      options: [
                         ProfileSegmentOption(
-                          label: 'Photos',
+                          label: context.l10n.viewProfileTabPhotos,
                           value: 'photos',
                         ),
                         ProfileSegmentOption(
-                          label: 'Map',
+                          label: context.l10n.viewProfileTabMap,
                           value: 'map',
                         ),
                         ProfileSegmentOption(
-                          label: 'Achievements',
+                          label: context.l10n.viewProfileTabAchievements,
                           value: 'achievements',
                         ),
                       ],

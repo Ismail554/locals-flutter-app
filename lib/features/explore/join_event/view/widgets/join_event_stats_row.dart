@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class JoinEventStatsRow extends StatelessWidget {
   final String stops;
@@ -21,19 +22,19 @@ class JoinEventStatsRow extends StatelessWidget {
         Flexible(
           flex: 1,
           fit: FlexFit.tight,
-          child: _StatCard(value: stops, label: 'STOPS'),
+          child: _StatCard(value: stops, label: context.l10n.statStops),
         ),
         SizedBox(width: 10.w),
         Flexible(
           flex: 1,
           fit: FlexFit.tight,
-          child: _StatCard(value: reward, label: 'REWARD'),
+          child: _StatCard(value: reward, label: context.l10n.statReward),
         ),
         SizedBox(width: 10.w),
         Flexible(
           flex: 1,
           fit: FlexFit.tight,
-          child: _StatCard(value: progress, label: 'PROGRESS'),
+          child: _StatCard(value: progress, label: context.l10n.statProgress),
         ),
       ],
     );

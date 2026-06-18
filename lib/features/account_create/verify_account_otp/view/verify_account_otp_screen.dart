@@ -11,6 +11,7 @@ import '../controller/verify_account_otp_controller.dart';
 import '../repository/verify_account_otp_repository.dart';
 import 'widgets/email_verified_success_view.dart';
 import 'widgets/verify_account_otp_hint_text.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class VerifyAccountOtpScreen extends StatelessWidget {
   const VerifyAccountOtpScreen({super.key});
@@ -42,9 +43,9 @@ class _VerifyAccountOtpView extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AuthScreenHeader(
-            title: 'Join locals',
-            subtitle: 'Start collecting authentic places.',
+          AuthScreenHeader(
+            title: context.l10n.signupTitle,
+            subtitle: context.l10n.signupSubtitle,
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 0),
@@ -61,7 +62,7 @@ class _VerifyAccountOtpView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Verify',
+                    context.l10n.otpVerifyHeader,
                     style: TextStyle(
                       color: AppColors.black,
                       fontSize: 16.sp,
@@ -78,7 +79,7 @@ class _VerifyAccountOtpView extends StatelessWidget {
                   const VerifyAccountOtpHintText(),
                   const Spacer(),
                   PrimaryButton(
-                    label: 'Verify OTP',
+                    label: context.l10n.otpVerifyButton,
                     onPressed: () => controller.verifyOtp(context),
                   ),
                   SizedBox(height: 20.h),

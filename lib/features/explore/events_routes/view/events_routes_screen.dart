@@ -7,6 +7,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/events_routes_controller.dart';
 import '../repository/events_routes_repository.dart';
 import 'widgets/event_route_card.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class EventsRoutesScreen extends StatelessWidget {
   const EventsRoutesScreen({super.key});
@@ -36,7 +37,7 @@ class _EventsRoutesView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Events & routes',
+                title: context.l10n.eventsRoutesTitle,
                 onBack: () => context.pop(),
               ),
             ),

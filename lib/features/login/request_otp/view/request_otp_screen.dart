@@ -8,6 +8,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/request_otp_controller.dart';
 import '../repository/request_otp_repository.dart';
 import 'widgets/request_otp_form.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class RequestOtpScreen extends StatelessWidget {
   const RequestOtpScreen({super.key});
@@ -33,9 +34,9 @@ class _RequestOtpView extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AuthScreenHeader(
-            title: 'Reset your password',
-            subtitle: 'Use the same mail that you used to create the account',
+          AuthScreenHeader(
+            title: context.l10n.otpResetPasswordTitle,
+            subtitle: context.l10n.otpResetPasswordSubtitle,
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 0),
@@ -53,7 +54,7 @@ class _RequestOtpView extends StatelessWidget {
                   RequestOtpForm(onEmailChanged: controller.setEmail),
                   const Spacer(),
                   PrimaryButton(
-                    label: 'Request OTP',
+                    label: context.l10n.requestOtpButton,
                     onPressed: () => controller.requestOtp(context),
                   ),
                   SizedBox(height: 24.h),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class MissionDetailsProgressSection extends StatelessWidget {
   final int current;
@@ -22,7 +23,7 @@ class MissionDetailsProgressSection extends StatelessWidget {
         Row(
           children: [
             Text(
-              'PROGRESS',
+              context.l10n.statProgress,
               style: TextStyle(
                 color: AppColors.levelGrey,
                 fontSize: 12.sp,

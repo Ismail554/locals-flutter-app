@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:locals/shared/components/image_view/check_in_image_view.dart';
 import 'package:locals/shared/model/check_in_photo_model.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ImageViewDialog {
   ImageViewDialog._();
@@ -9,7 +10,7 @@ class ImageViewDialog {
     return showGeneralDialog<void>(
       context: context,
       barrierDismissible: true,
-      barrierLabel: 'Dismiss',
+      barrierLabel: context.l10n.commonDismiss,
       barrierColor: Colors.black54,
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (context, animation, secondaryAnimation) {

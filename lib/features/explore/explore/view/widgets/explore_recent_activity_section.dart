@@ -4,6 +4,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/explore_model.dart';
 import 'explore_section_header.dart';
 import 'explore_story_item.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ExploreRecentActivitySection extends StatelessWidget {
   final List<ExploreStory> stories;
@@ -22,7 +23,7 @@ class ExploreRecentActivitySection extends StatelessWidget {
       children: [
         ExploreSectionHeader(
           icon: Icons.circle_outlined,
-          title: 'RECENT ACTIVITY',
+          title: context.l10n.exploreRecentActivity,
         ),
         SizedBox(height: 14.h),
         SizedBox(

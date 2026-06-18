@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SignupLoginFooter extends StatelessWidget {
   final VoidCallback onLogin;
@@ -13,13 +14,13 @@ class SignupLoginFooter extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Already a local? ',
+          '${context.l10n.signupAlreadyLocal} ',
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
         GestureDetector(
           onTap: onLogin,
           child: Text(
-            'Log in',
+            context.l10n.authLogIn,
             style: TextStyle(
               color: AppColors.primaryPink,
               fontSize: 14.sp,

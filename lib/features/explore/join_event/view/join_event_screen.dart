@@ -9,6 +9,7 @@ import '../repository/join_event_repository.dart';
 import 'widgets/join_event_hero_header.dart';
 import 'widgets/join_event_stats_row.dart';
 import 'widgets/join_event_stop_tile.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class JoinEventScreen extends StatelessWidget {
   final JoinEventArgs? args;
@@ -66,7 +67,7 @@ class _JoinEventView extends StatelessWidget {
                     ),
                     SizedBox(height: 24.h),
                     Text(
-                      'ROUTE STOPS',
+                      context.l10n.joinEventRouteStops,
                       style: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 11.sp,
@@ -110,7 +111,7 @@ class _JoinEventView extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    event.isJoined ? 'Joined' : 'Join event',
+                    event.isJoined ? context.l10n.joinEventJoined : context.l10n.joinEventButton,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w700,

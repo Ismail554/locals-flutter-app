@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class AuthDivider extends StatelessWidget {
   const AuthDivider({super.key});
@@ -16,7 +17,7 @@ class AuthDivider extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.w),
           child: Text(
-            'or continue with',
+            context.l10n.authOrContinueWith,
             style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
           ),
         ),

@@ -8,6 +8,7 @@ import '../controller/find_locals_controller.dart';
 import '../model/find_locals_args.dart';
 import '../repository/find_locals_repository.dart';
 import 'widgets/find_local_card.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class FindLocalsScreen extends StatelessWidget {
   final FindLocalsArgs args;
@@ -39,7 +40,7 @@ class _FindLocalsView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Find Locals',
+                title: context.l10n.findLocalsTitle,
                 onBack: () => context.pop(),
               ),
             ),

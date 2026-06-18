@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../model/explore_model.dart';
 import 'explore_route_card.dart';
 import 'explore_section_header.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ExploreFeaturedRoutesSection extends StatelessWidget {
   final ExploreFeaturedRoute route;
@@ -23,8 +24,8 @@ class ExploreFeaturedRoutesSection extends StatelessWidget {
       children: [
         ExploreSectionHeader(
           icon: Icons.explore_outlined,
-          title: 'FEATURED ROUTES',
-          actionLabel: 'All events',
+          title: context.l10n.exploreFeaturedRoutes,
+          actionLabel: context.l10n.exploreAllEvents,
           onAction: onAllEvents,
         ),
         SizedBox(height: 12.h),

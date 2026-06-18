@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SignupHeader extends StatelessWidget {
   const SignupHeader({super.key});
@@ -11,7 +12,7 @@ class SignupHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Join locals',
+          context.l10n.signupTitle,
           style: TextStyle(
             color: AppColors.white,
             fontSize: 28.sp,
@@ -20,7 +21,7 @@ class SignupHeader extends StatelessWidget {
         ),
         SizedBox(height: 6.h),
         Text(
-          'Start collecting authentic places.',
+          context.l10n.signupSubtitle,
           style: TextStyle(
             color: AppColors.textSecondary,
             fontSize: 14.sp,

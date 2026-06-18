@@ -9,6 +9,7 @@ import '../model/share_card_args.dart';
 import '../model/share_card_model.dart';
 import '../repository/share_card_repository.dart';
 import '../view/share_card_camera_screen.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 enum ShareCardMediaSource { camera, gallery }
 
@@ -63,7 +64,7 @@ class ShareCardController extends ChangeNotifier {
       _addImageToStory(state.imagePath!);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Story added')),
+          SnackBar(content: Text(context.l10n.snackbarStoryAdded)),
         );
       }
       return;
@@ -86,7 +87,7 @@ class ShareCardController extends ChangeNotifier {
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Story added')),
+        SnackBar(content: Text(context.l10n.snackbarStoryAdded)),
       );
     }
   }
@@ -105,13 +106,13 @@ class ShareCardController extends ChangeNotifier {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_camera_outlined),
-              title: const Text('Take photo'),
+              title: Text(sheetContext.l10n.shareCardTakePhoto),
               onTap: () =>
                   Navigator.pop(sheetContext, ShareCardMediaSource.camera),
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Choose from gallery'),
+              title: Text(sheetContext.l10n.shareCardChooseGallery),
               onTap: () =>
                   Navigator.pop(sheetContext, ShareCardMediaSource.gallery),
             ),
@@ -148,7 +149,7 @@ class ShareCardController extends ChangeNotifier {
     final imagePath = state.imagePath;
     if (imagePath == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Capture a photo first')),
+        SnackBar(content: Text(context.l10n.snackbarCapturePhotoFirst)),
       );
       return;
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/map_mission_args.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class MapMissionProgressCard extends StatelessWidget {
   final MapActiveMission mission;
@@ -51,7 +52,7 @@ class MapMissionProgressCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'EXPLORING',
+                      context.l10n.mapExploring,
                       style: TextStyle(
                         color: AppColors.levelGrey,
                         fontSize: 10.sp,
@@ -74,7 +75,7 @@ class MapMissionProgressCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'COMPLETION',
+                    context.l10n.mapCompletion,
                     style: TextStyle(
                       color: AppColors.levelGrey,
                       fontSize: 10.sp,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
+import 'package:locals/core/localization/notification_l10n.dart';
 import 'package:locals/shared/components/profile_screen_header.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/set_notification_controller.dart';
@@ -26,6 +28,7 @@ class _SetNotificationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<SetNotificationController>();
+    final l10n = context.l10n;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -36,7 +39,7 @@ class _SetNotificationView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ProfileScreenHeader(
-                title: 'Notifications',
+                title: l10n.notificationsTitle,
                 onBack: () => context.pop(),
               ),
               SizedBox(height: 24.h),
@@ -44,7 +47,9 @@ class _SetNotificationView extends StatelessWidget {
                 return Padding(
                   padding: EdgeInsets.only(bottom: 12.h),
                   child: NotificationSettingTile(
-                    setting: setting,
+                    title: NotificationL10n.title(l10n, setting.id),
+                    subtitle: NotificationL10n.subtitle(l10n, setting.id),
+                    enabled: setting.enabled,
                     onChanged: (value) =>
                         controller.toggleSetting(setting.id, value),
                   ),

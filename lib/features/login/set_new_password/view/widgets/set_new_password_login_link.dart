@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SetNewPasswordLoginLink extends StatelessWidget {
   final VoidCallback onTap;
@@ -13,13 +14,13 @@ class SetNewPasswordLoginLink extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Back to ',
+          context.l10n.setPasswordBackTo,
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
         GestureDetector(
           onTap: onTap,
           child: Text(
-            'Log in',
+            context.l10n.authLogIn,
             style: TextStyle(
               color: AppColors.primaryPink,
               fontSize: 14.sp,

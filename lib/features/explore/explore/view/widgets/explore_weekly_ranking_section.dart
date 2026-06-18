@@ -4,6 +4,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/explore_model.dart';
 import 'explore_ranking_row.dart';
 import 'explore_section_header.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ExploreWeeklyRankingSection extends StatelessWidget {
   final List<ExploreRankingUser> users;
@@ -24,8 +25,8 @@ class ExploreWeeklyRankingSection extends StatelessWidget {
       children: [
         ExploreSectionHeader(
           icon: Icons.trending_up,
-          title: 'WEEKLY RANKING',
-          actionLabel: 'See all',
+          title: context.l10n.exploreWeeklyRanking,
+          actionLabel: context.l10n.commonSeeAll,
           onAction: onSeeAll,
         ),
         SizedBox(height: 12.h),

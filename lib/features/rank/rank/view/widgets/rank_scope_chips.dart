@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/rank_model.dart';
 
@@ -13,15 +14,16 @@ class RankScopeChips extends StatelessWidget {
     required this.onChanged,
   });
 
-  static const _labels = {
-    RankScope.city: 'City',
-    RankScope.country: 'Country',
-    RankScope.global: 'Global',
-    RankScope.followers: 'Followers',
-  };
-
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final labels = {
+      RankScope.city: l10n.rankScopeCity,
+      RankScope.country: l10n.rankScopeCountry,
+      RankScope.global: l10n.rankScopeGlobal,
+      RankScope.followers: l10n.rankScopeFollowers,
+    };
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -38,13 +40,12 @@ class RankScopeChips extends StatelessWidget {
                   vertical: 8.h,
                 ),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.black
-                      : AppColors.chipUnselected,
+                  color:
+                      isSelected ? AppColors.black : AppColors.chipUnselected,
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
-                  _labels[scope]!,
+                  labels[scope]!,
                   style: TextStyle(
                     color: isSelected
                         ? AppColors.white

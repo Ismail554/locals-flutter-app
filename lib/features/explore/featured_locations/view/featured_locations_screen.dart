@@ -7,6 +7,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/featured_locations_controller.dart';
 import '../repository/featured_locations_repository.dart';
 import 'widgets/featured_location_card.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class FeaturedLocationsScreen extends StatelessWidget {
   const FeaturedLocationsScreen({super.key});
@@ -38,7 +39,7 @@ class _FeaturedLocationsView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Featured locations',
+                title: context.l10n.featuredLocationsTitle,
                 onBack: () => context.pop(),
               ),
             ),

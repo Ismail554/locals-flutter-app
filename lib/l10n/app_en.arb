@@ -1,0 +1,442 @@
+{
+  "@@locale": "en",
+  "navMap": "Map",
+  "navExplore": "Explore",
+  "navMissions": "Missions",
+  "navRank": "Rank",
+  "navProfile": "Profile",
+  "authOrContinueWith": "or continue with",
+  "authGoogle": "Google",
+  "authEmailLabel": "Email",
+  "authEmailHint": "you@gmail.com",
+  "authPasswordLabel": "Password",
+  "authPasswordHint": "********",
+  "authNameLabel": "Name",
+  "authNameHint": "Alex Vidal",
+  "authLogIn": "Log in",
+  "authPasswordMustContain": "Password must contain:",
+  "commonCancel": "Cancel",
+  "commonDismiss": "Dismiss",
+  "commonBack": "Back",
+  "commonCopy": "Copy",
+  "commonDone": "Done",
+  "commonSeeAll": "See all",
+  "commonViewAll": "View all",
+  "commonFollow": "Follow",
+  "commonFollowing": "Following",
+  "commonBlock": "Block",
+  "commonShowMore": "Show more",
+  "commonShowLess": "Show less",
+  "commonProgress": "Progress",
+  "commonDelete": "Delete",
+  "commonContinue": "Continue",
+  "commonLevel": "Level {level}",
+  "@commonLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "commonPointsShort": "+{points} pts",
+  "@commonPointsShort": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "loginWelcomeTitle": "Welcome back",
+  "loginWelcomeSubtitle": "Your locals are waiting.",
+  "loginRememberMe": "Remember me",
+  "loginForgotPassword": "Forgot password?",
+  "loginButton": "Log in",
+  "loginNewHere": "New here?",
+  "loginCreateAccount": "Create account",
+  "signupTitle": "Join locals",
+  "signupSubtitle": "Start collecting authentic places.",
+  "signupButton": "Create account",
+  "signupAlreadyLocal": "Already a local?",
+  "otpResetPasswordTitle": "Reset your password",
+  "otpResetPasswordSubtitle": "Use the same mail that you used to create the account",
+  "otpHint6Digit": "We have sent a 6-digit code to your email",
+  "otpHint4Digit": "We have sent a 4-digit code to your email",
+  "otpVerifyHeader": "Verify",
+  "otpVerifyButton": "Verify OTP",
+  "otpDidntReceiveCode": "Didn't receive code?",
+  "otpResend": "Resend",
+  "otpEmailVerifiedTitle": "Email Verified",
+  "otpEmailVerifiedMessage": "Your email has been verified successfully.",
+  "requestOtpButton": "Request OTP",
+  "setPasswordTitle": "Create a new password",
+  "setPasswordSubtitle": "Create something unique but rememberable",
+  "setPasswordNewLabel": "New Password",
+  "setPasswordNewHint": "Something secure",
+  "setPasswordConfirmLabel": "Confirm Password",
+  "setPasswordConfirmHint": "Confirm your password",
+  "setPasswordButton": "Reset Password",
+  "setPasswordBackTo": "Back to",
+  "setPasswordSuccessTitle": "Password Changed",
+  "setPasswordSuccessMessage": "Your password has been changed successfully.",
+  "passwordReqMinLength": "At least 8 characters",
+  "passwordReqUppercase": "Contains uppercase letter",
+  "passwordReqLowercase": "Contains lowercase letter",
+  "passwordReqNumber": "Contains number",
+  "dialogLogoutTitle": "Log out?",
+  "dialogLogoutMessage": "You will need to sign in again to access your profile, missions, and saved places.",
+  "dialogLogoutConfirm": "Log out",
+  "dialogDeleteAccountTitle": "Delete account?",
+  "dialogDeleteAccountMessage": "This permanently removes your profile, progress, and saved data. This action cannot be undone.",
+  "dialogDeleteAccountConfirm": "Delete account",
+  "legalLastUpdated": "Last updated: {date}",
+  "@legalLastUpdated": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardSkip": "Skip",
+  "onboardNotNow": "Not now",
+  "onboardPage1Title": "Discover authentic local places",
+  "onboardPage1Subtitle": "Hand-picked spots with the locals' seal — the ones neighbors actually love.",
+  "onboardPage2Title": "Collect locations, earn points",
+  "onboardPage2Subtitle": "Check in when you visit. Every authentic place becomes part of your map.",
+  "onboardPage3Title": "Level up, complete cities",
+  "onboardPage3Subtitle": "Climb the ranks, unlock achievements, and chase 100% completion.",
+  "onboardPage4Title": "Find locals around you",
+  "onboardPage4Subtitle": "We use your location to show authentic places nearby and to confirm your check-ins. Your location is never shared with other users.",
+  "onboardContinue": "Continue",
+  "onboardGetStarted": "Get Started",
+  "onboardAllowLocation": "Allow location",
+  "exploreNewLocals": "NEW LOCALS",
+  "exploreFeaturedLocations": "FEATURED LOCATIONS",
+  "exploreFeaturedRoutes": "FEATURED ROUTES",
+  "exploreFindLocalsToFollow": "FIND LOCALS TO FOLLOW",
+  "exploreRecentActivity": "RECENT ACTIVITY",
+  "exploreWeeklyRanking": "WEEKLY RANKING",
+  "exploreAllEvents": "All events",
+  "exploreNewCategory": "NEW · {category}",
+  "@exploreNewCategory": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "exploreYourStory": "Your story",
+  "exploreViewYourStory": "View your story",
+  "exploreAddPhoto": "Add photo",
+  "findLocalsTitle": "Find Locals",
+  "featuredLocationsTitle": "Featured locations",
+  "eventsRoutesTitle": "Events & routes",
+  "eventsByOrganizer": "By {organizer}",
+  "@eventsByOrganizer": {
+    "placeholders": {
+      "organizer": {
+        "type": "String"
+      }
+    }
+  },
+  "eventSponsoredBy": "Sponsored · {sponsor}",
+  "@eventSponsoredBy": {
+    "placeholders": {
+      "sponsor": {
+        "type": "String"
+      }
+    }
+  },
+  "joinEventRouteStops": "ROUTE STOPS",
+  "joinEventButton": "Join event",
+  "joinEventJoined": "Joined",
+  "eventCheckInNextStop": "Check in next stop",
+  "eventRouteComplete": "Route complete",
+  "restaurantLocalsSeal": "locals' seal",
+  "restaurantLocalSpot": "Local spot",
+  "restaurantBeenHere": "I've been here",
+  "restaurantBeenHereDone": "I've been here ✓",
+  "restaurantDirections": "Directions",
+  "restaurantPhotos": "Photos",
+  "restaurantVisitors": "Visitors",
+  "shareLocationTitle": "Share the location",
+  "storyDeleteTooltip": "Delete this story",
+  "storyViewersTitle": "Viewers",
+  "storyViewersEmpty": "No one has viewed this story yet.",
+  "storyDeletePhotoTitle": "Delete this photo?",
+  "storyDeletePhotoMessage": "Only this story slide will be removed. Your other stories stay.",
+  "checkInConfirmed": "CHECK-IN CONFIRMED",
+  "checkInLocationYours": "{locationName} is yours.",
+  "@checkInLocationYours": {
+    "placeholders": {
+      "locationName": {
+        "type": "String"
+      }
+    }
+  },
+  "checkInAddedToMap": "Another local added to your map.",
+  "checkInShareMoment": "Share moment",
+  "checkInContinueExploring": "Continue exploring",
+  "shareCardTitle": "Share card",
+  "shareCardTapToCapture": "Tap to capture",
+  "shareCardRetake": "Retake",
+  "shareCardConfirm": "Confirm",
+  "shareCardAddToStory": "Add to Story",
+  "shareCardSaving": "Saving...",
+  "shareCardSaved": "Saved",
+  "shareCardSaveImage": "Save Image",
+  "shareProfileTitle": "Share your profile",
+  "statVisits": "VISITS",
+  "statCities": "CITIES",
+  "statFollowers": "FOLLOWERS",
+  "statPoints": "POINTS",
+  "statStops": "STOPS",
+  "statReward": "REWARD",
+  "statProgress": "PROGRESS",
+  "statLevel": "LEVEL",
+  "statCity": "CITY",
+  "mapSearchHint": "Search locals & places",
+  "mapSearchRecent": "RECENT",
+  "mapSearchTrending": "TRENDING",
+  "filtersTitle": "Filters",
+  "filtersReset": "Reset",
+  "filtersType": "TYPE",
+  "filtersStatus": "STATUS",
+  "filtersCategories": "CATEGORIES",
+  "filtersBusinesses": "Businesses",
+  "filtersHerbs": "Herbs",
+  "filtersBoth": "Both",
+  "filtersVisited": "Visited",
+  "filtersUnvisited": "Unvisited",
+  "filtersApply": "Apply filters",
+  "mapExploring": "EXPLORING",
+  "mapCompletion": "COMPLETION",
+  "notificationsTitle": "Notifications",
+  "achievementsTitle": "Achievements",
+  "missionsTitle": "Missions",
+  "missionsSubtitle": "Curated challenges to discover Barcelona.",
+  "missionFilterNearby": "Nearby",
+  "missionFilterActive": "Active",
+  "missionFilterCompleted": "Completed",
+  "missionFilterEvents": "Events",
+  "missionStopsSection": "STOPS",
+  "missionContinue": "Continue mission",
+  "achievementsUnlocked": "UNLOCKED",
+  "achievementsKeepVisiting": "Keep visiting to unlock more.",
+  "rankLeaderboardTitle": "Leaderboard",
+  "rankScopeCity": "City",
+  "rankScopeCountry": "Country",
+  "rankScopeGlobal": "Global",
+  "rankScopeFollowers": "Followers",
+  "rankPeriodWeekly": "Weekly",
+  "rankPeriodMonthly": "Monthly",
+  "rankPeriodAllTime": "All-time",
+  "viewProfileTitle": "{name}'s profile",
+  "@viewProfileTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "viewProfileTabPhotos": "Photos",
+  "viewProfileTabMap": "Map",
+  "viewProfileTabAchievements": "Achievements",
+  "viewProfileLevelLocation": "Level {level} · {location}",
+  "@viewProfileLevelLocation": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "blockUserTitle": "Block user",
+  "blockUserMessage": "Block {name}? They will not be able to see your profile.",
+  "@blockUserMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "blockUserConfirm": "Block",
+  "profilePointsToNextLevel": "{points} Pts To Level {nextLevel}",
+  "@profilePointsToNextLevel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      },
+      "nextLevel": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMyMap": "My Map",
+  "profileFollowers": "Followers",
+  "profileSavedPlace": "Saved place",
+  "profileBlocked": "Blocked",
+  "profileRecentAchievements": "Recent achievements",
+  "profileLatestVisits": "Latest visits",
+  "editProfileTitle": "Edit profile",
+  "editProfileName": "Name",
+  "editProfileLocation": "Location",
+  "editProfileSaveChanges": "Save changes",
+  "editProfileChangePassword": "Change password",
+  "editProfileCurrentPassword": "Current password",
+  "editProfileNewPassword": "New password",
+  "editProfileConfirmPassword": "Confirm password",
+  "myMapTitle": "My map",
+  "myMapFilterAll": "All",
+  "myMapFilterVisited": "Visited · {count}",
+  "@myMapFilterVisited": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "myMapFilterUnvisited": "Unvisited · {count}",
+  "@myMapFilterUnvisited": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "myMapLegendVisited": "Visited",
+  "myMapLegendUnvisited": "Unvisited",
+  "listTitle": "List",
+  "listFollowersCount": "Followers · {count}",
+  "@listFollowersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listFollowingCount": "Following · {count}",
+  "@listFollowingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "listLevelFollowsYou": "Level {level} · Follows you",
+  "@listLevelFollowsYou": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "blockedListTitle": "Blocked list",
+  "blockedUnblock": "Unblock",
+  "settingsTitle": "Settings",
+  "settingsSectionPreferences": "PREFERENCES",
+  "settingsSectionAccount": "ACCOUNT",
+  "settingsSectionAbout": "ABOUT",
+  "settingsSectionDangerZone": "DANGER ZONE",
+  "settingsLanguage": "Language",
+  "settingsNotification": "Notification",
+  "settingsPrivacy": "Privacy",
+  "settingsEditProfile": "Edit Profile",
+  "settingsHelpSupport": "Help & Support",
+  "settingsPrivacyPolicy": "Privacy and policy",
+  "settingsRateLocal": "Rate Local",
+  "settingsLogOut": "Log out",
+  "languageEnglish": "English",
+  "languageSpanish": "Spanish",
+  "languagePickerTitle": "Choose language",
+  "privacyTitle": "Privacy",
+  "privacySectionProfileVisibility": "PROFILE VISIBILITY",
+  "privacySectionPhotoVisibility": "PHOTO VISIBILITY",
+  "privacySectionLocationPermission": "LOCATION PERMISSION",
+  "privacySectionLeaderboard": "SHOW ON LEADERBOARD",
+  "privacyPublic": "Public",
+  "privacyPrivate": "Private",
+  "privacyFollowersOnly": "Followers only",
+  "privacyAllTime": "All time",
+  "privacyWhileUsingApp": "While using app",
+  "privacyOn": "On",
+  "privacyOff": "Off",
+  "privacyDataTitle": "Privacy & Data",
+  "privacyDeleteAccount": "Delete my account",
+  "privacyPolicyLink": "Privacy policy",
+  "termsOfUseLink": "Terms of use",
+  "termsOfUseTitle": "Terms of use",
+  "privacyPolicyTitle": "Privacy policy",
+  "privacyDataEncryptedTitle": "Your data is encrypted",
+  "privacyDataEncryptedSubtitle": "Health information is stored locally and synced securely.",
+  "notificationMissionAlerts": "Mission alerts",
+  "notificationMissionAlertsDesc": "When a new mission is available.",
+  "notificationEvents": "Events",
+  "notificationEventsDesc": "Festivals and sponsored routes.",
+  "notificationAnnouncements": "Announcements",
+  "notificationAnnouncementsDesc": "Festivals and sponsored routes.",
+  "helpSupportTitle": "Help & Support",
+  "helpSubjectLabel": "Subject",
+  "helpMessageLabel": "Message",
+  "helpMessageHint": "Describe your issue or question...",
+  "helpSending": "Sending...",
+  "helpSend": "Send",
+  "helpVersion": "Version {version}",
+  "@helpVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "helpEmailTo": "To",
+  "subscriptionTitle": "Manage Subscription",
+  "subscriptionCurrentPlan": "Current plan",
+  "subscriptionPremiumUnlocked": "All premium features unlocked",
+  "subscriptionBillingHistory": "BILLING HISTORY",
+  "subscriptionUpdatePayment": "Update",
+  "subscriptionAutoRenew": "Auto-renew",
+  "subscriptionAutoRenewDesc": "Will renew automatically each month",
+  "subscriptionUpgradeYearly": "Upgrade to Yearly",
+  "subscriptionYearlySavings": "Save 50% · $4.92/mo",
+  "subscriptionSwitch": "Switch",
+  "subscriptionCancel": "Cancel subscription",
+  "filterCategoryRestaurant": "Restaurant",
+  "filterCategoryBar": "Bar",
+  "filterCategoryCafe": "Cafe",
+  "filterCategoryBakery": "Bakery",
+  "filterCategoryShop": "Shop",
+  "filterCategoryMarket": "Market",
+  "filterCategoryMonument": "Monument",
+  "filterCategoryCultural": "Cultural Space",
+  "filterCategoryViewpoint": "Viewpoint",
+  "filterCategorySquare": "Square",
+  "filterCategoryOther": "Other",
+  "snackbarLinkCopied": "Link copied",
+  "snackbarCaptureFailed": "Failed to capture photo",
+  "snackbarThanksFeedback": "Thanks for your feedback!",
+  "snackbarProfileUpdated": "Profile updated",
+  "snackbarPasswordsNoMatch": "Passwords do not match",
+  "snackbarPasswordChanged": "Password changed",
+  "snackbarPasswordChangeFailed": "Could not change password",
+  "snackbarStoryAdded": "Story added",
+  "photoLikesCount": "{count} likes",
+  "@photoLikesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedPlacesTitle": "Saved places",
+  "storyJustNow": "Just now",
+  "snackbarCapturePhotoFirst": "Capture a photo first",
+  "helpWriteMessage": "Please write a message",
+  "helpOpeningEmail": "Opening email app",
+  "helpCouldNotOpenEmail": "Could not open email app",
+  "cameraNoAvailable": "No camera available on this device.",
+  "cameraCouldNotOpen": "Could not open the camera. Please try again.",
+  "shareCardTakePhoto": "Take photo",
+  "shareCardChooseGallery": "Choose from gallery"
+}

@@ -2,41 +2,68 @@
 
 A Flutter mobile app for discovering local places, checking in, completing missions, sharing stories, and competing on city leaderboards.
 
-| Status | Detail |
-|--------|--------|
-| **Frontend** | Complete (UI + navigation + mock data) |
-| **Backend** | Not integrated — ready for API wiring |
-| **Platform** | iOS & Android |
+| | |
+|---|---|
+| **Status** | Frontend complete — UI, navigation, mock data, EN/ES localization |
+| **Backend** | Not integrated — repository layer ready for API wiring |
+| **Platforms** | iOS & Android |
 | **Flutter SDK** | ^3.10.4 |
+| **Design canvas** | 440 × 956 (`flutter_screenutil`) |
 
 ---
 
 ## Table of contents
 
-1. [What is Locals?](#what-is-locals)
-2. [Quick start](#quick-start)
-3. [Project statistics](#project-statistics)
-4. [Architecture](#architecture)
-5. [File & folder conventions](#file--folder-conventions)
-6. [Full directory tree](#full-directory-tree)
-7. [Widget files by feature](#widget-files-by-feature)
-8. [Shared components](#shared-components)
-9. [Screens & routes](#screens--routes)
-10. [Frontend completion](#frontend-completion)
-11. [Backend integration](#backend-integration)
-12. [Documentation](#documentation)
+1. [Recent updates](#recent-updates)
+2. [Feature overview](#feature-overview)
+3. [Quick start](#quick-start)
+4. [Project statistics](#project-statistics)
+5. [Architecture pattern](#architecture-pattern)
+6. [Project structure](#project-structure)
+7. [Localization](#localization) — [full guide](docs/LOCALIZATION.md)
+8. [Full directory tree](#full-directory-tree)
+9. [Widget files by feature](#widget-files-by-feature)
+10. [Shared components](#shared-components)
+11. [Navigation & routes](#navigation--routes)
+12. [Frontend completion](#frontend-completion)
+13. [Backend integration](#backend-integration)
+14. [Documentation](#documentation)
+15. [Dependencies](#dependencies)
 
 ---
 
-## What is Locals?
+## Recent updates
 
-Locals helps users explore a city like a local:
+| Area | Change |
+|------|--------|
+| **Localization** | English and Spanish via ARB files (~300 keys). Language picker in Settings. `context.l10n` across static UI. `Accept-Language` header helper ready for API calls. |
+| **Stories** | 24-hour story expiry, per-slide delete in story viewer, tap viewers to open profile. |
+| **Navigation** | Restaurant details → Points (“I've been here”) and Map (directions). Saved places → restaurant details. Story viewers → `ViewProfileScreen`. |
+| **Settings & privacy** | Premium animated confirm dialogs for logout and delete account. Manage subscription hidden from settings. Privacy & Data header simplified. |
+| **Onboarding** | Fixed `!_dirty` build-phase crash by deferring localized page init to post-frame callback. |
+| **Documentation** | `docs/PROJECT.md`, `docs/API_INTEGRATION.md` (~87 endpoints), `docs/DIRECTORY_TREE.md`. |
 
-- **Map** — interactive pin map with visited/unvisited locations, search, and filters
-- **Explore** — stories (24h), featured spots, events, weekly rankings, find locals
-- **Missions** — gamified location challenges and achievements
-- **Rank** — city / country / global / followers leaderboards
-- **Profile** — level, points, check-ins, settings, privacy, saved places
+---
+
+## Feature overview
+
+### Map
+Interactive pin map with visited/unvisited locations, pan and zoom, search, category filters, and notification inbox. Directions from restaurant details focus the map on a specific pin.
+
+### Explore
+Stories (24h expiry, upload, delete, viewer list), featured locations, event routes, weekly rankings, find locals, join events, event progress map, restaurant details, check-in points, and share cards.
+
+### Missions
+Mission list with filters, mission details, and achievements grid.
+
+### Rank
+City, country, global, and followers leaderboards with podium UI. View other users’ profiles (stats, map, photos, achievements).
+
+### Profile
+Level and points, check-in history, edit profile (avatar picker), settings, privacy controls, saved places, followers/blocked lists, personal map, help & support, and legal screens.
+
+### Auth & onboarding
+Splash, onboarding carousel, login, signup, OTP verification, and password reset flows.
 
 ---
 
@@ -44,11 +71,12 @@ Locals helps users explore a city like a local:
 
 ```bash
 flutter pub get
+flutter gen-l10n   # optional — runs automatically on build when generate: true
 flutter run
 flutter analyze
 ```
 
-**Design size:** 440 × 956 (`flutter_screenutil`)
+Hot restart after changing ARB files or `l10n.yaml`.
 
 ---
 
@@ -56,55 +84,91 @@ flutter analyze
 
 | Metric | Count |
 |--------|------:|
-| Dart files in lib/ | 342 |
-| Screen files (*_screen.dart) | 42 |
-| Feature widget files (`view/widgets/`) | 125 |
-| Shared component files | 25 |
-| Controllers | 41 |
-| Repositories | 40 |
-| Models / args | 54 |
-| GoRouter routes | 37 |
-| Feature modules | 8 top-level groups |
+| Dart files in `lib/` | 356 |
+| Screen files (`*_screen.dart`) | 42 |
+| Feature widget files (`view/widgets/`) | 126 |
+| Shared component files | 26 |
+| Controllers | 42 |
+| Repositories | 41 |
+| Models | 41+ |
+| GoRouter paths | 41 |
+| Supported locales | 2 (EN, ES) |
+| Feature groups | 9 |
 
 ---
 
-## Architecture
+## Architecture pattern
 
-Feature-first **MVC + Repository** pattern:
+The codebase follows a **feature-first MVC + Repository** layout. Each screen owns a thin view layer; business logic lives in controllers; data access is isolated behind repositories.
 
 ```
-Screen (*_screen.dart)
-    |
-    +-- widgets/          # UI building blocks
-    |
-Controller (*_controller.dart)   # ChangeNotifier, navigation, actions
-    |
-Repository (*_repository.dart)   # Data access (mock today -> API next)
-    |
-Model (*_model.dart, *_args.dart)
+┌─────────────────────────────────────────────────────────┐
+│  Screen (*_screen.dart)                                 │
+│    └── widgets/              UI building blocks         │
+├─────────────────────────────────────────────────────────┤
+│  Controller (*_controller.dart)                         │
+│    ChangeNotifier — state, user actions, navigation     │
+├─────────────────────────────────────────────────────────┤
+│  Repository (*_repository.dart)                         │
+│    Contract + *Impl — mock data today, HTTP tomorrow    │
+├─────────────────────────────────────────────────────────┤
+│  Model (*_model.dart, *_args.dart)                      │
+│    Domain state, route payloads                         │
+└─────────────────────────────────────────────────────────┘
 ```
 
-**State management:** provider + ChangeNotifierProvider per screen.
+| Concern | Choice |
+|---------|--------|
+| **State management** | `provider` — `ChangeNotifierProvider` scoped per screen |
+| **Navigation** | `go_router` — `ShellRoute` for 5 bottom tabs + root overlay routes |
+| **Localization** | Flutter gen-l10n (`app_en.arb`, `app_es.arb`) + `LocaleController` |
+| **Theming** | `AppColors`, Neumorphic theme, ScreenUtil for responsive sizing |
+| **Data (current)** | Mock seed data in models and `*RepositoryImpl`; `ExploreRepositoryImpl` is a singleton for in-memory stories |
 
-**Navigation:** go_router with ShellRoute (5 tabs) + root overlay routes.
-
-**Data today:** Mock seed data inside models and *RepositoryImpl stubs. ExploreRepositoryImpl is a singleton for in-memory stories.
+**Startup flow:** `startup.dart` initializes `SharedPreferences`, `LocaleController`, and root providers before `MyApp` mounts.
 
 ---
 
-## File & folder conventions
+## Project structure
+
+High-level layout of `lib/`:
+
+```
+lib/
+├── app/
+│   ├── app.dart              # MaterialApp.router, locale, theme
+│   ├── app_scaffold.dart     # Bottom nav shell
+│   └── router.dart           # GoRouter route table
+├── core/
+│   ├── localization/         # LocaleController, l10n helpers, API locale
+│   ├── media/                # Avatar picker, image save
+│   ├── permissions/          # Camera & gallery
+│   └── startup/              # App bootstrap
+├── features/                 # Feature modules (see conventions below)
+├── l10n/
+│   ├── app_en.arb            # English strings
+│   ├── app_es.arb            # Spanish strings
+│   └── app_localizations*.dart  # Generated — do not edit
+└── shared/
+    ├── components/           # Reusable widgets (buttons, map, dialogs)
+    ├── model/                # Cross-feature models
+    ├── story/                # Story launcher helper
+    └── theme/                # Colors, assets
+```
+
+### File naming conventions
 
 | Pattern | Purpose | Example |
 |---------|---------|---------|
-| *_screen.dart | Full-page route target | explore_screen.dart |
+| `*_screen.dart` | Full-page route target | `explore_screen.dart` |
 | `view/widgets/*.dart` | Screen-specific widgets | `explore_header.dart` |
-| *_controller.dart | UI logic & state | explore_controller.dart |
-| *_repository.dart | Data contract + impl | explore_repository.dart |
-| *_model.dart | Domain / UI state data | explore_model.dart |
+| `*_controller.dart` | UI logic and state | `explore_controller.dart` |
+| `*_repository.dart` | Data contract + implementation | `explore_repository.dart` |
+| `*_model.dart` | Domain / UI state | `explore_model.dart` |
 | `*_args.dart` | Route `extra` payload | `view_profile_args.dart` |
-| *_service.dart | Device / media helpers | story_upload_service.dart |
+| `*_service.dart` | Device / media helpers | `story_upload_service.dart` |
 
-Standard feature layout:
+### Standard feature module
 
 ```
 lib/features/<group>/<feature>/
@@ -115,16 +179,164 @@ lib/features/<group>/<feature>/
 └── view/
     ├── <feature>_screen.dart
     └── widgets/
-        └── *.dart
 ```
+
+**Top-level feature groups:** `account_create`, `explore`, `login`, `map`, `missions`, `onboard`, `profile`, `rank`, `splash`
+
+---
+
+## Localization
+
+The app supports **English (en)** and **Spanish (es)**. All static UI labels, buttons, titles, and empty states come from ARB files. Content from APIs or mock models (restaurant names, addresses, user bios) stays as returned by the server and is **not** translated in the app.
+
+**Full guide:** [docs/LOCALIZATION.md](docs/LOCALIZATION.md)
+
+### How it works (overview)
+
+```
+lib/l10n/app_en.arb          ← you edit (source of truth)
+lib/l10n/app_es.arb          ← you edit (translations)
+        │
+        ▼  flutter gen-l10n (via l10n.yaml)
+lib/l10n/app_localizations.dart   ← generated — do not edit
+        │
+        ▼  context.l10n in widgets
+UI text updates when LocaleController changes locale
+```
+
+| File / folder | Purpose |
+|---------------|---------|
+| `l10n.yaml` | Generator config (ARB dir, template file, output class name) |
+| `lib/l10n/app_en.arb` | English strings — **template**; every key must exist here first |
+| `lib/l10n/app_es.arb` | Spanish translations — must mirror keys from `app_en.arb` |
+| `lib/l10n/app_localizations*.dart` | Auto-generated `AppLocalizations` API |
+| `lib/core/localization/l10n_extensions.dart` | `context.l10n` shortcut |
+| `lib/core/localization/locale_controller.dart` | Current locale + `setLocale()` + persistence |
+| `lib/core/localization/locale_repository.dart` | Saves language to `SharedPreferences` (`app_locale`) |
+| `lib/core/localization/app_locales.dart` | Supported locales list (`en`, `es`) |
+| `lib/core/localization/api_locale.dart` | `Accept-Language` header for future HTTP client |
+| `lib/core/localization/*_l10n.dart` | Builders for dynamic lists (settings sections, onboard pages, filter labels) |
+
+### Add or change a UI string
+
+1. **Add the key** to `lib/l10n/app_en.arb`:
+   ```json
+   "settingsTitle": "Settings",
+   ```
+2. **Add the same key** to `lib/l10n/app_es.arb`:
+   ```json
+   "settingsTitle": "Ajustes",
+   ```
+3. **Regenerate** (happens automatically on `flutter run` / `flutter build`; or run manually):
+   ```bash
+   flutter gen-l10n
+   ```
+4. **Use in a widget:**
+   ```dart
+   import 'package:locals/core/localization/l10n_extensions.dart';
+
+   Text(context.l10n.settingsTitle)
+   ```
+5. **Hot restart** the app after ARB changes (`R` in terminal). Hot reload alone may not pick up new keys.
+
+**Key naming:** use `featureElement` camelCase — e.g. `loginWelcomeTitle`, `mapSearchHint`, `commonCancel`. Group related keys with a shared prefix.
+
+### Strings with placeholders
+
+Define the message and metadata in `app_en.arb`:
+
+```json
+"commonLevel": "Level {level}",
+"@commonLevel": {
+  "placeholders": {
+    "level": { "type": "int" }
+  }
+}
+```
+
+Mirror the key and `@commonLevel` block in `app_es.arb`, then call:
+
+```dart
+Text(context.l10n.commonLevel(user.level))
+```
+
+Supported placeholder types: `String`, `int`, `double`, `num`, `DateTime`.
+
+### What to localize vs leave alone
+
+| Localize (ARB) | Do not localize (models / API) |
+|----------------|--------------------------------|
+| Button labels, screen titles, hints | Restaurant / place names |
+| Tab names, section headers | Street addresses |
+| Empty states, error messages (static) | User display names, bios |
+| Filter category labels (via `FiltersL10n`) | Story captions from users |
+| Settings menu items (via `SettingsL10n`) | Leaderboard names from server |
+
+For **IDs mapped to labels** (e.g. filter category `restaurant` → “Restaurant”), use a helper in `lib/core/localization/`:
+
+```dart
+// filters_l10n.dart
+static String categoryLabel(AppLocalizations l10n, String id) {
+  return switch (id) {
+    'restaurant' => l10n.filterCategoryRestaurant,
+    // ...
+    _ => id,
+  };
+}
+```
+
+For **lists built from strings** (onboarding pages, settings sections), use `OnboardL10n.buildPages(context.l10n)` or `SettingsL10n.buildSections(context.l10n, ...)` — see existing `*_l10n.dart` files.
+
+### Language switching (runtime)
+
+1. User opens **Settings → Language**.
+2. `LanguagePickerSheet` shows `AppLocales.supported` (English / Spanish).
+3. On selection, `SettingsController` calls `LocaleController.setLocale(locale)`.
+4. Locale is saved to `SharedPreferences` and `MyApp` rebuilds with the new `locale`.
+5. All widgets using `context.l10n` show the new language.
+
+**Locale resolution** (`app.dart`):
+
+- If the user picked a language → use saved locale.
+- Else if the device language is supported → use device locale.
+- Else → fallback to English (`AppLocales.en`).
+
+### API requests (future)
+
+When wiring HTTP, send the same language the UI uses:
+
+```dart
+import 'package:locals/core/localization/api_locale.dart';
+
+final header = ApiLocale.acceptLanguageHeader(localeController.locale);
+// → "en" or "es" for Accept-Language
+```
+
+Backend should return localized content for dynamic fields when this header is set.
+
+### Add a third language (e.g. French)
+
+1. Create `lib/l10n/app_fr.arb` (copy `app_en.arb`, translate, set `"@@locale": "fr"`).
+2. Add `Locale('fr')` to `AppLocales.supported` in `app_locales.dart`.
+3. Add display name in `AppLocales.displayNames` and `localizedDisplayName()`.
+4. Run `flutter gen-l10n` and hot restart.
+
+Flutter picks up new ARB files automatically when they sit in `lib/l10n/` (configured in `l10n.yaml`).
+
+### Common pitfalls
+
+- **Do not edit** `app_localizations.dart` — it is overwritten on every build.
+- **Every key in `app_en.arb` must exist in `app_es.arb`** (and vice versa for required keys); missing keys cause `gen-l10n` errors.
+- **Do not call `notifyListeners()` from `didChangeDependencies`** when building localized lists; defer with `addPostFrameCallback` (see `onboard_screen.dart`).
+- Screens that build menus from `*_l10n.dart` should `context.watch<LocaleController>()` or rebuild when locale changes (see `settings_screen.dart`).
 
 ---
 
 ## Full directory tree
 
-Complete tree of `lib/`, `assets/`, and `docs/` including every screen, widget, controller, model, and repository file.
+Complete tree of `lib/`, `assets/`, and `docs/` — every screen, widget, controller, model, and repository file. Includes `l10n/` and `core/localization/` added for EN/ES support.
 
-Also saved as [docs/DIRECTORY_TREE.md](docs/DIRECTORY_TREE.md).
+Standalone copy: [docs/DIRECTORY_TREE.md](docs/DIRECTORY_TREE.md).
 
 <details>
 <summary><strong>Expand full directory tree (638 lines)</strong></summary>
@@ -983,126 +1195,146 @@ docs/
 
 ## Shared components
 
-Reusable widgets in lib/shared/components/ (used across features):
+Reusable widgets in `lib/shared/components/`:
 
 | File | Purpose |
 |------|---------|
-| uth_text_field.dart | Auth form input |
-| uth_screen_header.dart | Auth page header |
-| uth_divider.dart | Or divider |
-| google_sign_in_button.dart | Google OAuth button |
-| primary_button.dart | Pink CTA button |
-| secondary_outlined_button.dart | Outlined button |
-| ottom_nav_bar.dart | 5-tab navigation |
-| locals_logo.dart | App logo |
-| profile_screen_header.dart | Sub-screen header with back |
-| profile_segmented_control.dart | Tab segmented control |
-| 
-eumorphic_back_button.dart | Neumorphic back |
-| 
-eumorphic_illustration_card.dart | Onboard illustration card |
-| onboard_page_indicator.dart | Dot indicator |
-| password_requirement_box.dart | Password rules UI |
-| premium_confirm_dialog.dart | Animated logout/delete dialog |
-| legal_document_body.dart | Legal text renderer |
-| story_avatar_ring.dart | Story ring on avatar |
-| story_ring_style.dart | Pink/gray ring colors |
+| `auth_text_field.dart` | Auth form input |
+| `auth_screen_header.dart` | Auth page header |
+| `auth_divider.dart` | “Or” divider |
+| `google_sign_in_button.dart` | Google OAuth button |
+| `primary_button.dart` | Pink CTA button |
+| `secondary_outlined_button.dart` | Outlined button |
+| `bottom_nav_bar.dart` | 5-tab navigation |
+| `locals_logo.dart` | App logo |
+| `profile_screen_header.dart` | Sub-screen header with back |
+| `profile_segmented_control.dart` | Tab segmented control |
+| `neumorphic_back_button.dart` | Neumorphic back |
+| `neumorphic_illustration_card.dart` | Onboard illustration card |
+| `onboard_page_indicator.dart` | Dot indicator |
+| `password_requirement_box.dart` | Password rules UI |
+| `premium_confirm_dialog.dart` | Animated logout/delete dialog |
+| `legal_document_body.dart` | Legal text renderer |
+| `story_avatar_ring.dart` | Story ring on avatar |
+| `story_ring_style.dart` | Pink/gray ring colors |
 | **map/** | |
-| scrollable_map_canvas.dart | Pan/zoom map canvas |
-| map_pins_layer.dart | Pin stack layer |
-| map_interactive_pin.dart | Tappable pin + callout |
-| map_pin_callout.dart | Name + level tooltip |
+| `scrollable_map_canvas.dart` | Pan/zoom map canvas |
+| `map_pins_layer.dart` | Pin stack layer |
+| `map_interactive_pin.dart` | Tappable pin + callout |
+| `map_pin_callout.dart` | Name + level tooltip |
 | **image_view/** | |
-| image_view_dialog.dart | Full-screen photo dialog |
-| check_in_image_view.dart | Check-in photo viewer |
+| `image_view_dialog.dart` | Full-screen photo dialog |
+| `check_in_image_view.dart` | Check-in photo viewer |
 | **share/** | |
-| share_bottom_sheet_shell.dart | Share sheet shell |
-| share_link_row.dart | Copy link row |
+| `share_bottom_sheet_shell.dart` | Share sheet shell |
+| `share_link_row.dart` | Copy link row |
 
-**Shared models:** map_pin_info.dart, map_pin_tag.dart, check_in_photo_model.dart, legal_document_section.dart
+**Shared models:** `map_pin_info.dart`, `map_pin_tag.dart`, `check_in_photo_model.dart`, `legal_document_section.dart`
 
-**Shared story:** user_story_launcher.dart — opens /story_view from any screen
+**Shared story:** `user_story_launcher.dart` — opens `/story_view` from any screen
 
-**Theme:** pp_colors.dart, pp_assets.dart
+**Theme:** `app_colors.dart`, `app_assets.dart`
 
 ---
 
-## Screens & routes
+## Navigation & routes
 
-**37 GoRouter paths** — 5 bottom tabs + auth + overlays.
+**41 GoRouter paths** — 5 bottom tabs inside a `ShellRoute`, plus auth flows and full-screen overlays on the root navigator.
 
-### Bottom navigation
+### Bottom navigation (shell)
 
-| Tab | Route | Screen file |
-|-----|-------|-------------|
-| Map | /map | map/map/view/map_screen.dart |
-| Explore | /explore | explore/explore/view/explore_screen.dart |
-| Missions | /missions | missions/missions/view/missions_screen.dart |
-| Rank | /rank | 
-ank/rank/view/rank_screen.dart |
-| Profile | /profile | profile/profile/view/profile_screen.dart |
+| Tab | Path | Screen |
+|-----|------|--------|
+| Map | `/map` | `map/map/view/map_screen.dart` |
+| Explore | `/explore` | `explore/explore/view/explore_screen.dart` |
+| Missions | `/missions` | `missions/missions/view/missions_screen.dart` |
+| Rank | `/rank` | `rank/rank/view/rank_screen.dart` |
+| Profile | `/profile` | `profile/profile/view/profile_screen.dart` |
 
-### All screens
+`/map` accepts optional `MapScreenArgs` via `state.extra` (`focusedPinId`, `highlightedLocation`).
 
-| Route | Screen file |
-|-------|-------------|
-| /splash | splash/view/splash_screen.dart |
-| /onboard | onboard/view/onboard_screen.dart |
-| /login | login/login/view/login_screen.dart |
-| /signup | ccount_create/signup/view/signup_screen.dart |
-| /verify_account_otp | ccount_create/verify_account_otp/view/verify_account_otp_screen.dart |
-| /request_otp | login/request_otp/view/request_otp_screen.dart |
-| /verify_otp | login/verify_otp/view/verify_otp_screen.dart |
-| /set_new_password | login/set_new_password/view/set_new_password_screen.dart |
-| /story_view | explore/story_view/view/story_view_screen.dart |
-| /find_locals | explore/find_locals/view/find_locals_screen.dart |
-| /featured_locations | explore/featured_locations/view/featured_locations_screen.dart |
-| /events_routes | explore/events_routes/view/events_routes_screen.dart |
-| /join_event | explore/join_event/view/join_event_screen.dart |
-| /events_progress_map | explore/events_progress_map/view/events_progress_map_screen.dart |
-| /restaurant_view_details | explore/restaurant_view_details/view/restaurant_view_details_screen.dart |
-| /points | explore/points/view/points_screen.dart |
-| /share_card | explore/share_card/view/share_card_screen.dart |
-| /map_search | map/search/view/map_search_screen.dart |
-| /filters | map/filters/view/filters_screen.dart |
-| /notification | map/notification/view/notification_screen.dart |
-| /mission_details | missions/mission_details/view/mission_details_screen.dart |
-| /achievements | missions/achievements/view/achievements_screen.dart |
-| /view_profile | 
-ank/view_profile/view/view_profile_screen.dart |
-| /settings | profile/settings/view/settings_screen.dart |
-| /edit_profile | profile/edit_profile/view/edit_profile_screen.dart |
-| /privacy | profile/privacy/view/privacy_screen.dart |
-| /privacy_data | profile/privacy_data/view/privacy_data_screen.dart |
-| /set_notification | profile/set_notification/view/set_notification_screen.dart |
-| /blocked_list | profile/blocked_list/view/blocked_list_screen.dart |
-| /list | profile/list/view/list_screen.dart |
-| /saved_places | profile/saved_places/view/saved_places_screen.dart |
-| /my_map | profile/my_map/view/my_map_screen.dart |
-| /help_support | profile/help_support/view/help_support_screen.dart |
-| /privacy_policy | profile/privacy_policy/view/privacy_policy_screen.dart |
-| /terms_of_use | profile/terms_of_use/view/terms_of_use_screen.dart |
-| /manage_subscription | profile/manage_subscription/view/manage_subscription_screen.dart |
+### Auth & onboarding
 
-**Non-router screen:** explore/share_card/view/share_card_camera_screen.dart (pushed via Navigator)
+| Path | Screen |
+|------|--------|
+| `/splash` | `splash/view/splash_screen.dart` |
+| `/onboard` | `onboard/view/onboard_screen.dart` |
+| `/login` | `login/login/view/login_screen.dart` |
+| `/signup` | `account_create/signup/view/signup_screen.dart` |
+| `/verify_account_otp` | `account_create/verify_account_otp/view/verify_account_otp_screen.dart` |
+| `/request_otp` | `login/request_otp/view/request_otp_screen.dart` |
+| `/verify_otp` | `login/verify_otp/view/verify_otp_screen.dart` |
+| `/set_new_password` | `login/set_new_password/view/set_new_password_screen.dart` |
+
+### Explore overlays
+
+| Path | Screen | `extra` type |
+|------|--------|----------------|
+| `/story_view` | `explore/story_view/view/story_view_screen.dart` | `StoryViewerArgs` |
+| `/find_locals` | `explore/find_locals/view/find_locals_screen.dart` | `FindLocalsArgs` |
+| `/featured_locations` | `explore/featured_locations/view/featured_locations_screen.dart` | — |
+| `/events_routes` | `explore/events_routes/view/events_routes_screen.dart` | — |
+| `/join_event` | `explore/join_event/view/join_event_screen.dart` | `JoinEventArgs?` |
+| `/events_progress_map` | `explore/events_progress_map/view/events_progress_map_screen.dart` | `EventsProgressMapArgs?` |
+| `/restaurant_view_details` | `explore/restaurant_view_details/view/restaurant_view_details_screen.dart` | `RestaurantViewDetailsArgs?` |
+| `/points` | `explore/points/view/points_screen.dart` | `PointsArgs?` |
+| `/share_card` | `explore/share_card/view/share_card_screen.dart` | `ShareCardArgs?` |
+
+### Map overlays
+
+| Path | Screen | `extra` type |
+|------|--------|----------------|
+| `/map_search` | `map/search/view/map_search_screen.dart` | `String?` (initial query) |
+| `/filters` | `map/filters/view/filters_screen.dart` | `FiltersArgs?` |
+| `/notification` | `map/notification/view/notification_screen.dart` | — |
+
+### Missions & rank
+
+| Path | Screen | `extra` type |
+|------|--------|----------------|
+| `/mission_details` | `missions/mission_details/view/mission_details_screen.dart` | `String?` (mission id) |
+| `/achievements` | `missions/achievements/view/achievements_screen.dart` | — |
+| `/view_profile` | `rank/view_profile/view/view_profile_screen.dart` | `ViewProfileArgs?` |
+
+### Profile & settings
+
+| Path | Screen |
+|------|--------|
+| `/settings` | `profile/settings/view/settings_screen.dart` |
+| `/edit_profile` | `profile/edit_profile/view/edit_profile_screen.dart` |
+| `/privacy` | `profile/privacy/view/privacy_screen.dart` |
+| `/privacy_data` | `profile/privacy_data/view/privacy_data_screen.dart` |
+| `/set_notification` | `profile/set_notification/view/set_notification_screen.dart` |
+| `/blocked_list` | `profile/blocked_list/view/blocked_list_screen.dart` |
+| `/list` | `profile/list/view/list_screen.dart` |
+| `/saved_places` | `profile/saved_places/view/saved_places_screen.dart` |
+| `/my_map` | `profile/my_map/view/my_map_screen.dart` |
+| `/help_support` | `profile/help_support/view/help_support_screen.dart` |
+| `/privacy_policy` | `profile/privacy_policy/view/privacy_policy_screen.dart` |
+| `/terms_of_use` | `profile/terms_of_use/view/terms_of_use_screen.dart` |
+| `/manage_subscription` | `profile/manage_subscription/view/manage_subscription_screen.dart` |
+
+> **Note:** `/manage_subscription` remains routable but is hidden from the Settings menu.  
+> **Non-router screen:** `explore/share_card/view/share_card_camera_screen.dart` (pushed via `Navigator`).
 
 ---
 
 ## Frontend completion
 
-- [x] Full navigation (37 routes, 5-tab shell)
-- [x] Auth & onboarding UI flows
-- [x] Map pins, callouts, pan/zoom, directions from location details
-- [x] Explore feed, stories (24h, delete, viewers), rankings, find locals
+- [x] Full navigation (41 routes, 5-tab shell)
+- [x] Auth and onboarding flows
+- [x] EN/ES localization (ARB, settings language picker, `context.l10n`)
+- [x] Map pins, callouts, pan/zoom, focused pin from restaurant details
+- [x] Explore feed, stories (24h expiry, delete, viewers → profile)
 - [x] Check-in to points screen
 - [x] Missions, achievements, events progress map
-- [x] Leaderboards + view profile
+- [x] Leaderboards and view profile
 - [x] Profile, edit profile (avatar picker), settings, privacy
-- [x] Saved places, followers, blocked list, my map
+- [x] Saved places → restaurant details, followers, blocked list, my map
 - [x] Premium confirm dialogs (logout, delete account)
-- [x] Share card, legal screens, help & support
+- [x] Share card, legal screens, help and support
 
-**Not yet done:** REST API, JWT persistence, push notifications, WebSocket
+**Not yet implemented:** REST API client, JWT persistence, push notifications, WebSocket
 
 ---
 
@@ -1134,19 +1366,30 @@ Frontend is ready for API wiring — swap each *RepositoryImpl for HTTP calls.
 
 | Document | Description |
 |----------|-------------|
-| [docs/PROJECT.md](docs/PROJECT.md) | Architecture deep-dive & checklist |
-| [docs/DIRECTORY_TREE.md](docs/DIRECTORY_TREE.md) | Full directory tree (standalone) |
-| [docs/API_INTEGRATION.md](docs/API_INTEGRATION.md) | ~87 APIs, screen mapping, examples |
+| [docs/LOCALIZATION.md](docs/LOCALIZATION.md) | How to add strings, ARB workflow, locale switching, API headers |
+| [docs/PROJECT.md](docs/PROJECT.md) | Architecture deep-dive and integration checklist |
+| [docs/DIRECTORY_TREE.md](docs/DIRECTORY_TREE.md) | Complete `lib/` directory tree |
+| [docs/API_INTEGRATION.md](docs/API_INTEGRATION.md) | ~87 API endpoints, screen mapping, request examples |
 
 ---
 
 ## Dependencies
 
 ```yaml
+# Navigation & state
 go_router: ^14.1.0
 provider: ^6.1.5+1
+
+# UI
 flutter_screenutil: ^5.9.3
 flutter_neumorphic_plus: ^3.5.0
+
+# Localization
+flutter_localizations: sdk
+intl: any
+shared_preferences: ^2.5.3
+
+# Media & device
 image_picker: ^1.1.2
 camera: ^0.11.1
 permission_handler: ^11.4.0

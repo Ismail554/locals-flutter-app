@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class MapSearchBar extends StatelessWidget {
   final String query;
@@ -47,7 +48,7 @@ class MapSearchBar extends StatelessWidget {
                 flex: 1,
                 fit: FlexFit.tight,
                 child: Text(
-                  hasQuery ? query : 'Search locals & places',
+                  hasQuery ? query : context.l10n.mapSearchHint,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

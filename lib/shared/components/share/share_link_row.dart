@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ShareLinkRow extends StatelessWidget {
   final String url;
@@ -12,7 +13,7 @@ class ShareLinkRow extends StatelessWidget {
     await Clipboard.setData(ClipboardData(text: url));
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Link copied')),
+      SnackBar(content: Text(context.l10n.snackbarLinkCopied)),
     );
   }
 
@@ -56,7 +57,7 @@ class ShareLinkRow extends StatelessWidget {
               ),
             ),
             child: Text(
-              'Copy',
+              context.l10n.commonCopy,
               style: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w600,

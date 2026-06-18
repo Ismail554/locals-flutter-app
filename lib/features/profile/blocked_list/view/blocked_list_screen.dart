@@ -7,6 +7,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/blocked_list_controller.dart';
 import '../repository/blocked_list_repository.dart';
 import 'widgets/blocked_user_item.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class BlockedListScreen extends StatelessWidget {
   const BlockedListScreen({super.key});
@@ -35,7 +36,7 @@ class _BlockedListView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Blocked list',
+                title: context.l10n.blockedListTitle,
                 onBack: () => context.pop(),
               ),
             ),

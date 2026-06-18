@@ -10,6 +10,7 @@ import '../controller/set_new_password_controller.dart';
 import '../repository/set_new_password_repository.dart';
 import 'widgets/password_changed_success_view.dart';
 import 'widgets/set_new_password_login_link.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SetNewPasswordScreen extends StatelessWidget {
   const SetNewPasswordScreen({super.key});
@@ -42,9 +43,9 @@ class _SetNewPasswordView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AuthScreenHeader(
-              title: 'Create a new password',
-              subtitle: 'Create something unique but rememberable',
+            AuthScreenHeader(
+              title: context.l10n.setPasswordTitle,
+              subtitle: context.l10n.setPasswordSubtitle,
             ),
             Padding(
               padding: EdgeInsets.all(24.w),
@@ -52,8 +53,8 @@ class _SetNewPasswordView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AuthTextField(
-                    label: 'New Password',
-                    hint: 'Something secure',
+                    label: context.l10n.setPasswordNewLabel,
+                    hint: context.l10n.setPasswordNewHint,
                     prefixIcon: Icons.lock_outline,
                     obscureText: controller.state.obscureNewPassword,
                     onChanged: controller.setNewPassword,
@@ -70,8 +71,8 @@ class _SetNewPasswordView extends StatelessWidget {
                   ),
                   SizedBox(height: 20.h),
                   AuthTextField(
-                    label: 'Confirm Password',
-                    hint: 'Confirm your password',
+                    label: context.l10n.setPasswordConfirmLabel,
+                    hint: context.l10n.setPasswordConfirmHint,
                     prefixIcon: Icons.lock_outline,
                     obscureText: controller.state.obscureConfirmPassword,
                     onChanged: controller.setConfirmPassword,
@@ -92,7 +93,7 @@ class _SetNewPasswordView extends StatelessWidget {
                   ),
                   SizedBox(height: 32.h),
                   PrimaryButton(
-                    label: 'Reset Password',
+                    label: context.l10n.setPasswordButton,
                     onPressed: () => controller.resetPassword(context),
                   ),
                   SizedBox(height: 24.h),

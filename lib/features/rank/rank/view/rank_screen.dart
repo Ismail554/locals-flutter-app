@@ -8,6 +8,7 @@ import 'widgets/rank_list_item.dart';
 import 'widgets/rank_period_tabs.dart';
 import 'widgets/rank_podium.dart';
 import 'widgets/rank_scope_chips.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class RankScreen extends StatelessWidget {
   const RankScreen({super.key});
@@ -38,7 +39,7 @@ class _RankView extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 16.h),
                 child: Text(
-                  'Leaderboard',
+                  context.l10n.rankLeaderboardTitle,
                   style: TextStyle(
                     color: AppColors.black,
                     fontSize: 26.sp,

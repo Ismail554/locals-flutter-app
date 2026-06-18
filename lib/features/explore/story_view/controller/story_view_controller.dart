@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../explore/model/explore_model.dart';
 import '../model/story_view_args.dart';
 import '../view/widgets/story_viewers_bottom_sheet.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class StoryViewController extends ChangeNotifier {
   final StoryViewerArgs args;
@@ -166,25 +167,26 @@ class StoryViewController extends ChangeNotifier {
     pause();
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete this photo?'),
-        content: const Text(
-          'Only this story slide will be removed. Your other stories stay.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(
-              'Delete',
-              style: TextStyle(color: Colors.red.shade700),
+      builder: (dialogContext) {
+        final l10n = dialogContext.l10n;
+        return AlertDialog(
+          title: Text(l10n.storyDeletePhotoTitle),
+          content: Text(l10n.storyDeletePhotoMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.commonCancel),
             ),
-          ),
-        ],
-      ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(
+                l10n.commonDelete,
+                style: TextStyle(color: Colors.red.shade700),
+              ),
+            ),
+          ],
+        );
+      },
     );
     resume();
 

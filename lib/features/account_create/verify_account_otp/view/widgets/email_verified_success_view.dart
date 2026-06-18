@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class EmailVerifiedSuccessView extends StatelessWidget {
   const EmailVerifiedSuccessView({super.key});
@@ -29,7 +30,7 @@ class EmailVerifiedSuccessView extends StatelessWidget {
           ),
           SizedBox(height: 32.h),
           Text(
-            'Email Verified',
+            context.l10n.otpEmailVerifiedTitle,
             style: TextStyle(
               color: AppColors.white,
               fontSize: 28.sp,
@@ -40,7 +41,7 @@ class EmailVerifiedSuccessView extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 32.w),
             child: Text(
-              'Your email has been verified successfully.',
+              context.l10n.otpEmailVerifiedMessage,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.actionPink,

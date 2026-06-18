@@ -7,6 +7,7 @@ import 'package:locals/shared/components/profile_screen_header.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/privacy_policy_controller.dart';
 import '../repository/privacy_policy_repository.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -36,7 +37,7 @@ class _PrivacyPolicyView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: 'Privacy policy',
+                title: context.l10n.privacyPolicyTitle,
                 onBack: () => context.pop(),
               ),
             ),

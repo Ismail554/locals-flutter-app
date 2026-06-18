@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/components/locals_logo.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class MissionsHeader extends StatelessWidget {
   final VoidCallback onAchievementsTap;
@@ -21,7 +22,7 @@ class MissionsHeader extends StatelessWidget {
               onPressed: onAchievementsTap,
               icon: Icon(Icons.military_tech_outlined, color: AppColors.actionPink, size: 18.sp),
               label: Text(
-                'Achievements',
+                context.l10n.achievementsTitle,
                 style: TextStyle(
                   color: AppColors.actionPink,
                   fontSize: 14.sp,
@@ -33,7 +34,7 @@ class MissionsHeader extends StatelessWidget {
         ),
         SizedBox(height: 20.h),
         Text(
-          'Missions',
+          context.l10n.missionsTitle,
           style: TextStyle(
             color: AppColors.black,
             fontSize: 28.sp,
@@ -42,7 +43,7 @@ class MissionsHeader extends StatelessWidget {
         ),
         SizedBox(height: 6.h),
         Text(
-          'Curated challenges to discover Barcelona.',
+          context.l10n.missionsSubtitle,
           style: TextStyle(
             color: AppColors.textSecondary,
             fontSize: 14.sp,

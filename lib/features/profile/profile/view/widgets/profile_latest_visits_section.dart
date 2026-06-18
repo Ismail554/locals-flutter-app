@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/model/check_in_photo_model.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class ProfileLatestVisitsSection extends StatelessWidget {
   final List<CheckInPhoto> visits;
@@ -19,7 +20,7 @@ class ProfileLatestVisitsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Latest visits',
+          context.l10n.profileLatestVisits,
           style: TextStyle(
             color: AppColors.black,
             fontSize: 16.sp,

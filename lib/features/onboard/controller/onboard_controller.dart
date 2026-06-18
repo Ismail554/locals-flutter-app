@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:locals/shared/theme/app_assets.dart';
 import '../model/onboard_model.dart';
 import '../repository/onboard_repository.dart';
 
@@ -8,42 +7,15 @@ class OnboardController extends ChangeNotifier {
   final OnboardRepository repo;
   final PageController pageController = PageController();
 
-  OnboardModel state = OnboardModel(
-    pages: const [
-      OnboardPageData(
-        imageAsset: AppAssets.onboardMap1,
-        title: 'Discover authentic local places',
-        subtitle:
-            "Hand-picked spots with the locals' seal — the ones neighbors actually love.",
-        buttonLabel: 'Continue',
-      ),
-      OnboardPageData(
-        imageAsset: AppAssets.onboardMapPin2,
-        title: 'Collect locations, earn points',
-        subtitle:
-            'Check in when you visit. Every authentic place becomes part of your map.',
-        buttonLabel: 'Continue',
-      ),
-      OnboardPageData(
-        imageAsset: AppAssets.onboardTrophy3,
-        title: 'Level up, complete cities',
-        subtitle:
-            'Climb the ranks, unlock achievements, and chase 100% completion.',
-        buttonLabel: 'Get Started',
-      ),
-      OnboardPageData(
-        imageAsset: AppAssets.onboardLocation4,
-        title: 'Find locals around you',
-        subtitle:
-            'We use your location to show authentic places nearby and to confirm your check-ins. Your location is never shared with other users.',
-        buttonLabel: 'Allow location',
-        showSkip: false,
-        isLocationPage: true,
-      ),
-    ],
-  );
+  OnboardModel state = const OnboardModel();
 
   OnboardController(this.repo);
+
+  void initPages(List<OnboardPageData> pages) {
+    if (pages.isEmpty || state.pages.isNotEmpty) return;
+    state = state.copyWith(pages: pages);
+    notifyListeners();
+  }
 
   int get carouselPageCount => state.pages.where((p) => !p.isLocationPage).length;
 

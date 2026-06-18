@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class PrivacyDeleteAccountButton extends StatelessWidget {
   final VoidCallback onTap;
@@ -31,7 +32,7 @@ class PrivacyDeleteAccountButton extends StatelessWidget {
               ),
               SizedBox(width: 8.w),
               Text(
-                'Delete my account',
+                context.l10n.privacyDeleteAccount,
                 style: TextStyle(
                   color: AppColors.actionPink,
                   fontSize: 15.sp,

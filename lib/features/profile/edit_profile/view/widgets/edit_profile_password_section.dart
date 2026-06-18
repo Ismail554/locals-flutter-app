@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/components/primary_button.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import 'edit_profile_form_field.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class EditProfilePasswordSection extends StatelessWidget {
   final TextEditingController currentPasswordController;
@@ -50,7 +51,7 @@ class EditProfilePasswordSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Change password',
+          context.l10n.editProfileChangePassword,
           style: TextStyle(
             color: AppColors.black,
             fontSize: 16.sp,
@@ -59,7 +60,7 @@ class EditProfilePasswordSection extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
         EditProfileFormField(
-          label: 'Current password',
+          label: context.l10n.editProfileCurrentPassword,
           controller: currentPasswordController,
           obscureText: obscureCurrentPassword,
           suffix: _visibilityToggle(
@@ -69,7 +70,7 @@ class EditProfilePasswordSection extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
         EditProfileFormField(
-          label: 'New password',
+          label: context.l10n.editProfileNewPassword,
           controller: newPasswordController,
           obscureText: obscureNewPassword,
           suffix: _visibilityToggle(
@@ -79,7 +80,7 @@ class EditProfilePasswordSection extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
         EditProfileFormField(
-          label: 'Confirm password',
+          label: context.l10n.editProfileConfirmPassword,
           controller: confirmPasswordController,
           obscureText: obscureConfirmPassword,
           suffix: _visibilityToggle(
@@ -89,7 +90,7 @@ class EditProfilePasswordSection extends StatelessWidget {
         ),
         SizedBox(height: 20.h),
         PrimaryButton(
-          label: 'Change password',
+          label: context.l10n.editProfileChangePassword,
           onPressed: onChangePassword,
         ),
       ],

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:locals/features/explore/explore/model/explore_model.dart';
 import 'package:locals/features/rank/view_profile/model/view_profile_args.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class StoryViewersBottomSheet extends StatelessWidget {
   final List<StoryViewer> viewers;
@@ -19,9 +20,9 @@ class StoryViewersBottomSheet extends StatelessWidget {
     );
   }
 
-  String _timeAgo(DateTime time) {
+  String _timeAgo(BuildContext context, DateTime time) {
     final diff = DateTime.now().difference(time);
-    if (diff.inMinutes < 1) return 'Just now';
+    if (diff.inMinutes < 1) return context.l10n.storyJustNow;
     if (diff.inHours < 1) return '${diff.inMinutes}m ago';
     if (diff.inHours < 24) return '${diff.inHours}h ago';
     return '${diff.inDays}d ago';
@@ -68,7 +69,7 @@ class StoryViewersBottomSheet extends StatelessWidget {
                   flex: 1,
                   fit: FlexFit.tight,
                   child: Text(
-                    'Viewers',
+                    context.l10n.storyViewersTitle,
                     style: TextStyle(
                       color: AppColors.black,
                       fontSize: 18.sp,
@@ -91,7 +92,7 @@ class StoryViewersBottomSheet extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 32.h),
               child: Text(
-                'No one has viewed this story yet.',
+                context.l10n.storyViewersEmpty,
                 style: TextStyle(
                   color: AppColors.levelGrey,
                   fontSize: 14.sp,
@@ -145,7 +146,7 @@ class StoryViewersBottomSheet extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              _timeAgo(viewer.viewedAt),
+                              _timeAgo(context, viewer.viewedAt),
                               style: TextStyle(
                                 color: AppColors.levelGrey,
                                 fontSize: 13.sp,

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../model/mission_details_model.dart';
 import 'mission_details_stop_tile.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class MissionDetailsStopsSection extends StatelessWidget {
   final List<MissionStop> stops;
@@ -15,7 +16,7 @@ class MissionDetailsStopsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'STOPS',
+          context.l10n.missionStopsSection,
           style: TextStyle(
             color: AppColors.levelGrey,
             fontSize: 12.sp,

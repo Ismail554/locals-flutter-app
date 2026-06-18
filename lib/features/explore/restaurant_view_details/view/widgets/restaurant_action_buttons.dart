@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class RestaurantActionButtons extends StatelessWidget {
   final bool hasVisited;
@@ -32,7 +33,9 @@ class RestaurantActionButtons extends StatelessWidget {
               ),
             ),
             child: Text(
-              hasVisited ? "I've been here ✓" : "I've been here",
+              hasVisited
+                  ? context.l10n.restaurantBeenHereDone
+                  : context.l10n.restaurantBeenHere,
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
@@ -48,7 +51,7 @@ class RestaurantActionButtons extends StatelessWidget {
             onPressed: onDirectionsTap,
             icon: Icon(Icons.near_me_outlined, size: 18.sp),
             label: Text(
-              'Directions',
+              context.l10n.restaurantDirections,
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w600,

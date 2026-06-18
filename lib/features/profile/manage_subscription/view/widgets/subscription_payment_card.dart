@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SubscriptionPaymentCard extends StatelessWidget {
   final String paymentMethod;
@@ -51,7 +52,7 @@ class SubscriptionPaymentCard extends StatelessWidget {
             ),
           ),
           Text(
-            'Update',
+            context.l10n.subscriptionUpdatePayment,
             style: TextStyle(
               color: AppColors.actionPink,
               fontSize: 14.sp,
