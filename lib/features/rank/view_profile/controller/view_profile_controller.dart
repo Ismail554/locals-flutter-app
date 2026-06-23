@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:locals/shared/components/image_view/check_in_image_view.dart';
 import 'package:locals/shared/components/image_view/image_view_dialog.dart';
 import 'package:locals/shared/model/check_in_photo_model.dart';
 import 'package:locals/shared/story/user_story_launcher.dart';
@@ -11,7 +12,7 @@ class ViewProfileController extends ChangeNotifier {
   ViewProfileModel state;
 
   ViewProfileController(this.repo, {String? userId})
-      : state = repo.load(userId ?? 'marta');
+    : state = repo.load(userId ?? 'marta');
 
   bool get hasStory => UserStoryLauncher.hasStory(state.storyUserId);
 
@@ -48,7 +49,7 @@ class ViewProfileController extends ChangeNotifier {
   }
 
   void openPhoto(BuildContext context, CheckInPhoto photo) {
-    ImageViewDialog.show(context, photo);
+    ImageViewDialog.show(context, photo, viewType: ImageViewType.checkIn);
   }
 
   Future<void> openStory(BuildContext context) async {

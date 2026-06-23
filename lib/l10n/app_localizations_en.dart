@@ -291,6 +291,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exploreNewLocals => 'NEW LOCALS';
 
   @override
+  String get localShares => 'LOCAL SHARES';
+
+  @override
   String get exploreFeaturedLocations => 'FEATURED LOCATIONS';
 
   @override

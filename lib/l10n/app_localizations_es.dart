@@ -293,6 +293,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get exploreNewLocals => 'NUEVOS LOCALES';
 
   @override
+  String get localShares => 'acciones locales';
+
+  @override
   String get exploreFeaturedLocations => 'LUGARES DESTACADOS';
 
   @override

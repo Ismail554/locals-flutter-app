@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/features/explore/events_progress_map/model/events_progress_map_args.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_args.dart';
+import 'package:locals/shared/components/pin_details_sheet.dart';
+import 'package:locals/shared/model/map_pin_details.dart';
+import 'package:locals/shared/model/map_pin_info.dart';
 import '../../filters/model/filters_model.dart';
 import '../../search/repository/map_search_repository.dart';
 import '../model/map_screen_args.dart';
@@ -29,12 +32,46 @@ class MapController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void onPinTap(String pinId) {
-    state = state.copyWith(
-      selectedPinId: state.selectedPinId == pinId ? null : pinId,
-    );
-    notifyListeners();
+void onPinTap(BuildContext context, String pinId) {
+  print('✅ Pin tapped: $pinId');
+
+  final pin = state.getPinById(pinId);
+  if (pin == null) {
+    print('❌ Pin not found: $pinId');
+    return;
   }
+
+  // Update selection state
+  state = state.copyWith(
+    selectedPinId: state.selectedPinId == pinId ? null : pinId,
+  );
+  notifyListeners();
+
+  // Show Bottom Sheet
+  _showPinDetailsBottomSheet(context, pin);
+}
+
+void _showPinDetailsBottomSheet(BuildContext context, MapPinInfo pin) {
+  print('📍 Showing bottom sheet for: ${pin.name}');
+
+  final details = MapPinDetails(
+    id: pin.id,
+    category: pin.category ?? 'PLACE',
+    name: pin.name,
+    address: pin.address ?? 'Unknown Address',
+    points: pin.points ?? 30,
+    accentColor: pin.accentColor ?? const Color(0xFFD4C4B0),
+  );
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => PinDetailsSheet(pin: details),
+  ).then((_) {
+    print('Bottom sheet closed');
+  });
+}
 
   void clearSelectedPin() {
     if (state.selectedPinId == null) return;

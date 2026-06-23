@@ -68,7 +68,6 @@ class _ScrollableMapCanvasState extends State<ScrollableMapCanvas> {
       }
 
       _transformController.value = Matrix4.translationValues(tx, ty, 0);
-
       _centered = true;
     });
   }
@@ -108,7 +107,7 @@ class _ScrollableMapCanvasState extends State<ScrollableMapCanvas> {
                   child: MapPinsLayer(
                     pins: widget.pins,
                     selectedPinId: widget.selectedPinId,
-                    onPinTap: widget.onPinTap,
+                    onPinTap: widget.onPinTap,   // ← Passed correctly
                   ),
                 ),
               ],

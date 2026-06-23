@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:locals/shared/model/map_pin_info.dart';
 import 'package:locals/shared/model/map_pin_tag.dart';
 import '../../filters/model/filters_model.dart';
@@ -28,6 +29,10 @@ class MapModel {
         y: 0.18,
         tag: MapPinTag.business,
         visited: true,
+        category: 'CAFE',
+        address: 'Carrer del Born 12',
+        points: 50,
+        accentColor: Color(0xFFD4C4B0),
       ),
       MapPinInfo(
         id: 'parc_guell',
@@ -37,6 +42,10 @@ class MapModel {
         y: 0.14,
         tag: MapPinTag.pointOfInterest,
         visited: false,
+        category: 'PARK',
+        address: 'Carrer d\'Olot',
+        points: 60,
+        accentColor: Color(0xFFC8D8B8),
       ),
       MapPinInfo(
         id: 'forn_baluard',
@@ -46,6 +55,10 @@ class MapModel {
         y: 0.28,
         tag: MapPinTag.business,
         visited: false,
+        category: 'BAKERY',
+        address: 'Carrer del Baluard 38',
+        points: 30,
+        accentColor: Color(0xFFE8D8C8),
       ),
       MapPinInfo(
         id: 'la_merce_stop',
@@ -55,6 +68,10 @@ class MapModel {
         y: 0.42,
         tag: MapPinTag.sponsoredOrEvent,
         visited: true,
+        category: 'EVENT',
+        address: 'Basílica de la Mercè',
+        points: 80,
+        accentColor: Color(0xFFFFB6C1),
       ),
       MapPinInfo(
         id: 'bar_marsella',
@@ -64,6 +81,10 @@ class MapModel {
         y: 0.38,
         tag: MapPinTag.business,
         visited: true,
+        category: 'BAR',
+        address: 'Carrer de Sant Pau 65',
+        points: 40,
+        accentColor: Color(0xFFB8C8D8),
       ),
       MapPinInfo(
         id: 'sagrada',
@@ -73,6 +94,10 @@ class MapModel {
         y: 0.55,
         tag: MapPinTag.pointOfInterest,
         visited: false,
+        category: 'MONUMENT',
+        address: 'Carrer de Mallorca 401',
+        points: 75,
+        accentColor: Color(0xFFD0D8E0),
       ),
       MapPinInfo(
         id: 'bunkers',
@@ -82,6 +107,10 @@ class MapModel {
         y: 0.52,
         tag: MapPinTag.pointOfInterest,
         visited: false,
+        category: 'VIEWPOINT',
+        address: 'Carrer de Marià Labèrnia',
+        points: 45,
+        accentColor: Color(0xFF9DB2C8),
       ),
       MapPinInfo(
         id: 'born_market',
@@ -91,24 +120,10 @@ class MapModel {
         y: 0.62,
         tag: MapPinTag.business,
         visited: false,
-      ),
-      MapPinInfo(
-        id: 'modernist_trail',
-        name: 'Modernist Trail',
-        level: 14,
-        x: 0.58,
-        y: 0.72,
-        tag: MapPinTag.sponsoredOrEvent,
-        visited: false,
-      ),
-      MapPinInfo(
-        id: 'plaça_reial',
-        name: 'Plaça Reial',
-        level: 7,
-        x: 0.28,
-        y: 0.78,
-        tag: MapPinTag.pointOfInterest,
-        visited: false,
+        category: 'MARKET',
+        address: 'Plaça Comercial 12',
+        points: 35,
+        accentColor: Color(0xFFE8D8C8),
       ),
     ],
   });
@@ -139,5 +154,10 @@ class MapModel {
           ? null
           : highlightedLocation ?? this.highlightedLocation,
     );
+  }
+
+  // Helper method to fix 'getPinById' error
+  MapPinInfo? getPinById(String id) {
+    return pins.where((pin) => pin.id == id).firstOrNull;
   }
 }

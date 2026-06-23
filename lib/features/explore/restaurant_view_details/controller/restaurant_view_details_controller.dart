@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/features/map/map/model/map_screen_args.dart';
+import 'package:locals/shared/components/image_view/check_in_image_view.dart';
 import 'package:locals/shared/components/image_view/image_view_dialog.dart';
 import '../model/restaurant_view_details_args.dart';
 import '../model/restaurant_view_details_model.dart';
@@ -67,6 +68,7 @@ class RestaurantViewDetailsController extends ChangeNotifier {
     ImageViewDialog.show(
       context,
       photo.toCheckInPhoto(_formatCategory(restaurant.category)),
+      viewType: ImageViewType.checkIn,
     );
   }
 

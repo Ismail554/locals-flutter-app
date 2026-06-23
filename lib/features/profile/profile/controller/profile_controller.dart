@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/shared/components/image_view/check_in_image_view.dart';
 import 'package:locals/shared/components/image_view/image_view_dialog.dart';
 import 'package:locals/shared/model/check_in_photo_model.dart';
 import 'package:locals/shared/story/user_story_launcher.dart';
@@ -60,6 +61,6 @@ class ProfileController extends ChangeNotifier {
   }
 
   void openVisitImage(BuildContext context, CheckInPhoto photo) {
-    ImageViewDialog.show(context, photo);
+    ImageViewDialog.show(context, photo, viewType: ImageViewType.checkIn);
   }
 }

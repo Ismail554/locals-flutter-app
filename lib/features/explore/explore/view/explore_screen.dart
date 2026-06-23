@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/features/explore/explore/model/explore_model.dart';
+import 'package:locals/features/explore/explore/view/widgets/local_shares_section.dart';
+import 'package:locals/features/rank/view_profile/view/widgets/view_profile_photos_tab.dart';
+import 'package:locals/shared/model/check_in_photo_model.dart';
 import 'package:provider/provider.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+
 import '../controller/explore_controller.dart';
 import '../repository/explore_repository.dart';
+
 import 'widgets/explore_featured_locations_section.dart';
 import 'widgets/explore_featured_routes_section.dart';
 import 'widgets/explore_follow_locals_section.dart';
@@ -42,21 +48,26 @@ class _ExploreView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ExploreHeader(
-                onNotificationTap: () =>
-                    controller.openNotifications(context),
+                onNotificationTap: () => controller.openNotifications(context),
               ),
               SizedBox(height: 20.h),
+
               ExploreRecentActivitySection(
                 stories: state.stories,
                 onStoryTap: (index) => controller.onStoryTap(context, index),
               ),
+
               SizedBox(height: 24.h),
-              ExploreWeeklyRankingSection(
-                users: state.weeklyRanking,
-                onSeeAll: () => context.push('/rank'),
-                onUserTap: (_) => controller.openProfile(context),
+
+              LocalSharesSection(
+                shares: state.localShares,
+                onPhotoTap: (share) =>
+                    controller.openLocalShareDetails(context, share),
+                    onSeeAll: () => controller.openLocalShares(context),
               ),
+
               SizedBox(height: 24.h),
+
               ExploreFollowLocalsSection(
                 users: state.followLocals,
                 stories: state.stories,
@@ -65,26 +76,30 @@ class _ExploreView extends StatelessWidget {
                 onAvatarTap: (id) => controller.openUserStory(context, id),
                 onSeeAll: () => controller.openFindLocals(context),
               ),
+
               SizedBox(height: 24.h),
+
               ExploreFeaturedLocationsSection(
                 locations: state.featuredLocations,
                 onSeeAll: () => controller.openFeaturedLocations(context),
                 onLocationTap: (id) =>
                     controller.openLocationDetails(context, id),
               ),
+
               SizedBox(height: 24.h),
+
               ExploreNewLocalsSection(
                 locals: state.newLocals,
                 onLocalTap: (id) => controller.openLocationDetails(context, id),
               ),
+
               SizedBox(height: 24.h),
+
               ExploreFeaturedRoutesSection(
                 route: state.featuredRoute,
                 onAllEvents: () => controller.openEventsRoutes(context),
-                onRouteTap: () => controller.openJoinEvent(
-                  context,
-                  state.featuredRoute.id,
-                ),
+                onRouteTap: () =>
+                    controller.openJoinEvent(context, state.featuredRoute.id),
               ),
             ],
           ),

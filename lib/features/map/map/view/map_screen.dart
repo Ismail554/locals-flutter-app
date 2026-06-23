@@ -45,7 +45,7 @@ class _MapView extends StatelessWidget {
           pins: state.pins,
           selectedPinId: state.selectedPinId,
           focusPinId: state.selectedPinId,
-          onPinTap: controller.onPinTap,
+          onPinTap: (pinId) => controller.onPinTap(context, pinId),
           onBackgroundTap: controller.clearSelectedPin,
         ),
         Positioned(
@@ -77,8 +77,7 @@ class _MapView extends StatelessWidget {
                       MapCircleActionButton(
                         icon: Icons.notifications_none,
                         showBadge: state.hasUnreadNotifications,
-                        onPressed: () =>
-                            controller.openNotifications(context),
+                        onPressed: () => controller.openNotifications(context),
                       ),
                     ],
                   ),

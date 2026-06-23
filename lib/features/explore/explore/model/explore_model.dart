@@ -47,10 +47,7 @@ class StorySlide {
     return '${remaining.inDays}d left';
   }
 
-  StorySlide copyWith({
-    String? imagePath,
-    Color? placeholderColor,
-  }) {
+  StorySlide copyWith({String? imagePath, Color? placeholderColor}) {
     return StorySlide(
       id: id,
       imagePath: imagePath ?? this.imagePath,
@@ -191,6 +188,26 @@ class ExploreFeaturedRoute {
   });
 }
 
+class ExploreLocalShare {
+  final String id;
+  final Color imageColor;
+  final String userName;
+  final String userAvatarInitial;
+  final String timeAgo;
+  final String caption;
+  final int likeCount;
+
+  const ExploreLocalShare({
+    required this.id,
+    required this.imageColor,
+    required this.userName,
+    this.userAvatarInitial = 'M',
+    required this.timeAgo,
+    required this.caption,
+    this.likeCount = 24,
+  });
+}
+
 class ExploreModel {
   static List<ExploreStory> get defaultStories {
     final now = DateTime.now();
@@ -259,6 +276,7 @@ class ExploreModel {
   final List<ExploreFeaturedLocation> featuredLocations;
   final List<ExploreNewLocal> newLocals;
   final ExploreFeaturedRoute featuredRoute;
+  final List<ExploreLocalShare> localShares;
 
   ExploreModel({
     List<ExploreStory>? stories,
@@ -318,17 +336,19 @@ class ExploreModel {
       title: 'Modernist Trail',
       subtitle: '7 stops · 500 pts',
       imageColor: Color(0xFF8A9AAA),
-    ),
+    ), required this.localShares,
   }) : stories = stories ?? List<ExploreStory>.from(defaultStories);
 
   ExploreModel copyWith({
     List<ExploreStory>? stories,
     List<ExploreFollowUser>? followLocals,
+    List<ExploreLocalShare>? localShares,
   }) {
     return ExploreModel(
       stories: stories ?? this.stories,
-      weeklyRanking: weeklyRanking,
       followLocals: followLocals ?? this.followLocals,
+      localShares: localShares ?? this.localShares,
+      weeklyRanking: weeklyRanking,
       featuredLocations: featuredLocations,
       newLocals: newLocals,
       featuredRoute: featuredRoute,

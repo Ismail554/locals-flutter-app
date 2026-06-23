@@ -632,6 +632,12 @@ abstract class AppLocalizations {
   /// **'NEW LOCALS'**
   String get exploreNewLocals;
 
+  /// No description provided for @localShares.
+  ///
+  /// In en, this message translates to:
+  /// **'LOCAL SHARES'**
+  String get localShares;
+
   /// No description provided for @exploreFeaturedLocations.
   ///
   /// In en, this message translates to:

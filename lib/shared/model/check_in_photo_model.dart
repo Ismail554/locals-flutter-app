@@ -6,6 +6,7 @@ class CheckInPhoto {
   final String timeAgo;
   final String caption;
   final int likes;
+  final String? userInitial;
 
   const CheckInPhoto({
     required this.previewColor,
@@ -13,5 +14,6 @@ class CheckInPhoto {
     required this.timeAgo,
     required this.caption,
     required this.likes,
+    this.userInitial,
   });
 }

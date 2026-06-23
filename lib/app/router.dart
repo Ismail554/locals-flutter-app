@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/features/explore/explore/view/local_shares_screen.dart';
 import 'app_scaffold.dart';
 import '../features/splash/view/splash_screen.dart';
 import '../features/onboard/view/onboard_screen.dart';
@@ -291,6 +292,10 @@ final appRouter = GoRouter(
         final args = state.extra! as FindLocalsArgs;
         return FindLocalsScreen(args: args);
       },
+    ),
+    GoRoute(
+      path: '/local_shares',
+      builder: (context, state) => const LocalSharesScreen(),
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
