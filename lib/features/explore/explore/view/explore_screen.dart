@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:locals/features/explore/explore/model/explore_model.dart';
 import 'package:locals/features/explore/explore/view/widgets/local_shares_section.dart';
-import 'package:locals/features/rank/view_profile/view/widgets/view_profile_photos_tab.dart';
-import 'package:locals/shared/model/check_in_photo_model.dart';
 import 'package:provider/provider.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
@@ -17,7 +13,6 @@ import 'widgets/explore_follow_locals_section.dart';
 import 'widgets/explore_header.dart';
 import 'widgets/explore_new_locals_section.dart';
 import 'widgets/explore_recent_activity_section.dart';
-import 'widgets/explore_weekly_ranking_section.dart';
 
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});

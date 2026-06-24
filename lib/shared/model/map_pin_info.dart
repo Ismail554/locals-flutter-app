@@ -4,9 +4,14 @@ import 'map_pin_tag.dart';
 class MapPinInfo {
   final String id;
   final String name;
+
+  /// Optional: useful for UI logic
   final int level;
-  final double x;
-  final double y;
+
+  /// 🌍 REAL WORLD COORDINATES (IMPORTANT)
+  final double lat;
+  final double lng;
+
   final MapPinTag tag;
   final bool visited;
 
@@ -19,8 +24,8 @@ class MapPinInfo {
     required this.id,
     required this.name,
     required this.level,
-    required this.x,
-    required this.y,
+    required this.lat,
+    required this.lng,
     required this.tag,
     required this.visited,
     this.category,

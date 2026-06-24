@@ -60,8 +60,8 @@ class _ScrollableMapCanvasState extends State<ScrollableMapCanvas> {
         }
 
         if (focusPin != null) {
-          final pinX = focusPin.x * canvasWidth;
-          final pinY = focusPin.y * canvasHeight;
+          final pinX = focusPin.lat * canvasWidth;
+          final pinY = focusPin.lng * canvasHeight;
           tx = viewportWidth / 2 - pinX;
           ty = viewportHeight / 2 - pinY;
         }

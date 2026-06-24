@@ -27,8 +27,8 @@ class MapPinsLayer extends StatelessWidget {
           children: [
             for (final pin in pins)
               Positioned(
-                left: pin.x * mapWidth - MapInteractivePin.pinWidth.w / 2,
-                top: pin.y * mapHeight - MapInteractivePin.pinHeight.h,
+                left: pin.lat * mapWidth - MapInteractivePin.pinWidth.w / 2,
+                top: pin.lng * mapHeight - MapInteractivePin.pinHeight.h,
                 child: MapInteractivePin(
                   pin: pin,
                   isSelected: selectedPinId == pin.id,
