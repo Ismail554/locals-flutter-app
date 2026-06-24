@@ -380,6 +380,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get restaurantPhotos => 'Fotos';
 
   @override
+  String get profileDetails => 'Detalles del perfil';
+
+  @override
   String get restaurantVisitors => 'Visitantes';
 
   @override

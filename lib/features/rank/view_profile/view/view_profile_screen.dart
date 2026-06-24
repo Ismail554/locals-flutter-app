@@ -42,6 +42,8 @@ class _ViewProfileView extends StatelessWidget {
     final controller = context.watch<ViewProfileController>();
     final state = controller.state;
 
+    final bool isPhotosActive = state.selectedTab == ViewProfileTab.photos;
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -52,9 +54,11 @@ class _ViewProfileView extends StatelessWidget {
               child: ProfileScreenHeader(
                 title: context.l10n.viewProfileTitle(state.name),
                 onBack: () => context.pop(),
+                onMorePressed: () => controller.showMoreOptions(context),
               ),
             ),
             SizedBox(height: 20.h),
+
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
@@ -70,51 +74,56 @@ class _ViewProfileView extends StatelessWidget {
                       isStoryViewed: controller.isStoryViewed,
                       onAvatarTap: () => controller.openStory(context),
                     ),
+
                     SizedBox(height: 20.h),
+
+                    // Action Buttons with Toggle Logic
                     ViewProfileActionButtons(
                       isFollowing: state.isFollowing,
                       onFollowTap: controller.toggleFollow,
-                      onBlockTap: () => controller.blockUser(context),
+                      isPhotosActive: isPhotosActive,
+                      onSecondaryButtonTap: () {
+                        if (isPhotosActive) {
+                          controller.selectTab(ViewProfileTab.map);     // Go to Profile Details
+                        } else {
+                          controller.selectTab(ViewProfileTab.photos);  // Go to Photos
+                        }
+                      },
                     ),
+
                     SizedBox(height: 16.h),
+
                     ViewProfileStatsRow(
                       visits: state.visits,
                       followers: state.followers,
                       cities: state.cities,
                     ),
+
                     SizedBox(height: 20.h),
-                    ProfileSegmentedControl(
-                      options: [
-                        ProfileSegmentOption(
-                          label: context.l10n.viewProfileTabPhotos,
-                          value: 'photos',
+
+                    // Show Segmented Control (Map / Achievements) only when Profile Details is active
+                    if (!isPhotosActive) ...[
+                      ProfileSegmentedControl(
+                        options: [
+                          ProfileSegmentOption(label: context.l10n.navMap, value: 'map'),
+                          ProfileSegmentOption(label: context.l10n.achievementsTitle, value: 'achievements'),
+                        ],
+                        selectedValue: state.selectedTab.name,
+                        onChanged: (value) => controller.selectTab(
+                          ViewProfileTab.values.byName(value),
                         ),
-                        ProfileSegmentOption(
-                          label: context.l10n.viewProfileTabMap,
-                          value: 'map',
-                        ),
-                        ProfileSegmentOption(
-                          label: context.l10n.viewProfileTabAchievements,
-                          value: 'achievements',
-                        ),
-                      ],
-                      selectedValue: state.selectedTab.name,
-                      onChanged: (value) => controller.selectTab(
-                        ViewProfileTab.values.byName(value),
                       ),
-                    ),
-                    SizedBox(height: 20.h),
+                      SizedBox(height: 20.h),
+                    ],
+
+                    // Tab Content
                     switch (state.selectedTab) {
                       ViewProfileTab.photos => ViewProfilePhotosTab(
                           photos: state.photos,
-                          onPhotoTap: (photo) =>
-                              controller.openPhoto(context, photo),
+                          onPhotoTap: (photo) => controller.openPhoto(context, photo),
                         ),
-                      ViewProfileTab.map => ViewProfileMapTab(
-                          pins: state.mapPins,
-                        ),
-                      ViewProfileTab.achievements =>
-                        ViewProfileAchievementsTab(
+                      ViewProfileTab.map => ViewProfileMapTab(pins: state.mapPins),
+                      ViewProfileTab.achievements => ViewProfileAchievementsTab(
                           achievements: state.achievements,
                         ),
                     },

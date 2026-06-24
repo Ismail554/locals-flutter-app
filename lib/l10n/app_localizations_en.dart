@@ -378,6 +378,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restaurantPhotos => 'Photos';
 
   @override
+  String get profileDetails => 'Profile Details';
+
+  @override
   String get restaurantVisitors => 'Visitors';
 
   @override

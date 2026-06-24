@@ -794,6 +794,12 @@ abstract class AppLocalizations {
   /// **'Photos'**
   String get restaurantPhotos;
 
+  /// No description provided for @profileDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Details'**
+  String get profileDetails;
+
   /// No description provided for @restaurantVisitors.
   ///
   /// In en, this message translates to:

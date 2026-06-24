@@ -12,10 +12,9 @@ class ViewProfileController extends ChangeNotifier {
   ViewProfileModel state;
 
   ViewProfileController(this.repo, {String? userId})
-    : state = repo.load(userId ?? 'marta');
+      : state = repo.load(userId ?? 'marta');
 
   bool get hasStory => UserStoryLauncher.hasStory(state.storyUserId);
-
   bool get isStoryViewed => UserStoryLauncher.isViewed(state.storyUserId);
 
   void selectTab(ViewProfileTab tab) {
@@ -28,8 +27,30 @@ class ViewProfileController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void showMoreOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.block, color: Colors.red),
+              title: Text(context.l10n.blockUserTitle),
+              onTap: () {
+                Navigator.pop(context);
+                blockUser(context);
+              },
+            ),
+            
+          ],
+        ),
+      ),
+    );
+  }
+
   void blockUser(BuildContext context) {
-    showDialog<void>(
+    showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.l10n.blockUserTitle),
@@ -40,8 +61,13 @@ class ViewProfileController extends ChangeNotifier {
             child: Text(context.l10n.commonCancel),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.blockUserConfirm),
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${state.name} has been blocked')),
+              );
+            },
+            child: Text(context.l10n.blockUserConfirm, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
