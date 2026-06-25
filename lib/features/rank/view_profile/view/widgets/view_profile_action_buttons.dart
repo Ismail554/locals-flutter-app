@@ -44,23 +44,43 @@ class ViewProfileActionButtons extends StatelessWidget {
         SizedBox(width: 12.w),
 
         // Toggle Button: Photos <-> Profile Details
-        Expanded(
-          child: SizedBox(
-            height: 48.h,
-            child: TextButton(
-              onPressed: onSecondaryButtonTap,
-              style: TextButton.styleFrom(
-                backgroundColor: AppColors.chipUnselected,
-                foregroundColor: AppColors.black,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
-              ),
-              child: Text(
-                isPhotosActive ? context.l10n.profileDetails : context.l10n.viewProfileTabPhotos,
-                style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
-              ),
-            ),
+        // Toggle Button: Photos <-> Profile Details
+Expanded(
+  child: SizedBox(
+    height: 48.h,
+    child: TextButton(
+      onPressed: onSecondaryButtonTap,
+      style: TextButton.styleFrom(
+        backgroundColor: isPhotosActive
+            ? AppColors.chipUnselected
+            : AppColors.actionPink.withValues(alpha: 0.1),
+
+        foregroundColor: isPhotosActive
+            ? AppColors.black
+            : AppColors.actionPink,
+
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24.r),
+          side: BorderSide(
+            color: isPhotosActive
+                ? Colors.transparent
+                : AppColors.actionPink,
+            width: 1.5,
           ),
         ),
+      ),
+      child: Text(
+        isPhotosActive
+            ? context.l10n.profileDetails
+            : context.l10n.viewProfileTabPhotos,
+        style: TextStyle(
+          fontSize: 15.sp,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ),
+  ),
+),
       ],
     );
   }

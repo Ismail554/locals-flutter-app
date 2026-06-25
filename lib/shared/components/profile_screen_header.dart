@@ -72,7 +72,8 @@ class ProfileScreenHeader extends StatelessWidget {
                         width: 44.w,
                         height: 44.w,
                         decoration: const BoxDecoration(
-                          color: AppColors.chipUnselected,
+                          // color: AppColors.chipUnselected,
+                          color: Colors.transparent,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(

@@ -44,6 +44,7 @@ class RestaurantViewDetailsModel {
   final List<Color> visitorAvatarColors;
   final bool hasVisited;
   final bool isSaved;
+  final bool businessOfTheMonth;
 
   const RestaurantViewDetailsModel({
     required this.id,
@@ -62,14 +63,15 @@ class RestaurantViewDetailsModel {
     required this.visitorAvatarColors,
     this.hasVisited = false,
     this.isSaved = false,
+    this.businessOfTheMonth = true,
   });
 
   String get shareUrl => 'https://local.app/l/$id';
 
   String get mapPinId => switch (id) {
-        'sagrada_familia' => 'sagrada',
-        _ => id,
-      };
+    'sagrada_familia' => 'sagrada',
+    _ => id,
+  };
 
   PointsArgs toPointsArgs() {
     return PointsArgs(
@@ -94,10 +96,7 @@ class RestaurantViewDetailsModel {
     );
   }
 
-  RestaurantViewDetailsModel copyWith({
-    bool? hasVisited,
-    bool? isSaved,
-  }) {
+  RestaurantViewDetailsModel copyWith({bool? hasVisited, bool? isSaved}) {
     return RestaurantViewDetailsModel(
       id: id,
       category: category,
@@ -115,6 +114,7 @@ class RestaurantViewDetailsModel {
       visitorAvatarColors: visitorAvatarColors,
       hasVisited: hasVisited ?? this.hasVisited,
       isSaved: isSaved ?? this.isSaved,
+      businessOfTheMonth: true,
     );
   }
 
@@ -123,6 +123,7 @@ class RestaurantViewDetailsModel {
     category: 'BAKERY',
     name: 'Forn Baluard',
     hasLocalsSeal: true,
+    businessOfTheMonth: true,
     heroColor: Color(0xFFE8D8C8),
     shortDescription:
         'A family-run bakery since 1945, famous for its sourdough and pastries.',
@@ -177,6 +178,7 @@ class RestaurantViewDetailsModel {
     category: 'CAFE',
     name: 'Café del Born',
     hasLocalsSeal: true,
+    businessOfTheMonth: true,
     heroColor: Color(0xFFD4C4B0),
     shortDescription:
         'A cozy café in the heart of El Born, perfect for morning coffee.',
@@ -223,9 +225,9 @@ class RestaurantViewDetailsModel {
     category: 'BAR',
     name: 'Bar Marsella',
     hasLocalsSeal: false,
+    businessOfTheMonth: true,
     heroColor: Color(0xFFB8C8D8),
-    shortDescription:
-        'Historic absinthe bar in El Raval, open since 1820.',
+    shortDescription: 'Historic absinthe bar in El Raval, open since 1820.',
     fullDescription:
         'Historic absinthe bar in El Raval, open since 1820. '
         'Bar Marsella retains its vintage charm with original décor and '
@@ -262,9 +264,9 @@ class RestaurantViewDetailsModel {
     category: 'PARK',
     name: 'Parc Güell',
     hasLocalsSeal: true,
+    businessOfTheMonth: true,
     heroColor: Color(0xFFC8D8B8),
-    shortDescription:
-        'Gaudí\'s whimsical park with stunning city views.',
+    shortDescription: 'Gaudí\'s whimsical park with stunning city views.',
     fullDescription:
         'Gaudí\'s whimsical park with stunning city views. '
         'A UNESCO World Heritage site featuring colorful mosaics, '
@@ -309,6 +311,7 @@ class RestaurantViewDetailsModel {
     category: 'MONUMENT',
     name: 'Sagrada Família',
     hasLocalsSeal: true,
+    businessOfTheMonth: true,
     heroColor: Color(0xFFD0D8E0),
     shortDescription:
         'Gaudí\'s iconic basilica and UNESCO World Heritage site.',

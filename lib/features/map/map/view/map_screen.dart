@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:locals/features/map/map/view/widgets/business_banner.dart';
 import 'package:provider/provider.dart';
 
 import '../controller/map_controller.dart';
@@ -19,10 +20,7 @@ class MapScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => MapController(
-        MapRepositoryImpl(),
-        screenArgs: screenArgs,
-      ),
+      create: (_) => MapController(MapRepositoryImpl(), screenArgs: screenArgs),
       child: const _MapView(),
     );
   }
@@ -45,8 +43,7 @@ class _MapViewState extends State<_MapView> {
 
     final mission = state.activeMission;
     final highlightedLocation = state.highlightedLocation;
-    final bottomLocation =
-        mission?.activeLocation ?? highlightedLocation;
+    final bottomLocation = mission?.activeLocation ?? highlightedLocation;
 
     final markers = state.pins.map((pin) {
       return Marker(
@@ -63,7 +60,7 @@ class _MapViewState extends State<_MapView> {
         /// 🌍 REAL GOOGLE MAP
         GoogleMap(
           initialCameraPosition: CameraPosition(
-            target: LatLng(23.8103, 90.4125), // Dhaka default
+            target: LatLng(23.8103, 90.4125),
             zoom: 12,
           ),
           markers: markers,
@@ -100,8 +97,7 @@ class _MapViewState extends State<_MapView> {
                       MapCircleActionButton(
                         icon: Icons.notifications_none,
                         showBadge: state.hasUnreadNotifications,
-                        onPressed: () =>
-                            controller.openNotifications(context),
+                        onPressed: () => controller.openNotifications(context),
                       ),
                     ],
                   ),
@@ -109,13 +105,28 @@ class _MapViewState extends State<_MapView> {
                     SizedBox(height: 12.h),
                     MapMissionProgressCard(
                       mission: mission,
-                      onTap: () =>
-                          controller.openEventsProgressMap(context),
+                      onTap: () => controller.openEventsProgressMap(context),
                     ),
                   ],
                 ],
               ),
             ),
+          ),
+        ),
+
+        Positioned(
+          top: 140.h,
+          left: 16.w,
+          right: 16.w,
+          child: BusinessBanner(
+            title: "Café del Born",
+            subtitle: null, // optional
+            type: BannerType.businessOfTheMonth,
+            onTap: () =>
+                controller.openRestaurantDetails(context, 'cafe_del_born'),
+            onClose: () {
+              // Optional: dismiss banner logic
+            },
           ),
         ),
 
@@ -131,8 +142,7 @@ class _MapViewState extends State<_MapView> {
                 padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
                 child: MapLocationDetailCard(
                   location: bottomLocation,
-                  onTap: () =>
-                      controller.openActiveLocationDetails(context),
+                  onTap: () => controller.openActiveLocationDetails(context),
                 ),
               ),
             ),

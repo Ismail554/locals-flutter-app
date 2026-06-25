@@ -84,9 +84,13 @@ class _ViewProfileView extends StatelessWidget {
                       isPhotosActive: isPhotosActive,
                       onSecondaryButtonTap: () {
                         if (isPhotosActive) {
-                          controller.selectTab(ViewProfileTab.map);     // Go to Profile Details
+                          controller.selectTab(
+                            ViewProfileTab.map,
+                          ); // Go to Profile Details
                         } else {
-                          controller.selectTab(ViewProfileTab.photos);  // Go to Photos
+                          controller.selectTab(
+                            ViewProfileTab.photos,
+                          ); // Go to Photos
                         }
                       },
                     ),
@@ -105,8 +109,14 @@ class _ViewProfileView extends StatelessWidget {
                     if (!isPhotosActive) ...[
                       ProfileSegmentedControl(
                         options: [
-                          ProfileSegmentOption(label: context.l10n.navMap, value: 'map'),
-                          ProfileSegmentOption(label: context.l10n.achievementsTitle, value: 'achievements'),
+                          ProfileSegmentOption(
+                            label: context.l10n.navMap,
+                            value: 'map',
+                          ),
+                          ProfileSegmentOption(
+                            label: context.l10n.achievementsTitle,
+                            value: 'achievements',
+                          ),
                         ],
                         selectedValue: state.selectedTab.name,
                         onChanged: (value) => controller.selectTab(
@@ -119,13 +129,16 @@ class _ViewProfileView extends StatelessWidget {
                     // Tab Content
                     switch (state.selectedTab) {
                       ViewProfileTab.photos => ViewProfilePhotosTab(
-                          photos: state.photos,
-                          onPhotoTap: (photo) => controller.openPhoto(context, photo),
-                        ),
-                      ViewProfileTab.map => ViewProfileMapTab(pins: state.mapPins),
+                        photos: state.photos,
+                        onPhotoTap: (photo) =>
+                            controller.openPhoto(context, photo),
+                      ),
+                      ViewProfileTab.map => ViewProfileMapTab(
+                        pins: state.mapPins,
+                      ),
                       ViewProfileTab.achievements => ViewProfileAchievementsTab(
-                          achievements: state.achievements,
-                        ),
+                        achievements: state.achievements,
+                      ),
                     },
                   ],
                 ),

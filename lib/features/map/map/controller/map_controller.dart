@@ -131,4 +131,11 @@ void _showPinDetailsBottomSheet(BuildContext context, MapPinInfo pin) {
       ),
     );
   }
+
+  void openRestaurantDetails(BuildContext context, String locationId) {
+  context.push(
+    '/restaurant_view_details',
+    extra: RestaurantViewDetailsArgs(locationId: locationId),
+  );
+}
 }

@@ -360,6 +360,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventRouteComplete => 'Route complete';
 
   @override
+  String get sponsored => 'Sponsored';
+
+  @override
+  String get learnMore => 'Learn More';
+
+  @override
   String get restaurantLocalsSeal => 'locals\' seal';
 
   @override
@@ -379,6 +385,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileDetails => 'Profile Details';
+
+  @override
+  String get busniessOfTheMonth => 'Business of the month';
 
   @override
   String get restaurantVisitors => 'Visitors';

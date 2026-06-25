@@ -758,6 +758,18 @@ abstract class AppLocalizations {
   /// **'Route complete'**
   String get eventRouteComplete;
 
+  /// No description provided for @sponsored.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored'**
+  String get sponsored;
+
+  /// No description provided for @learnMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn More'**
+  String get learnMore;
+
   /// No description provided for @restaurantLocalsSeal.
   ///
   /// In en, this message translates to:
@@ -799,6 +811,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile Details'**
   String get profileDetails;
+
+  /// No description provided for @busniessOfTheMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Business of the month'**
+  String get busniessOfTheMonth;
 
   /// No description provided for @restaurantVisitors.
   ///

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_model.dart';
+import 'package:locals/features/map/map/view/widgets/business_banner.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
 class RestaurantHeroHeader extends StatelessWidget {
@@ -40,15 +41,9 @@ class RestaurantHeroHeader extends StatelessWidget {
             right: 20.w,
             child: Row(
               children: [
-                _CircleButton(
-                  icon: Icons.chevron_left,
-                  onTap: onBack,
-                ),
+                _CircleButton(icon: Icons.chevron_left, onTap: onBack),
                 const Spacer(),
-                _CircleButton(
-                  icon: Icons.ios_share_outlined,
-                  onTap: onShare,
-                ),
+                _CircleButton(icon: Icons.ios_share_outlined, onTap: onShare),
                 SizedBox(width: 8.w),
                 _CircleButton(
                   icon: restaurant.isSaved
@@ -69,9 +64,15 @@ class RestaurantHeroHeader extends StatelessWidget {
                 Row(
                   children: [
                     _Tag(label: restaurant.category),
+
                     if (restaurant.hasLocalsSeal) ...[
                       SizedBox(width: 8.w),
                       _SealTag(),
+                    ],
+
+                    if (restaurant.businessOfTheMonth) ...[
+                      SizedBox(width: 8.w),
+                      _BusinessMonthTag(),
                     ],
                   ],
                 ),
@@ -86,6 +87,40 @@ class RestaurantHeroHeader extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BusinessMonthTag extends StatelessWidget {
+  const _BusinessMonthTag();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: AppColors.actionPink,
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.emoji_events,
+            color: Colors.white,
+            size: 16.sp,
+          ),
+          SizedBox(width: 4.w),
+          Text(
+            context.l10n.busniessOfTheMonth,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
