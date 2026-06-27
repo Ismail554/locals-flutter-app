@@ -9,7 +9,6 @@ import '../controller/request_otp_controller.dart';
 import '../repository/request_otp_repository.dart';
 import 'widgets/request_otp_form.dart';
 import 'package:locals/core/localization/l10n_extensions.dart';
-
 class RequestOtpScreen extends StatelessWidget {
   const RequestOtpScreen({super.key});
 
@@ -27,7 +26,7 @@ class _RequestOtpView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<RequestOtpController>();
+    final controller = context.watch<RequestOtpController>();
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -52,10 +51,24 @@ class _RequestOtpView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   RequestOtpForm(onEmailChanged: controller.setEmail),
+                  if (controller.state.errorMessage != null) ...[
+                    SizedBox(height: 12.h),
+                    Text(
+                      controller.state.errorMessage!,
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 13.sp,
+                      ),
+                    ),
+                  ],
                   const Spacer(),
                   PrimaryButton(
                     label: context.l10n.requestOtpButton,
-                    onPressed: () => controller.requestOtp(context),
+                    onPressed: () {
+                      if (!controller.state.isLoading) {
+                        controller.requestOtp(context);
+                      }
+                    },
                   ),
                   SizedBox(height: 24.h),
                 ],

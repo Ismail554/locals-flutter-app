@@ -73,11 +73,21 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/verify_otp',
-      builder: (context, state) => const VerifyOtpScreen(),
+      builder: (context, state) {
+        final email = state.extra as String? ?? '';
+        return VerifyOtpScreen(email: email);
+      },
     ),
+
     GoRoute(
       path: '/set_new_password',
-      builder: (context, state) => const SetNewPasswordScreen(),
+      builder: (context, state) {
+        final args = state.extra as Map<String, String>? ?? {};
+        return SetNewPasswordScreen(
+          email: args['email'] ?? '',
+          resetToken: args['reset_token'] ?? '',
+        );
+      },
     ),
     GoRoute(path: '/signup', builder: (context, state) => const SignupScreen()),
     GoRoute(
