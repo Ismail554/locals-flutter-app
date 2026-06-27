@@ -61,18 +61,12 @@ final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/splash',
   routes: [
-    GoRoute(
-      path: '/splash',
-      builder: (context, state) => const SplashScreen(),
-    ),
+    GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(
       path: '/onboard',
       builder: (context, state) => const OnboardScreen(),
     ),
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
-    ),
+    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
     GoRoute(
       path: '/request_otp',
       builder: (context, state) => const RequestOtpScreen(),
@@ -85,13 +79,13 @@ final appRouter = GoRouter(
       path: '/set_new_password',
       builder: (context, state) => const SetNewPasswordScreen(),
     ),
-    GoRoute(
-      path: '/signup',
-      builder: (context, state) => const SignupScreen(),
-    ),
+    GoRoute(path: '/signup', builder: (context, state) => const SignupScreen()),
     GoRoute(
       path: '/verify_account_otp',
-      builder: (context, state) => const VerifyAccountOtpScreen(),
+      builder: (context, state) {
+        final email = state.extra as String? ?? '';
+        return VerifyAccountOtpScreen(email: email);
+      },
     ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
@@ -101,9 +95,7 @@ final appRouter = GoRouter(
           path: '/map',
           pageBuilder: (context, state) {
             final screenArgs = MapScreenArgs.fromExtra(state.extra);
-            return NoTransitionPage(
-              child: MapScreen(screenArgs: screenArgs),
-            );
+            return NoTransitionPage(child: MapScreen(screenArgs: screenArgs));
           },
         ),
         GoRoute(

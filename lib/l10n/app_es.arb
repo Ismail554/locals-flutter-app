@@ -303,6 +303,7 @@
   "snackbarStoryAdded": "Historia añadida",
   "photoLikesCount": "{count} me gusta",
   "savedPlacesTitle": "Lugares guardados",
+  "authConfirmPasswordLabel" : "Confirmar Contraseña",
   "storyJustNow": "Ahora mismo",
   "snackbarCapturePhotoFirst": "Captura una foto primero",
   "helpWriteMessage": "Escribe un mensaje",
@@ -311,5 +312,6 @@
   "cameraNoAvailable": "No hay cámara disponible en este dispositivo.",
   "cameraCouldNotOpen": "No se pudo abrir la cámara. Inténtalo de nuevo.",
   "shareCardTakePhoto": "Tomar foto",
-  "shareCardChooseGallery": "Elegir de la galería"
+  "shareCardChooseGallery": "Elegir de la galería",
+  "authConfirmPasswordHint" : "authConfirmPasswordHint"
 }

@@ -776,11 +776,23 @@ abstract class AppLocalizations {
   /// **'locals\' seal'**
   String get restaurantLocalsSeal;
 
+  /// No description provided for @authConfirmPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get authConfirmPasswordLabel;
+
   /// No description provided for @restaurantLocalSpot.
   ///
   /// In en, this message translates to:
   /// **'Local spot'**
   String get restaurantLocalSpot;
+
+  /// No description provided for @authConfirmPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'********'**
+  String get authConfirmPasswordHint;
 
   /// No description provided for @restaurantBeenHere.
   ///

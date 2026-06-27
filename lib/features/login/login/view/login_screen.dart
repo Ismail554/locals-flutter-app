@@ -73,17 +73,32 @@ class _LoginView extends StatelessWidget {
                   LoginOptionsRow(
                     rememberMe: controller.state.rememberMe,
                     onRememberChanged: controller.toggleRememberMe,
-                    onForgotPassword: () => controller.goToForgotPassword(context),
+                    onForgotPassword: () =>
+                        controller.goToForgotPassword(context),
                   ),
+                  if (controller.state.errorMessage != null) ...[
+                    SizedBox(height: 12.h),
+                    Text(
+                      controller.state.errorMessage!,
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 13.sp,
+                      ),
+                    ),
+                  ],
                   SizedBox(height: 24.h),
                   PrimaryButton(
                     label: context.l10n.loginButton,
-                    onPressed: () => controller.login(context),
+                    onPressed: controller.state.isLoading
+                        ? () {}
+                        : () => controller.login(context),
                   ),
                   SizedBox(height: 24.h),
                   const AuthDivider(),
                   SizedBox(height: 24.h),
-                  GoogleSignInButton(onPressed: () => controller.login(context)),
+                  GoogleSignInButton(
+                    onPressed: () => controller.login(context),
+                  ),
                   SizedBox(height: 32.h),
                   LoginSignupFooter(
                     onCreateAccount: () => controller.goToSignup(context),

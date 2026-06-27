@@ -369,7 +369,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restaurantLocalsSeal => 'locals\' seal';
 
   @override
+  String get authConfirmPasswordLabel => 'Confirm Password';
+
+  @override
   String get restaurantLocalSpot => 'Local spot';
+
+  @override
+  String get authConfirmPasswordHint => '********';
 
   @override
   String get restaurantBeenHere => 'I\'ve been here';

@@ -14,8 +14,20 @@ class SplashController extends ChangeNotifier {
   Future<void> initialize(BuildContext context) async {
     if (_hasStarted) return;
     _hasStarted = true;
+
+    // Allow splash animation to play
     await Future<void>.delayed(const Duration(seconds: 2));
+
     if (!context.mounted) return;
-    context.go('/onboard');
+
+    final isLoggedIn = await repo.isLoggedIn();
+
+    if (!context.mounted) return;
+
+    if (isLoggedIn) {
+      context.go('/map');
+    } else {
+      context.go('/onboard');
+    }
   }
 }
