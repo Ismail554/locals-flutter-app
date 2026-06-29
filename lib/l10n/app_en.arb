@@ -445,5 +445,6 @@
   "cameraNoAvailable": "No camera available on this device.",
   "cameraCouldNotOpen": "Could not open the camera. Please try again.",
   "shareCardTakePhoto": "Take photo",
-  "shareCardChooseGallery": "Choose from gallery"
+  "shareCardChooseGallery": "Choose from gallery",
+  "likes": "LIKES"
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/core/localization/l10n_extensions.dart';
-import 'package:locals/features/explore/explore/model/explore_model.dart';
 import 'package:locals/features/explore/explore/view/widgets/local_share_item.dart';
 import 'package:locals/shared/components/profile_screen_header.dart';
 import 'package:locals/shared/theme/app_colors.dart';

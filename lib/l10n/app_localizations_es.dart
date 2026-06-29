@@ -1006,4 +1006,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get shareCardChooseGallery => 'Elegir de la galería';
+
+  @override
+  String get likes => 'Gustos';
 }

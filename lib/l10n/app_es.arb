@@ -313,5 +313,6 @@
   "cameraCouldNotOpen": "No se pudo abrir la cámara. Inténtalo de nuevo.",
   "shareCardTakePhoto": "Tomar foto",
   "shareCardChooseGallery": "Elegir de la galería",
-  "authConfirmPasswordHint" : "authConfirmPasswordHint"
+  "authConfirmPasswordHint" : "authConfirmPasswordHint",
+  "likes" : "Gustos"
 }

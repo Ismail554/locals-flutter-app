@@ -1981,6 +1981,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose from gallery'**
   String get shareCardChooseGallery;
+
+  /// No description provided for @likes.
+  ///
+  /// In en, this message translates to:
+  /// **'LIKES'**
+  String get likes;
 }
 
 class _AppLocalizationsDelegate
