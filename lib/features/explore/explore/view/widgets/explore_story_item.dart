@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/components/story_avatar_ring.dart';
@@ -120,6 +119,23 @@ class _StoryThumbnail extends StatelessWidget {
     }
 
     final slide = story.activeSlides.last;
+
+    // 1. Network image from API (imageUrl)
+    if (slide.imageUrl != null) {
+      return Image.network(
+        slide.imageUrl!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        loadingBuilder: (_, child, progress) {
+          if (progress == null) return child;
+          return _colorThumb(slide);
+        },
+        errorBuilder: (_, __, ___) => _colorThumb(slide),
+      );
+    }
+
+    // 2. Local file path (picked but not yet uploaded, or camera)
     if (slide.imagePath != null) {
       return Image.file(
         File(slide.imagePath!),
@@ -130,6 +146,7 @@ class _StoryThumbnail extends StatelessWidget {
       );
     }
 
+    // 3. Color placeholder fallback
     return _colorThumb(slide);
   }
 

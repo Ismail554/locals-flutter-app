@@ -19,14 +19,21 @@ class StorySlide {
 
   final String id;
   final String? imagePath;
+  final String? imageUrl;
   final Color? placeholderColor;
   final DateTime createdAt;
 
+  final bool isLikedByMe;
+  final int likeCount;
+
   const StorySlide({
     required this.id,
-    this.imagePath,
-    this.placeholderColor,
-    required this.createdAt,
+  this.imagePath,
+  this.imageUrl,
+  this.placeholderColor,
+  required this.createdAt,
+  this.isLikedByMe = false,
+  this.likeCount = 0,
   });
 
   DateTime get expiresAt => createdAt.add(storyLifetime);
@@ -47,14 +54,52 @@ class StorySlide {
     return '${remaining.inDays}d left';
   }
 
-  StorySlide copyWith({String? imagePath, Color? placeholderColor}) {
-    return StorySlide(
-      id: id,
-      imagePath: imagePath ?? this.imagePath,
-      placeholderColor: placeholderColor ?? this.placeholderColor,
-      createdAt: createdAt,
-    );
-  }
+  StorySlide copyWith({
+  String? imagePath,
+  String? imageUrl,
+  Color? placeholderColor,
+  bool? isLikedByMe,
+  int? likeCount,
+}) {
+
+  return StorySlide(
+    id: id,
+    imagePath: imagePath ?? this.imagePath,
+    imageUrl: imageUrl ?? this.imageUrl,
+    placeholderColor:
+        placeholderColor ?? this.placeholderColor,
+    createdAt: createdAt,
+
+    isLikedByMe:
+        isLikedByMe ?? this.isLikedByMe,
+
+    likeCount:
+        likeCount ?? this.likeCount,
+  );
+}
+
+factory StorySlide.fromApi(Map<String,dynamic> json){
+
+ return StorySlide(
+
+   id: json['id'].toString(),
+
+   imageUrl: json['image'],
+
+   createdAt:
+     DateTime.parse(
+       json['created_at'],
+     ),
+
+   isLikedByMe:
+     json['liked_by_me'] ?? false,
+
+   likeCount:
+     json['like_count'] ?? 0,
+
+ );
+
+}
 }
 
 class ExploreStory {
@@ -63,9 +108,8 @@ class ExploreStory {
   final bool isYourStory;
   final List<StorySlide> slides;
   final bool isViewed;
-  final bool isLikedByMe;
-  final int likeCount;
   final List<StoryViewer> viewers;
+  final int? serverId;      
 
   const ExploreStory({
     required this.id,
@@ -73,9 +117,8 @@ class ExploreStory {
     this.isYourStory = false,
     this.slides = const [],
     this.isViewed = false,
-    this.isLikedByMe = false,
-    this.likeCount = 0,
     this.viewers = const [],
+    this.serverId,        
   });
 
   List<StorySlide> get activeSlides =>
@@ -83,22 +126,35 @@ class ExploreStory {
 
   bool get hasStory => activeSlides.isNotEmpty;
 
-  ExploreStory copyWith({
-    List<StorySlide>? slides,
-    bool? isViewed,
-    bool? isLikedByMe,
-    int? likeCount,
-    List<StoryViewer>? viewers,
-  }) {
+ExploreStory copyWith({
+  List<StorySlide>? slides,
+  bool? isViewed,
+  bool? isLikedByMe,
+  int? likeCount,
+  List<StoryViewer>? viewers,
+}) {
+  return ExploreStory(
+    id: id,
+    name: name,
+    isYourStory: isYourStory,
+    slides: slides ?? this.slides,
+    isViewed: isViewed ?? this.isViewed,
+    viewers: viewers ?? this.viewers,
+    serverId: serverId,
+  );
+}
+
+  /// Factory from API feed item
+  factory ExploreStory.fromApi(Map<String, dynamic> json) {
+    final slides = (json['stories'] as List)
+        .map((s) => StorySlide.fromApi(s as Map<String, dynamic>))
+        .toList();
     return ExploreStory(
-      id: id,
-      name: name,
-      isYourStory: isYourStory,
-      slides: slides ?? this.slides,
-      isViewed: isViewed ?? this.isViewed,
-      isLikedByMe: isLikedByMe ?? this.isLikedByMe,
-      likeCount: likeCount ?? this.likeCount,
-      viewers: viewers ?? this.viewers,
+      id: json['id'].toString(),
+      name: json['full_name'] as String,
+      slides: slides,
+      isViewed: json['all_viewed'] as bool? ?? false,
+      serverId: json['id'] as int?,
     );
   }
 }
@@ -209,10 +265,17 @@ class ExploreLocalShare {
 }
 
 class ExploreModel {
+  // "Your story" placeholder — always first in the list
+  static const ExploreStory yourStoryPlaceholder = ExploreStory(
+    id: 'you',
+    name: 'Your story',
+    isYourStory: true,
+  );
+
   static List<ExploreStory> get defaultStories {
     final now = DateTime.now();
     return [
-      const ExploreStory(id: 'you', name: 'Your story', isYourStory: true),
+      yourStoryPlaceholder,
       ExploreStory(
         id: 'marta',
         name: 'Marta',
@@ -228,7 +291,6 @@ class ExploreModel {
             createdAt: now.subtract(const Duration(hours: 1, minutes: 45)),
           ),
         ],
-        likeCount: 24,
       ),
       ExploreStory(
         id: 'aina',
@@ -240,37 +302,12 @@ class ExploreModel {
             createdAt: now.subtract(const Duration(hours: 5)),
           ),
         ],
-        likeCount: 12,
-      ),
-      ExploreStory(
-        id: 'joan',
-        name: 'Joan',
-        slides: [
-          StorySlide(
-            id: 'j1',
-            placeholderColor: const Color(0xFFC8D8B8),
-            createdAt: now.subtract(const Duration(hours: 10)),
-          ),
-        ],
-        isViewed: true,
-        likeCount: 8,
-      ),
-      ExploreStory(
-        id: 'paul',
-        name: 'Paul',
-        slides: [
-          StorySlide(
-            id: 'p1',
-            placeholderColor: const Color(0xFFB8C8D8),
-            createdAt: now.subtract(const Duration(hours: 18)),
-          ),
-        ],
-        likeCount: 5,
       ),
     ];
   }
 
   final List<ExploreStory> stories;
+  final bool isLoadingStories; 
   final List<ExploreRankingUser> weeklyRanking;
   final List<ExploreFollowUser> followLocals;
   final List<ExploreFeaturedLocation> featuredLocations;
@@ -280,6 +317,7 @@ class ExploreModel {
 
   ExploreModel({
     List<ExploreStory>? stories,
+    this.isLoadingStories = false,
     this.weeklyRanking = const [
       ExploreRankingUser(rank: 1, name: 'Aina V.', level: 24, points: 12450),
       ExploreRankingUser(rank: 2, name: 'Marta Roig', level: 22, points: 11280),
@@ -336,16 +374,19 @@ class ExploreModel {
       title: 'Modernist Trail',
       subtitle: '7 stops · 500 pts',
       imageColor: Color(0xFF8A9AAA),
-    ), required this.localShares,
+    ),
+    required this.localShares,
   }) : stories = stories ?? List<ExploreStory>.from(defaultStories);
 
   ExploreModel copyWith({
     List<ExploreStory>? stories,
+    bool? isLoadingStories,
     List<ExploreFollowUser>? followLocals,
     List<ExploreLocalShare>? localShares,
   }) {
     return ExploreModel(
       stories: stories ?? this.stories,
+      isLoadingStories: isLoadingStories ?? this.isLoadingStories,
       followLocals: followLocals ?? this.followLocals,
       localShares: localShares ?? this.localShares,
       weeklyRanking: weeklyRanking,

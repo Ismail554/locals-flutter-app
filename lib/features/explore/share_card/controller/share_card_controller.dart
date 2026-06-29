@@ -32,7 +32,8 @@ class ShareCardController extends ChangeNotifier {
         state = repo.load(args);
 
   Future<void> capturePhoto(BuildContext context) async {
-    final imagePath = await Navigator.of(context, rootNavigator: true).push<String>(
+    final imagePath = await Navigator.of(context, rootNavigator: true)
+        .push<String>(
       MaterialPageRoute(
         fullscreenDialog: true,
         builder: (_) => const ShareCardCameraScreen(),
@@ -61,7 +62,8 @@ class ShareCardController extends ChangeNotifier {
 
   Future<void> addToStory(BuildContext context) async {
     if (state.imagePath != null) {
-      _addImageToStory(state.imagePath!);
+      // Already have an image — add it locally (no upload needed, it's a share card)
+      _addLocalImageToStory(state.imagePath!);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.snackbarStoryAdded)),
@@ -73,17 +75,37 @@ class ShareCardController extends ChangeNotifier {
     final source = await _showMediaSourceSheet(context);
     if (!context.mounted || source == null) return;
 
-    final StorySlide? slide;
     if (source == ShareCardMediaSource.camera) {
-      slide = await _captureSlide(context);
+      // Camera: capture locally, add to story locally
+      await capturePhoto(context);
+      if (!context.mounted || state.imagePath == null) return;
+      _addLocalImageToStory(state.imagePath!);
     } else {
-      slide = await storyUploadService.pickFromGallery(context);
+      // Gallery: pick and upload to API, get server-backed slide
+      try {
+        final slide =
+            await storyUploadService.pickAndUpload(context, exploreRepo);
+        if (!context.mounted || slide == null) return;
+
+        // If slide has a local path, reflect it in the share card UI
+        if (slide.imagePath != null) _applyImage(slide.imagePath!);
+
+        // Slide is already added to exploreRepo inside pickAndUpload → addSlideToYourStory
+        // (StoryUploadService calls repo.uploadStory which returns the slide,
+        //  then ExploreController calls repo.addSlideToYourStory — but here we
+        //  call addSlideToYourStory directly since we bypass ExploreController)
+        exploreRepo.addSlideToYourStory(slide);
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to upload story. Please try again.'),
+            ),
+          );
+          return;
+        }
+      }
     }
-
-    if (!context.mounted || slide == null || slide.imagePath == null) return;
-
-    _applyImage(slide.imagePath!);
-    _addImageToStory(slide.imagePath!);
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -92,12 +114,10 @@ class ShareCardController extends ChangeNotifier {
     }
   }
 
-  Future<ShareCardMediaSource?> _showMediaSourceSheet(
-    BuildContext context,
-  ) {
+  Future<ShareCardMediaSource?> _showMediaSourceSheet(BuildContext context) {
     return showModalBottomSheet<ShareCardMediaSource>(
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (sheetContext) => SafeArea(
@@ -122,13 +142,6 @@ class ShareCardController extends ChangeNotifier {
     );
   }
 
-  Future<StorySlide?> _captureSlide(BuildContext context) async {
-    await capturePhoto(context);
-    final path = state.imagePath;
-    if (path == null) return null;
-    return storyUploadService.slideFromPath(path);
-  }
-
   void _applyImage(String imagePath) {
     state = state.copyWith(
       imagePath: imagePath,
@@ -138,7 +151,9 @@ class ShareCardController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _addImageToStory(String imagePath) {
+  /// Add a local file path slide to your story without uploading to server.
+  /// Used for camera captures and share card images.
+  void _addLocalImageToStory(String imagePath) {
     final slide = storyUploadService.slideFromPath(imagePath);
     exploreRepo.addSlideToYourStory(slide);
     state = state.copyWith(isConfirmed: true);

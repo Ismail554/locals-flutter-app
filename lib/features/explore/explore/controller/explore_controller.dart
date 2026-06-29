@@ -18,71 +18,179 @@ class ExploreController extends ChangeNotifier {
   ExploreModel state;
 
   ExploreController(this.repo, {StoryUploadService? storyUploadService})
-    : storyUploadService = storyUploadService ?? StoryUploadService(),
-      state = ExploreModel(
-        stories: repo.loadStories(),
-        localShares: _getDefaultLocalShares(), // ← Added
-      );
-
-  // NEW: Default Local Shares to match screenshot
-  static List<ExploreLocalShare> _getDefaultLocalShares() {
-    return [
-      ExploreLocalShare(
-        id: 'ls1',
-        imageColor: const Color(0xFFFFE4C4),
-        userName: 'Marta Roig',
-        userAvatarInitial: 'M',
-        timeAgo: '2d ago',
-        caption: 'Best cortado in the Born.',
-        likeCount: 24,
-      ),
-      ExploreLocalShare(
-        id: 'ls2',
-        imageColor: const Color(0xFFB0C4DE),
-        userName: 'Joan Bosch',
-        userAvatarInitial: 'J',
-        timeAgo: '5h ago',
-        caption: 'Tokyo Skytree at sunset.',
-        likeCount: 42,
-      ),
-      ExploreLocalShare(
-        id: 'ls3',
-        imageColor: const Color(0xFF4682B4),
-        userName: 'Aina V.',
-        userAvatarInitial: 'A',
-        timeAgo: '1d ago',
-        caption: 'Cozy evening at the bar.',
-        likeCount: 19,
-      ),
-      ExploreLocalShare(
-        id: 'ls4',
-        imageColor: const Color(0xFFD2B48C),
-        userName: 'Marta Roig',
-        userAvatarInitial: 'M',
-        timeAgo: '3h ago',
-        caption: 'Fresh pastries for breakfast.',
-        likeCount: 31,
-      ),
-      ExploreLocalShare(
-        id: 'ls5',
-        imageColor: const Color(0xFFFFDAB9),
-        userName: 'Joan Bosch',
-        userAvatarInitial: 'J',
-        timeAgo: '12h ago',
-        caption: 'Tapas night with friends.',
-        likeCount: 28,
-      ),
-      ExploreLocalShare(
-        id: 'ls6',
-        imageColor: const Color(0xFF708090),
-        userName: 'Aina V.',
-        userAvatarInitial: 'A',
-        timeAgo: 'Yesterday',
-        caption: 'Beautiful restaurant interior.',
-        likeCount: 15,
-      ),
-    ];
+      : storyUploadService = storyUploadService ?? StoryUploadService(),
+        state = ExploreModel(
+          stories: repo.loadStories(), // "your story" slot only initially
+          localShares: _getDefaultLocalShares(),
+        ) {
+    _loadStoryFeed();
   }
+
+  // ─── Story Feed ─────────────────────────────────────────────────────────────
+
+  Future<void> _loadStoryFeed() async {
+    state = state.copyWith(isLoadingStories: true);
+    notifyListeners();
+
+    try {
+      final feedStories = await repo.fetchStoryFeed();
+      final yourStory = repo.loadStories().first;
+      state = state.copyWith(
+        stories: [yourStory, ...feedStories],
+        isLoadingStories: false,
+      );
+    } catch (e) {
+      // Feed failure is non-fatal — keep "your story" slot visible
+      print('Story feed error: $e');
+      state = state.copyWith(isLoadingStories: false);
+    }
+
+    notifyListeners();
+  }
+
+  // ─── Story Tap ──────────────────────────────────────────────────────────────
+
+  Future<void> onStoryTap(BuildContext context, int index) async {
+    final story = state.stories[index];
+    if (story.isYourStory) {
+      await _onYourStoryTap(context, story);
+      return;
+    }
+    if (!story.hasStory) return;
+    await openStoryViewer(context, index);
+  }
+
+  Future<void> _onYourStoryTap(
+      BuildContext context, ExploreStory story) async {
+    if (!story.hasStory) {
+      await _pickAndUploadStory(context);
+      return;
+    }
+
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.play_circle_outline),
+              title: Text(ctx.l10n.exploreViewYourStory),
+              onTap: () => Navigator.pop(ctx, 'view'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.add_photo_alternate_outlined),
+              title: Text(ctx.l10n.exploreAddPhoto),
+              onTap: () => Navigator.pop(ctx, 'add'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (!context.mounted) return;
+    switch (action) {
+      case 'view':
+        await openStoryViewer(context, 0);
+      case 'add':
+        await _pickAndUploadStory(context);
+    }
+  }
+
+  Future<void> _pickAndUploadStory(BuildContext context) async {
+    try {
+      final slide = await storyUploadService.pickAndUpload(context, repo);
+      if (slide == null) return;
+
+      repo.addSlideToYourStory(slide);
+      final yourStory = repo.loadStories().first;
+      state = state.copyWith(
+        stories: [yourStory, ...state.stories.where((s) => !s.isYourStory)],
+      );
+      notifyListeners();
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.snackbarStoryAdded)),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Failed to upload story. Please try again.')),
+        );
+      }
+    }
+  }
+
+  // ─── Story Viewer ───────────────────────────────────────────────────────────
+
+  Future<void> openStoryViewer(BuildContext context, int initialIndex) async {
+    final storiesWithContent = state.stories.where((s) => s.hasStory).toList();
+    if (storiesWithContent.isEmpty) return;
+
+    final story = state.stories[initialIndex];
+    final viewerIndex = storiesWithContent.indexWhere((s) => s.id == story.id);
+    if (viewerIndex < 0) return;
+
+    // Fire-and-forget: mark all slides of this story as viewed
+    if (!story.isYourStory) {
+      _markStoriesViewed(story);
+    }
+
+    await context.push(
+      '/story_view',
+      extra: StoryViewerArgs(
+        stories: List<ExploreStory>.from(state.stories),
+        initialStoryIndex: viewerIndex,
+        onStoriesUpdated: _updateStories,
+      ),
+    );
+
+    // Refresh your story after viewer closes (slides may have been deleted)
+    final yourStory = repo.loadStories().first;
+    state = state.copyWith(
+      stories: [yourStory, ...state.stories.where((s) => !s.isYourStory)],
+    );
+    notifyListeners();
+  }
+
+  void _markStoriesViewed(ExploreStory story) {
+    for (final slide in story.activeSlides) {
+      repo.markStoryViewed(slide.id).catchError((dynamic e) {
+        print('Mark viewed error (slide ${slide.id}): $e');
+      });
+    }
+
+    // Optimistic local update
+    state = state.copyWith(
+      stories: state.stories
+          .map((s) => s.id == story.id ? s.copyWith(isViewed: true) : s)
+          .toList(),
+    );
+    notifyListeners();
+  }
+
+  void openUserStory(BuildContext context, String userId) {
+    final index = state.stories.indexWhere((s) => s.id == userId);
+    if (index < 0 || !state.stories[index].hasStory) return;
+    openStoryViewer(context, index);
+  }
+
+  void _updateStories(List<ExploreStory> updated) {
+    repo.saveStories(updated);
+    final yourStory = repo.loadStories().first;
+    state = state.copyWith(
+      stories: [yourStory, ...updated.where((s) => !s.isYourStory)],
+    );
+    notifyListeners();
+  }
+
+  // ─── Navigation ─────────────────────────────────────────────────────────────
 
   void openLocalShareDetails(BuildContext context, ExploreLocalShare share) {
     final photo = CheckInPhoto(
@@ -93,17 +201,14 @@ class ExploreController extends ChangeNotifier {
       likes: share.likeCount,
       userInitial: share.userAvatarInitial,
     );
-
     ImageViewDialog.show(context, photo, viewType: ImageViewType.localShare);
   }
 
-  void openFeaturedLocations(BuildContext context) {
-    context.push('/featured_locations');
-  }
+  void openFeaturedLocations(BuildContext context) =>
+      context.push('/featured_locations');
 
-  void openEventsRoutes(BuildContext context) {
-    context.push('/events_routes');
-  }
+  void openEventsRoutes(BuildContext context) =>
+      context.push('/events_routes');
 
   void openLocationDetails(BuildContext context, String locationId) {
     context.push(
@@ -116,9 +221,8 @@ class ExploreController extends ChangeNotifier {
     context.push('/join_event', extra: JoinEventArgs(eventId: eventId));
   }
 
-  void openNotifications(BuildContext context) {
-    context.push('/notification');
-  }
+  void openNotifications(BuildContext context) =>
+      context.push('/notification');
 
   void openFindLocals(BuildContext context) {
     context.push(
@@ -135,122 +239,77 @@ class ExploreController extends ChangeNotifier {
     );
   }
 
-  void openLocalShares(BuildContext context) {
-    context.push('/local_shares');
-  }
+  void openLocalShares(BuildContext context) => context.push('/local_shares');
 
-  void openProfile(BuildContext context) {
-    context.push('/view_profile');
-  }
-
-  void openUserStory(BuildContext context, String userId) {
-    final index = state.stories.indexWhere((story) => story.id == userId);
-    if (index < 0) return;
-    if (!state.stories[index].hasStory) return;
-    openStoryViewer(context, index);
-  }
+  void openProfile(BuildContext context) => context.push('/view_profile');
 
   void toggleFollow(String id) {
     state = state.copyWith(
       followLocals: state.followLocals
-          .map(
-            (user) => user.id == id
-                ? user.copyWith(isFollowing: !user.isFollowing)
-                : user,
-          )
+          .map((u) => u.id == id
+              ? u.copyWith(isFollowing: !u.isFollowing)
+              : u)
           .toList(),
     );
     notifyListeners();
   }
 
-  Future<void> onStoryTap(BuildContext context, int index) async {
-    final story = state.stories[index];
-    if (story.isYourStory) {
-      await _onYourStoryTap(context, story);
-      return;
-    }
-    if (!story.hasStory) return;
-    openStoryViewer(context, index);
-  }
+  // ─── Local Shares ───────────────────────────────────────────────────────────
 
-  Future<void> _onYourStoryTap(BuildContext context, ExploreStory story) async {
-    if (!story.hasStory) {
-      await _pickAndAddStoryImage(context);
-      return;
-    }
-
-    final action = await showModalBottomSheet<String>(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.play_circle_outline),
-              title: Text(context.l10n.exploreViewYourStory),
-              onTap: () => Navigator.pop(context, 'view'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.add_photo_alternate_outlined),
-              title: Text(context.l10n.exploreAddPhoto),
-              onTap: () => Navigator.pop(context, 'add'),
-            ),
-          ],
+  static List<ExploreLocalShare> _getDefaultLocalShares() => [
+        ExploreLocalShare(
+          id: 'ls1',
+          imageColor: const Color(0xFFFFE4C4),
+          userName: 'Marta Roig',
+          userAvatarInitial: 'M',
+          timeAgo: '2d ago',
+          caption: 'Best cortado in the Born.',
+          likeCount: 24,
         ),
-      ),
-    );
-
-    if (!context.mounted) return;
-    switch (action) {
-      case 'view':
-        openStoryViewer(context, 0);
-      case 'add':
-        await _pickAndAddStoryImage(context);
-    }
-  }
-
-  Future<void> _pickAndAddStoryImage(BuildContext context) async {
-    final slide = await storyUploadService.pickFromGallery(context);
-    if (slide == null) return;
-
-    repo.addSlideToYourStory(slide);
-    state = state.copyWith(stories: repo.loadStories());
-    notifyListeners();
-
-    if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.l10n.snackbarStoryAdded)));
-    }
-  }
-
-  Future<void> openStoryViewer(BuildContext context, int initialIndex) async {
-    final storiesWithContent = state.stories.where((s) => s.hasStory).toList();
-    if (storiesWithContent.isEmpty) return;
-
-    final story = state.stories[initialIndex];
-    final viewerIndex = storiesWithContent.indexWhere((s) => s.id == story.id);
-    if (viewerIndex < 0) return;
-
-    await context.push(
-      '/story_view',
-      extra: StoryViewerArgs(
-        stories: List<ExploreStory>.from(state.stories),
-        initialStoryIndex: viewerIndex,
-        onStoriesUpdated: _updateStories,
-      ),
-    );
-
-    state = state.copyWith(stories: repo.loadStories());
-    notifyListeners();
-  }
-
-  void _updateStories(List<ExploreStory> updated) {
-    repo.saveStories(updated);
-    state = state.copyWith(stories: updated);
-    notifyListeners();
-  }
+        ExploreLocalShare(
+          id: 'ls2',
+          imageColor: const Color(0xFFB0C4DE),
+          userName: 'Joan Bosch',
+          userAvatarInitial: 'J',
+          timeAgo: '5h ago',
+          caption: 'Tokyo Skytree at sunset.',
+          likeCount: 42,
+        ),
+        ExploreLocalShare(
+          id: 'ls3',
+          imageColor: const Color(0xFF4682B4),
+          userName: 'Aina V.',
+          userAvatarInitial: 'A',
+          timeAgo: '1d ago',
+          caption: 'Cozy evening at the bar.',
+          likeCount: 19,
+        ),
+        ExploreLocalShare(
+          id: 'ls4',
+          imageColor: const Color(0xFFD2B48C),
+          userName: 'Marta Roig',
+          userAvatarInitial: 'M',
+          timeAgo: '3h ago',
+          caption: 'Fresh pastries for breakfast.',
+          likeCount: 31,
+        ),
+        ExploreLocalShare(
+          id: 'ls5',
+          imageColor: const Color(0xFFFFDAB9),
+          userName: 'Joan Bosch',
+          userAvatarInitial: 'J',
+          timeAgo: '12h ago',
+          caption: 'Tapas night with friends.',
+          likeCount: 28,
+        ),
+        ExploreLocalShare(
+          id: 'ls6',
+          imageColor: const Color(0xFF708090),
+          userName: 'Aina V.',
+          userAvatarInitial: 'A',
+          timeAgo: 'Yesterday',
+          caption: 'Beautiful restaurant interior.',
+          likeCount: 15,
+        ),
+      ];
 }

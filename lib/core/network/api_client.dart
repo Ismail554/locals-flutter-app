@@ -18,18 +18,19 @@ class ApiClient {
 
   factory ApiClient() => _instance;
 
-  ApiClient._internal();
+  // static final baseUrl = dotenv.env['base_url'] ?? '';
+  static const baseUrl = 'https://clubby-andy-irksomely.ngrok-free.dev/api/v1';
+  // static const _apiPrefix = '/api/v1';
 
-  static const String _baseUrl =
-      'https://clubby-andy-irksomely.ngrok-free.dev/api/v1';
+  ApiClient._internal();
 
   static const Duration _timeout = Duration(seconds: 30);
 
   Map<String, String> get _baseHeaders => {
-        'Content-Type': 'application/json',
-        'Accept': '*/*',
-        'Accept-Language': 'en',
-      };
+    'Content-Type': 'application/json',
+    'Accept': '*/*',
+    'Accept-Language': 'en',
+  };
 
   Future<Map<String, String>> get _authHeaders async {
     final token = await TokenManager().accessToken;
@@ -42,9 +43,9 @@ class ApiClient {
   Future<Map<String, dynamic>> post(
     String path,
     Map<String, dynamic> body, {
-    bool requiresAuth = false,
+    bool requiresAuth = true,
   }) async {
-    final url = '$_baseUrl$path';
+    final url = '$baseUrl$path';
 
     try {
       final headers = requiresAuth ? await _authHeaders : _baseHeaders;
@@ -52,11 +53,7 @@ class ApiClient {
       _logRequest('POST', url, body);
 
       final response = await http
-          .post(
-            Uri.parse(url),
-            headers: headers,
-            body: jsonEncode(body),
-          )
+          .post(Uri.parse(url), headers: headers, body: jsonEncode(body))
           .timeout(_timeout);
 
       _logResponse(response);
@@ -78,7 +75,7 @@ class ApiClient {
     String path, {
     bool requiresAuth = true,
   }) async {
-    final url = '$_baseUrl$path';
+    final url = '$baseUrl$path';
 
     try {
       final headers = requiresAuth ? await _authHeaders : _baseHeaders;
@@ -112,7 +109,7 @@ class ApiClient {
     print('│ $method $url');
     if (body != null) {
       final safeBody = Map<String, dynamic>.from(body);
-      for (final key in ['password', 'confirm_password']) {
+      for (final key in ['password', 'confirm_password', 'new_password']) {
         if (safeBody.containsKey(key)) safeBody[key] = '••••••••';
       }
       print('│ Body: ${jsonEncode(safeBody)}');
@@ -139,7 +136,7 @@ class ApiClient {
     print('└────────────────────────────────────────────────────');
   }
 
-  // ─── Response handling ───────────────────────────────────────────────────────
+  // ─── Response handling ──────────────────────────────────────────────────────
 
   Map<String, dynamic> _handleResponse(http.Response response) {
     final body = _decodeBody(response.body);

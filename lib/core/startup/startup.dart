@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +10,8 @@ import '../../app/app.dart';
 void startFlutterApp() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await dotenv.load(fileName: ".env");
+
   final prefs = await SharedPreferences.getInstance();
   final localeController = LocaleController(LocaleRepositoryImpl(prefs));
   await localeController.loadLocale();
@@ -17,10 +20,11 @@ void startFlutterApp() async {
     ScreenUtilInit(
       designSize: const Size(440, 956),
       minTextAdapt: true,
-      builder: (context, child) => ChangeNotifierProvider<LocaleController>.value(
-        value: localeController,
-        child: const MyApp(),
-      ),
+      builder: (context, child) =>
+          ChangeNotifierProvider<LocaleController>.value(
+            value: localeController,
+            child: const MyApp(),
+          ),
     ),
   );
 }
