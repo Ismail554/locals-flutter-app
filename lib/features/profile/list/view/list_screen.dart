@@ -41,7 +41,8 @@ class _ListView extends StatelessWidget {
               child: ProfileScreenHeader(
                 title: context.l10n.listTitle,
                 onBack: () => context.pop(),
-                trailing: Icon(Icons.more_horiz, color: AppColors.black, size: 24.sp),
+                trailing:
+                    Icon(Icons.more_horiz, color: AppColors.black, size: 24.sp),
               ),
             ),
             SizedBox(height: 16.h),
@@ -50,11 +51,13 @@ class _ListView extends StatelessWidget {
               child: ProfileSegmentedControl(
                 options: [
                   ProfileSegmentOption(
-                    label: context.l10n.listFollowersCount(state.followersCount),
+                    label:
+                        context.l10n.listFollowersCount(state.followersCount),
                     value: ListTab.followers.name,
                   ),
                   ProfileSegmentOption(
-                    label: context.l10n.listFollowingCount(state.followingCount),
+                    label:
+                        context.l10n.listFollowingCount(state.followingCount),
                     value: ListTab.following.name,
                   ),
                 ],
@@ -67,24 +70,42 @@ class _ListView extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: ListView.separated(
-                padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                itemCount: state.activeUsers.length,
-                separatorBuilder: (_, __) => SizedBox(height: 10.h),
-                itemBuilder: (context, index) {
-                  final user = state.activeUsers[index];
-                  return ListUserItem(
-                    user: user,
-                    tab: state.selectedTab,
-                    hasStory: controller.hasStory(user.id),
-                    isStoryViewed: controller.isStoryViewed(user.id),
-                    onActionTap: () => controller.toggleFollow(user.id),
-                    onAvatarTap: () =>
-                        controller.openUserStory(context, user.id),
-                    onProfileTap: () => controller.openViewProfile(context),
-                  );
-                },
-              ),
+              child: state.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : state.errorMessage != null && state.activeUsers.isEmpty
+                      ? Center(
+                          child: Text(
+                            state.errorMessage!,
+                            style: TextStyle(
+                              color: AppColors.levelGrey,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: controller.refresh,
+                          child: ListView.separated(
+                            padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+                            itemCount: state.activeUsers.length,
+                            separatorBuilder: (_, __) => SizedBox(height: 10.h),
+                            itemBuilder: (context, index) {
+                              final user = state.activeUsers[index];
+                              return ListUserItem(
+                                user: user,
+                                tab: state.selectedTab,
+                                hasStory: controller.hasStory(user.id),
+                                isStoryViewed:
+                                    controller.isStoryViewed(user.id),
+                                onActionTap: () =>
+                                    controller.toggleFollow(user.id),
+                                onAvatarTap: () =>
+                                    controller.openUserStory(context, user.id),
+                                onProfileTap: () =>
+                                    controller.openViewProfile(context),
+                              );
+                            },
+                          ),
+                        ),
             ),
           ],
         ),
