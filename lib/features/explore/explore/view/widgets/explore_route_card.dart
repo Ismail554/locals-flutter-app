@@ -26,13 +26,20 @@ class ExploreRouteCard extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               Container(color: route.imageColor),
-              Positioned.fill(
-                child: Icon(
-                  Icons.landscape_outlined,
-                  color: AppColors.white.withValues(alpha: 0.25),
-                  size: 80.sp,
-                ),
-              ),
+              if (route.imageUrl != null)
+                Image.network(
+                  route.imageUrl!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  loadingBuilder: (_, child, progress) {
+                    if (progress == null) return child;
+                    return _placeholderIcon();
+                  },
+                  errorBuilder: (_, __, ___) => _placeholderIcon(),
+                )
+              else
+                _placeholderIcon(),
               Positioned(
                 left: 0,
                 right: 0,
@@ -87,6 +94,16 @@ class ExploreRouteCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _placeholderIcon() {
+    return Positioned.fill(
+      child: Icon(
+        Icons.landscape_outlined,
+        color: AppColors.white.withValues(alpha: 0.25),
+        size: 80.sp,
       ),
     );
   }

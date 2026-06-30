@@ -58,7 +58,7 @@ class _ExploreView extends StatelessWidget {
                 shares: state.localShares,
                 onPhotoTap: (share) =>
                     controller.openLocalShareDetails(context, share),
-                    onSeeAll: () => controller.openLocalShares(context),
+                onSeeAll: () => controller.openLocalShares(context),
               ),
 
               SizedBox(height: 24.h),
@@ -88,14 +88,17 @@ class _ExploreView extends StatelessWidget {
                 onLocalTap: (id) => controller.openLocationDetails(context, id),
               ),
 
-              SizedBox(height: 24.h),
-
-              ExploreFeaturedRoutesSection(
-                route: state.featuredRoute,
-                onAllEvents: () => controller.openEventsRoutes(context),
-                onRouteTap: () =>
-                    controller.openJoinEvent(context, state.featuredRoute.id),
-              ),
+              if (state.featuredRoute != null) ...[
+                SizedBox(height: 24.h),
+                ExploreFeaturedRoutesSection(
+                  route: state.featuredRoute!,
+                  onAllEvents: () => controller.openEventsRoutes(context),
+                  onRouteTap: () => controller.openJoinEvent(
+                    context,
+                    state.featuredRoute!.id,
+                  ),
+                ),
+              ],
             ],
           ),
         ),

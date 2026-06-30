@@ -1,33 +1,29 @@
+import 'package:locals/core/network/api_client.dart';
 import '../../explore/model/explore_model.dart';
 
 abstract class FindLocalsRepository {
-  List<ExploreFollowUser> buildUsers(List<ExploreFollowUser> followLocals);
+  Future<List<ExploreFollowUser>> fetchSuggestions();
+  Future<bool> toggleFollow(String userId);
 }
 
 class FindLocalsRepositoryImpl implements FindLocalsRepository {
-  static const _allUsers = [
-    ExploreFollowUser(id: 'marta', name: 'Marta Roig', level: 14),
-    ExploreFollowUser(id: 'joan_bosch', name: 'Joan Bosch', level: 9),
-    ExploreFollowUser(id: 'aina', name: 'Aina V.', level: 24),
-    ExploreFollowUser(id: 'joan', name: 'Joan P.', level: 18),
-    ExploreFollowUser(id: 'nuria', name: 'Núria T.', level: 16),
-    ExploreFollowUser(id: 'paul', name: 'Paul M.', level: 15),
-    ExploreFollowUser(id: 'marc', name: 'Marc B.', level: 12),
-    ExploreFollowUser(id: 'laia', name: 'Laia M.', level: 18),
-  ];
+  final ApiClient _client = ApiClient();
 
   @override
-  List<ExploreFollowUser> buildUsers(List<ExploreFollowUser> followLocals) {
-    final followById = {for (final user in followLocals) user.id: user};
-
-    return _allUsers
-        .map((user) {
-          final synced = followById[user.id];
-          if (synced != null) {
-            return user.copyWith(isFollowing: synced.isFollowing);
-          }
-          return user;
-        })
+  Future<List<ExploreFollowUser>> fetchSuggestions() async {
+    final response = await _client.get('/social/suggestions/');
+    final results = response['results'] as List? ?? [];
+    return results
+        .map((item) => ExploreFollowUser.fromApi(item as Map<String, dynamic>))
         .toList();
+  }
+
+  @override
+  Future<bool> toggleFollow(String userId) async {
+    final response = await _client.post('/social/profiles/$userId/follow/', {});
+    final detail = response['detail'] as String? ?? '';
+    // API returns a message rather than a boolean — infer state from text
+    return detail.toLowerCase().contains('followed successfully') &&
+        !detail.toLowerCase().contains('unfollowed');
   }
 }

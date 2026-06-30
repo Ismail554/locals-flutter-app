@@ -29,43 +29,44 @@ class LocalSharesSection extends StatelessWidget {
           onAction: onSeeAll,
         ),
         SizedBox(height: 12.h),
-
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             crossAxisSpacing: 8.w,
             mainAxisSpacing: 8.h,
             childAspectRatio: 1,
           ),
-
           itemCount: shares.length,
-
           itemBuilder: (context, index) {
             final share = shares[index];
 
             return Material(
               color: Colors.transparent,
-
               child: InkWell(
                 onTap: () => onPhotoTap(share),
-
                 borderRadius: BorderRadius.circular(12.r),
-
-                child: Ink(
-                  decoration: BoxDecoration(
-                    color: share.imageColor,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-
-                  child: Center(
-                    child: Icon(
-                      Icons.image_outlined,
-                      color: Colors.white.withValues(alpha: 0.6),
-                      size: 32.sp,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.r),
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      color: share.imageColor,
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
+                    child: share.imageUrl != null
+                        ? Image.network(
+                            share.imageUrl!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            loadingBuilder: (_, child, progress) {
+                              if (progress == null) return child;
+                              return _placeholderIcon();
+                            },
+                            errorBuilder: (_, __, ___) => _placeholderIcon(),
+                          )
+                        : _placeholderIcon(),
                   ),
                 ),
               ),
@@ -73,6 +74,16 @@ class LocalSharesSection extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+
+  Widget _placeholderIcon() {
+    return Center(
+      child: Icon(
+        Icons.image_outlined,
+        color: Colors.white.withValues(alpha: 0.6),
+        size: 32.sp,
+      ),
     );
   }
 }

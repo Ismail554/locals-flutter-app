@@ -34,13 +34,19 @@ class ExploreLocationCard extends StatelessWidget {
             child: Container(
               width: double.infinity,
               color: location.imageColor,
-              child: Center(
-                child: Icon(
-                  Icons.image_outlined,
-                  color: AppColors.white.withValues(alpha: 0.6),
-                  size: 32.sp,
-                ),
-              ),
+              child: location.imageUrl != null
+                  ? Image.network(
+                      location.imageUrl!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      loadingBuilder: (_, child, progress) {
+                        if (progress == null) return child;
+                        return _placeholderIcon();
+                      },
+                      errorBuilder: (_, __, ___) => _placeholderIcon(),
+                    )
+                  : _placeholderIcon(),
             ),
           ),
           Padding(
@@ -92,6 +98,16 @@ class ExploreLocationCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _placeholderIcon() {
+    return Center(
+      child: Icon(
+        Icons.image_outlined,
+        color: AppColors.white.withValues(alpha: 0.6),
+        size: 32.sp,
       ),
     );
   }

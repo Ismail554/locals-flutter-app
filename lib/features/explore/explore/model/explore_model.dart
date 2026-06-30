@@ -28,12 +28,12 @@ class StorySlide {
 
   const StorySlide({
     required this.id,
-  this.imagePath,
-  this.imageUrl,
-  this.placeholderColor,
-  required this.createdAt,
-  this.isLikedByMe = false,
-  this.likeCount = 0,
+    this.imagePath,
+    this.imageUrl,
+    this.placeholderColor,
+    required this.createdAt,
+    this.isLikedByMe = false,
+    this.likeCount = 0,
   });
 
   DateTime get expiresAt => createdAt.add(storyLifetime);
@@ -55,51 +55,32 @@ class StorySlide {
   }
 
   StorySlide copyWith({
-  String? imagePath,
-  String? imageUrl,
-  Color? placeholderColor,
-  bool? isLikedByMe,
-  int? likeCount,
-}) {
+    String? imagePath,
+    String? imageUrl,
+    Color? placeholderColor,
+    bool? isLikedByMe,
+    int? likeCount,
+  }) {
+    return StorySlide(
+      id: id,
+      imagePath: imagePath ?? this.imagePath,
+      imageUrl: imageUrl ?? this.imageUrl,
+      placeholderColor: placeholderColor ?? this.placeholderColor,
+      createdAt: createdAt,
+      isLikedByMe: isLikedByMe ?? this.isLikedByMe,
+      likeCount: likeCount ?? this.likeCount,
+    );
+  }
 
-  return StorySlide(
-    id: id,
-    imagePath: imagePath ?? this.imagePath,
-    imageUrl: imageUrl ?? this.imageUrl,
-    placeholderColor:
-        placeholderColor ?? this.placeholderColor,
-    createdAt: createdAt,
-
-    isLikedByMe:
-        isLikedByMe ?? this.isLikedByMe,
-
-    likeCount:
-        likeCount ?? this.likeCount,
-  );
-}
-
-factory StorySlide.fromApi(Map<String,dynamic> json){
-
- return StorySlide(
-
-   id: json['id'].toString(),
-
-   imageUrl: json['image'],
-
-   createdAt:
-     DateTime.parse(
-       json['created_at'],
-     ),
-
-   isLikedByMe:
-     json['liked_by_me'] ?? false,
-
-   likeCount:
-     json['like_count'] ?? 0,
-
- );
-
-}
+  factory StorySlide.fromApi(Map<String, dynamic> json) {
+    return StorySlide(
+      id: json['id'].toString(),
+      imageUrl: json['image'] as String?,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      isLikedByMe: json['liked_by_me'] as bool? ?? false,
+      likeCount: json['like_count'] as int? ?? 0,
+    );
+  }
 }
 
 class ExploreStory {
@@ -109,7 +90,7 @@ class ExploreStory {
   final List<StorySlide> slides;
   final bool isViewed;
   final List<StoryViewer> viewers;
-  final int? serverId;      
+  final int? serverId;
 
   const ExploreStory({
     required this.id,
@@ -118,7 +99,7 @@ class ExploreStory {
     this.slides = const [],
     this.isViewed = false,
     this.viewers = const [],
-    this.serverId,        
+    this.serverId,
   });
 
   List<StorySlide> get activeSlides =>
@@ -126,25 +107,24 @@ class ExploreStory {
 
   bool get hasStory => activeSlides.isNotEmpty;
 
-ExploreStory copyWith({
-  List<StorySlide>? slides,
-  bool? isViewed,
-  bool? isLikedByMe,
-  int? likeCount,
-  List<StoryViewer>? viewers,
-}) {
-  return ExploreStory(
-    id: id,
-    name: name,
-    isYourStory: isYourStory,
-    slides: slides ?? this.slides,
-    isViewed: isViewed ?? this.isViewed,
-    viewers: viewers ?? this.viewers,
-    serverId: serverId,
-  );
-}
+  ExploreStory copyWith({
+    List<StorySlide>? slides,
+    bool? isViewed,
+    bool? isLikedByMe,
+    int? likeCount,
+    List<StoryViewer>? viewers,
+  }) {
+    return ExploreStory(
+      id: id,
+      name: name,
+      isYourStory: isYourStory,
+      slides: slides ?? this.slides,
+      isViewed: isViewed ?? this.isViewed,
+      viewers: viewers ?? this.viewers,
+      serverId: serverId,
+    );
+  }
 
-  /// Factory from API feed item
   factory ExploreStory.fromApi(Map<String, dynamic> json) {
     final slides = (json['stories'] as List)
         .map((s) => StorySlide.fromApi(s as Map<String, dynamic>))
@@ -178,12 +158,14 @@ class ExploreFollowUser {
   final String name;
   final int level;
   final bool isFollowing;
+  final String? avatarUrl; // ← NEW: from API `avatar` field
 
   const ExploreFollowUser({
     required this.id,
     required this.name,
-    required this.level,
+    this.level = 0,
     this.isFollowing = false,
+    this.avatarUrl,
   });
 
   ExploreFollowUser copyWith({bool? isFollowing}) {
@@ -192,6 +174,17 @@ class ExploreFollowUser {
       name: name,
       level: level,
       isFollowing: isFollowing ?? this.isFollowing,
+      avatarUrl: avatarUrl,
+    );
+  }
+
+  /// Factory from `suggested_users` API item
+  factory ExploreFollowUser.fromApi(Map<String, dynamic> json) {
+    return ExploreFollowUser(
+      id: json['id'].toString(),
+      name: json['full_name'] as String? ?? 'Unknown',
+      isFollowing: json['is_following'] as bool? ?? false,
+      avatarUrl: json['avatar'] as String?,
     );
   }
 }
@@ -202,6 +195,7 @@ class ExploreFeaturedLocation {
   final String name;
   final int points;
   final Color imageColor;
+  final String? imageUrl; // ← NEW: from API `cover_photo`
 
   const ExploreFeaturedLocation({
     required this.id,
@@ -209,7 +203,21 @@ class ExploreFeaturedLocation {
     required this.name,
     required this.points,
     required this.imageColor,
+    this.imageUrl,
   });
+
+  /// Factory from `featured_locations` / `new_locals` API item
+  factory ExploreFeaturedLocation.fromApi(Map<String, dynamic> json) {
+    final category = json['category'] as Map<String, dynamic>?;
+    return ExploreFeaturedLocation(
+      id: json['id'].toString(),
+      category: (category?['name'] as String? ?? '').toUpperCase(),
+      name: json['name'] as String? ?? '',
+      points: json['base_points'] as int? ?? 0,
+      imageColor: const Color(0xFFD4C4B0),
+      imageUrl: json['cover_photo'] as String?,
+    );
+  }
 }
 
 class ExploreNewLocal {
@@ -218,6 +226,7 @@ class ExploreNewLocal {
   final String name;
   final String address;
   final Color imageColor;
+  final String? imageUrl; // ← NEW: from API `cover_photo`
 
   const ExploreNewLocal({
     required this.id,
@@ -225,7 +234,21 @@ class ExploreNewLocal {
     required this.name,
     required this.address,
     required this.imageColor,
+    this.imageUrl,
   });
+
+  /// Factory from `new_locals` API item
+  factory ExploreNewLocal.fromApi(Map<String, dynamic> json) {
+    final category = json['category'] as Map<String, dynamic>?;
+    return ExploreNewLocal(
+      id: json['id'].toString(),
+      category: (category?['name'] as String? ?? '').toUpperCase(),
+      name: json['name'] as String? ?? '',
+      address: json['address'] as String? ?? '',
+      imageColor: const Color(0xFFE8D8C8),
+      imageUrl: json['cover_photo'] as String?,
+    );
+  }
 }
 
 class ExploreFeaturedRoute {
@@ -234,6 +257,7 @@ class ExploreFeaturedRoute {
   final String title;
   final String subtitle;
   final Color imageColor;
+  final String? imageUrl; // ← NEW: from API `cover_photo`
 
   const ExploreFeaturedRoute({
     required this.id,
@@ -241,7 +265,20 @@ class ExploreFeaturedRoute {
     required this.title,
     required this.subtitle,
     required this.imageColor,
+    this.imageUrl,
   });
+
+  /// Factory from `featured_routes` API item
+  factory ExploreFeaturedRoute.fromApi(Map<String, dynamic> json) {
+    return ExploreFeaturedRoute(
+      id: json['id'].toString(),
+      label: 'FEATURED ROUTE',
+      title: json['name'] as String? ?? '',
+      subtitle: json['description'] as String? ?? '',
+      imageColor: const Color(0xFF8A9AAA),
+      imageUrl: json['cover_photo'] as String?,
+    );
+  }
 }
 
 class ExploreLocalShare {
@@ -252,6 +289,8 @@ class ExploreLocalShare {
   final String timeAgo;
   final String caption;
   final int likeCount;
+  final String? imageUrl; // ← NEW: from API `full_image_url`
+  final bool isLikedByUser; // ← NEW: from API `is_liked_by_user`
 
   const ExploreLocalShare({
     required this.id,
@@ -261,7 +300,39 @@ class ExploreLocalShare {
     required this.timeAgo,
     required this.caption,
     this.likeCount = 24,
+    this.imageUrl,
+    this.isLikedByUser = false,
   });
+
+  ExploreLocalShare copyWith({bool? isLikedByUser, int? likeCount}) {
+    return ExploreLocalShare(
+      id: id,
+      imageColor: imageColor,
+      userName: userName,
+      userAvatarInitial: userAvatarInitial,
+      timeAgo: timeAgo,
+      caption: caption,
+      likeCount: likeCount ?? this.likeCount,
+      imageUrl: imageUrl,
+      isLikedByUser: isLikedByUser ?? this.isLikedByUser,
+    );
+  }
+
+  /// Factory from `local_shares` API item.
+  /// Note: API doesn't return a user name for local shares — `category_name`
+  /// is used as a stand-in label since that's the closest descriptive field.
+  factory ExploreLocalShare.fromApi(Map<String, dynamic> json) {
+    return ExploreLocalShare(
+      id: json['id'].toString(),
+      imageColor: const Color(0xFFD4C4B0),
+      userName: json['category_name'] as String? ?? '',
+      timeAgo: json['created_at_relative'] as String? ?? '',
+      caption: json['caption'] as String? ?? '',
+      likeCount: json['likes_count'] as int? ?? 0,
+      imageUrl: json['full_image_url'] as String?,
+      isLikedByUser: json['is_liked_by_user'] as bool? ?? false,
+    );
+  }
 }
 
 class ExploreModel {
@@ -273,126 +344,51 @@ class ExploreModel {
   );
 
   static List<ExploreStory> get defaultStories {
-    final now = DateTime.now();
-    return [
-      yourStoryPlaceholder,
-      ExploreStory(
-        id: 'marta',
-        name: 'Marta',
-        slides: [
-          StorySlide(
-            id: 'm1',
-            placeholderColor: const Color(0xFFD4A574),
-            createdAt: now.subtract(const Duration(hours: 2)),
-          ),
-          StorySlide(
-            id: 'm2',
-            placeholderColor: const Color(0xFF7EB8DA),
-            createdAt: now.subtract(const Duration(hours: 1, minutes: 45)),
-          ),
-        ],
-      ),
-      ExploreStory(
-        id: 'aina',
-        name: 'Aina',
-        slides: [
-          StorySlide(
-            id: 'a1',
-            placeholderColor: const Color(0xFFE8A0A0),
-            createdAt: now.subtract(const Duration(hours: 5)),
-          ),
-        ],
-      ),
-    ];
+    return [yourStoryPlaceholder];
   }
 
   final List<ExploreStory> stories;
-  final bool isLoadingStories; 
+  final bool isLoadingStories;
+  final bool isLoadingDashboard; // ← NEW: loading state for dashboard
   final List<ExploreRankingUser> weeklyRanking;
   final List<ExploreFollowUser> followLocals;
   final List<ExploreFeaturedLocation> featuredLocations;
   final List<ExploreNewLocal> newLocals;
-  final ExploreFeaturedRoute featuredRoute;
+  final ExploreFeaturedRoute? featuredRoute; // ← now nullable (until loaded)
   final List<ExploreLocalShare> localShares;
 
   ExploreModel({
     List<ExploreStory>? stories,
     this.isLoadingStories = false,
-    this.weeklyRanking = const [
-      ExploreRankingUser(rank: 1, name: 'Aina V.', level: 24, points: 12450),
-      ExploreRankingUser(rank: 2, name: 'Marta Roig', level: 22, points: 11280),
-      ExploreRankingUser(rank: 3, name: 'Joan P.', level: 20, points: 10720),
-    ],
-    this.followLocals = const [
-      ExploreFollowUser(id: 'marta', name: 'Marta Roig', level: 14),
-      ExploreFollowUser(id: 'aina', name: 'Aina V.', level: 24),
-      ExploreFollowUser(id: 'joan', name: 'Joan P.', level: 18),
-      ExploreFollowUser(id: 'nuria', name: 'Núria T.', level: 16),
-    ],
-    this.featuredLocations = const [
-      ExploreFeaturedLocation(
-        id: 'cafe_del_born',
-        category: 'CAFE',
-        name: 'Café del Born',
-        points: 50,
-        imageColor: Color(0xFFD4C4B0),
-      ),
-      ExploreFeaturedLocation(
-        id: 'bar_marsella',
-        category: 'BAR',
-        name: 'Bar Marsella',
-        points: 40,
-        imageColor: Color(0xFFB8C8D8),
-      ),
-      ExploreFeaturedLocation(
-        id: 'parc_guell',
-        category: 'PARK',
-        name: 'Parc Güell',
-        points: 60,
-        imageColor: Color(0xFFC8D8B8),
-      ),
-    ],
-    this.newLocals = const [
-      ExploreNewLocal(
-        id: 'forn_baluard',
-        category: 'BAKERY',
-        name: 'Forn Baluard',
-        address: 'Carrer del Baluard 38',
-        imageColor: Color(0xFFE8D8C8),
-      ),
-      ExploreNewLocal(
-        id: 'sagrada_familia',
-        category: 'MONUMENT',
-        name: 'Sagrada Família',
-        address: 'Carrer de Mallorca 401',
-        imageColor: Color(0xFFD0D8E0),
-      ),
-    ],
-    this.featuredRoute = const ExploreFeaturedRoute(
-      id: 'modernist_weekend',
-      label: 'SPONSORED ROUTE',
-      title: 'Modernist Trail',
-      subtitle: '7 stops · 500 pts',
-      imageColor: Color(0xFF8A9AAA),
-    ),
-    required this.localShares,
+    this.isLoadingDashboard = false,
+    this.weeklyRanking = const [],
+    this.followLocals = const [],
+    this.featuredLocations = const [],
+    this.newLocals = const [],
+    this.featuredRoute,
+    this.localShares = const [],
   }) : stories = stories ?? List<ExploreStory>.from(defaultStories);
 
   ExploreModel copyWith({
     List<ExploreStory>? stories,
     bool? isLoadingStories,
+    bool? isLoadingDashboard,
     List<ExploreFollowUser>? followLocals,
     List<ExploreLocalShare>? localShares,
+    List<ExploreFeaturedLocation>? featuredLocations,
+    List<ExploreNewLocal>? newLocals,
+    ExploreFeaturedRoute? featuredRoute,
   }) {
     return ExploreModel(
       stories: stories ?? this.stories,
       isLoadingStories: isLoadingStories ?? this.isLoadingStories,
+      isLoadingDashboard: isLoadingDashboard ?? this.isLoadingDashboard,
       followLocals: followLocals ?? this.followLocals,
       localShares: localShares ?? this.localShares,
       weeklyRanking: weeklyRanking,
-      featuredLocations: featuredLocations,
-      newLocals: newLocals,
-      featuredRoute: featuredRoute,
+      featuredLocations: featuredLocations ?? this.featuredLocations,
+      newLocals: newLocals ?? this.newLocals,
+      featuredRoute: featuredRoute ?? this.featuredRoute,
     );
   }
 }

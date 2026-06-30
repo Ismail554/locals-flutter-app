@@ -14,30 +14,75 @@ class FindLocalsController extends ChangeNotifier {
 
   FindLocalsController(this.repo, this.args)
       : state = FindLocalsModel(
-          users: repo.buildUsers(args.followLocals),
+          users: const [],
           stories: List<ExploreStory>.from(args.stories),
-        );
+          isLoading: true,
+        ) {
+    _loadSuggestions();
+  }
 
-  void toggleFollow(String id) {
+  Future<void> _loadSuggestions() async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    notifyListeners();
+
+    try {
+      final users = await repo.fetchSuggestions();
+
+      // Sync with any follow-state changes already made on the Explore screen
+      final followById = {for (final u in args.followLocals) u.id: u};
+      final synced = users.map((user) {
+        final existing = followById[user.id];
+        return existing != null
+            ? user.copyWith(isFollowing: existing.isFollowing)
+            : user;
+      }).toList();
+
+      state = state.copyWith(users: synced, isLoading: false);
+    } catch (e) {
+      print('Find locals suggestions error: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to load suggestions. Please try again.',
+      );
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> toggleFollow(String id) async {
+    final target = state.users.firstWhere((u) => u.id == id);
+    final wasFollowing = target.isFollowing;
+
+    // Optimistic update
     state = state.copyWith(
       users: state.users
-          .map(
-            (user) => user.id == id
-                ? user.copyWith(isFollowing: !user.isFollowing)
-                : user,
-          )
+          .map((user) =>
+              user.id == id ? user.copyWith(isFollowing: !wasFollowing) : user)
           .toList(),
     );
     notifyListeners();
     _syncFollowLocals();
+
+    try {
+      await repo.toggleFollow(id);
+    } catch (e) {
+      print('Toggle follow error: $e');
+      // Rollback on failure
+      state = state.copyWith(
+        users: state.users
+            .map((user) =>
+                user.id == id ? user.copyWith(isFollowing: wasFollowing) : user)
+            .toList(),
+      );
+      notifyListeners();
+      _syncFollowLocals();
+    }
   }
 
   void _syncFollowLocals() {
     final byId = {for (final user in state.users) user.id: user};
     args.onFollowLocalsUpdated(
-      args.followLocals
-          .map((user) => byId[user.id] ?? user)
-          .toList(),
+      args.followLocals.map((user) => byId[user.id] ?? user).toList(),
     );
   }
 

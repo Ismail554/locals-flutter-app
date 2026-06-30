@@ -21,10 +21,38 @@ class ExploreController extends ChangeNotifier {
       : storyUploadService = storyUploadService ?? StoryUploadService(),
         state = ExploreModel(
           stories: repo.loadStories(), // "your story" slot only initially
-          localShares: _getDefaultLocalShares(),
         ) {
     _loadStoryFeed();
+    _loadDashboard();
   }
+
+  // ─── Dashboard ──────────────────────────────────────────────────────────────
+
+  Future<void> _loadDashboard() async {
+    state = state.copyWith(isLoadingDashboard: true);
+    notifyListeners();
+
+    try {
+      final dashboard = await repo.fetchDashboard();
+      state = state.copyWith(
+        localShares: dashboard.localShares,
+        followLocals: dashboard.suggestedUsers,
+        featuredLocations: dashboard.featuredLocations,
+        newLocals: dashboard.newLocals,
+        featuredRoute: dashboard.featuredRoutes.isNotEmpty
+            ? dashboard.featuredRoutes.first
+            : null,
+        isLoadingDashboard: false,
+      );
+    } catch (e) {
+      print('Dashboard load error: $e');
+      state = state.copyWith(isLoadingDashboard: false);
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> refreshDashboard() => _loadDashboard();
 
   // ─── Story Feed ─────────────────────────────────────────────────────────────
 
@@ -40,7 +68,6 @@ class ExploreController extends ChangeNotifier {
         isLoadingStories: false,
       );
     } catch (e) {
-      // Feed failure is non-fatal — keep "your story" slot visible
       print('Story feed error: $e');
       state = state.copyWith(isLoadingStories: false);
     }
@@ -137,7 +164,6 @@ class ExploreController extends ChangeNotifier {
     final viewerIndex = storiesWithContent.indexWhere((s) => s.id == story.id);
     if (viewerIndex < 0) return;
 
-    // Fire-and-forget: mark all slides of this story as viewed
     if (!story.isYourStory) {
       _markStoriesViewed(story);
     }
@@ -151,7 +177,6 @@ class ExploreController extends ChangeNotifier {
       ),
     );
 
-    // Refresh your story after viewer closes (slides may have been deleted)
     final yourStory = repo.loadStories().first;
     state = state.copyWith(
       stories: [yourStory, ...state.stories.where((s) => !s.isYourStory)],
@@ -166,7 +191,6 @@ class ExploreController extends ChangeNotifier {
       });
     }
 
-    // Optimistic local update
     state = state.copyWith(
       stories: state.stories
           .map((s) => s.id == story.id ? s.copyWith(isViewed: true) : s)
@@ -188,6 +212,36 @@ class ExploreController extends ChangeNotifier {
       stories: [yourStory, ...updated.where((s) => !s.isYourStory)],
     );
     notifyListeners();
+  }
+
+  // ─── Local Shares ───────────────────────────────────────────────────────────
+
+  Future<void> toggleLocalShareLike(ExploreLocalShare share) async {
+    // Optimistic update first
+    final wasLiked = share.isLikedByUser;
+    state = state.copyWith(
+      localShares: state.localShares.map((s) {
+        if (s.id != share.id) return s;
+        return s.copyWith(
+          isLikedByUser: !wasLiked,
+          likeCount: wasLiked ? s.likeCount - 1 : s.likeCount + 1,
+        );
+      }).toList(),
+    );
+    notifyListeners();
+
+    try {
+      await repo.likeLocalShare(share.id);
+    } catch (e) {
+      // Revert on failure
+      print('Like local share error: $e');
+      state = state.copyWith(
+        localShares: state.localShares.map((s) {
+          return s.id == share.id ? share : s;
+        }).toList(),
+      );
+      notifyListeners();
+    }
   }
 
   // ─── Navigation ─────────────────────────────────────────────────────────────
@@ -253,63 +307,4 @@ class ExploreController extends ChangeNotifier {
     );
     notifyListeners();
   }
-
-  // ─── Local Shares ───────────────────────────────────────────────────────────
-
-  static List<ExploreLocalShare> _getDefaultLocalShares() => [
-        ExploreLocalShare(
-          id: 'ls1',
-          imageColor: const Color(0xFFFFE4C4),
-          userName: 'Marta Roig',
-          userAvatarInitial: 'M',
-          timeAgo: '2d ago',
-          caption: 'Best cortado in the Born.',
-          likeCount: 24,
-        ),
-        ExploreLocalShare(
-          id: 'ls2',
-          imageColor: const Color(0xFFB0C4DE),
-          userName: 'Joan Bosch',
-          userAvatarInitial: 'J',
-          timeAgo: '5h ago',
-          caption: 'Tokyo Skytree at sunset.',
-          likeCount: 42,
-        ),
-        ExploreLocalShare(
-          id: 'ls3',
-          imageColor: const Color(0xFF4682B4),
-          userName: 'Aina V.',
-          userAvatarInitial: 'A',
-          timeAgo: '1d ago',
-          caption: 'Cozy evening at the bar.',
-          likeCount: 19,
-        ),
-        ExploreLocalShare(
-          id: 'ls4',
-          imageColor: const Color(0xFFD2B48C),
-          userName: 'Marta Roig',
-          userAvatarInitial: 'M',
-          timeAgo: '3h ago',
-          caption: 'Fresh pastries for breakfast.',
-          likeCount: 31,
-        ),
-        ExploreLocalShare(
-          id: 'ls5',
-          imageColor: const Color(0xFFFFDAB9),
-          userName: 'Joan Bosch',
-          userAvatarInitial: 'J',
-          timeAgo: '12h ago',
-          caption: 'Tapas night with friends.',
-          likeCount: 28,
-        ),
-        ExploreLocalShare(
-          id: 'ls6',
-          imageColor: const Color(0xFF708090),
-          userName: 'Aina V.',
-          userAvatarInitial: 'A',
-          timeAgo: 'Yesterday',
-          caption: 'Beautiful restaurant interior.',
-          likeCount: 15,
-        ),
-      ];
 }

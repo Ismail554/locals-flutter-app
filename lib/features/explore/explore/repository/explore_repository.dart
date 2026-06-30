@@ -6,6 +6,43 @@ import 'package:locals/core/network/api_client.dart';
 import 'package:locals/core/network/token_manager.dart';
 import '../model/explore_model.dart';
 
+class ExploreDashboard {
+  final List<ExploreLocalShare> localShares;
+  final List<ExploreFollowUser> suggestedUsers;
+  final List<ExploreFeaturedLocation> featuredLocations;
+  final List<ExploreNewLocal> newLocals;
+  final List<ExploreFeaturedRoute> featuredRoutes;
+
+  const ExploreDashboard({
+    required this.localShares,
+    required this.suggestedUsers,
+    required this.featuredLocations,
+    required this.newLocals,
+    required this.featuredRoutes,
+  });
+
+  factory ExploreDashboard.fromApi(Map<String, dynamic> json) {
+    return ExploreDashboard(
+      localShares: (json['local_shares'] as List? ?? [])
+          .map((e) => ExploreLocalShare.fromApi(e as Map<String, dynamic>))
+          .toList(),
+      suggestedUsers: (json['suggested_users'] as List? ?? [])
+          .map((e) => ExploreFollowUser.fromApi(e as Map<String, dynamic>))
+          .toList(),
+      featuredLocations: (json['featured_locations'] as List? ?? [])
+          .map((e) =>
+              ExploreFeaturedLocation.fromApi(e as Map<String, dynamic>))
+          .toList(),
+      newLocals: (json['new_locals'] as List? ?? [])
+          .map((e) => ExploreNewLocal.fromApi(e as Map<String, dynamic>))
+          .toList(),
+      featuredRoutes: (json['featured_routes'] as List? ?? [])
+          .map((e) => ExploreFeaturedRoute.fromApi(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
 abstract class ExploreRepository {
   List<ExploreStory> loadStories();
   void saveStories(List<ExploreStory> stories);
@@ -17,6 +54,9 @@ abstract class ExploreRepository {
   Future<StorySlide> uploadStory(File imageFile);
   Future<void> markStoryViewed(String storyId);
   Future<bool> likeStory(String storyId);
+
+  Future<ExploreDashboard> fetchDashboard();
+  Future<bool> likeLocalShare(String shareId);
 }
 
 class ExploreRepositoryImpl implements ExploreRepository {
@@ -75,11 +115,10 @@ class ExploreRepositoryImpl implements ExploreRepository {
     if (_yourSlides.isEmpty) _yourViewers = [];
   }
 
-  // ─── Remote API ─────────────────────────────────────────────────────────────
+  // ─── Remote API: Stories ────────────────────────────────────────────────────
 
   @override
   Future<List<ExploreStory>> fetchStoryFeed() async {
-    // ApiClient prepends baseUrl + /api/v1 — so path starts after that
     final response = await _client.get('/social/stories/feed/?page=1');
     final results = response['results'] as List? ?? [];
     return results
@@ -135,6 +174,27 @@ class ExploreRepositoryImpl implements ExploreRepository {
     await _client.post('/social/stories/$storyId/view/', {});
   }
 
+  @override
+  Future<bool> likeStory(String storyId) async {
+    final response = await _client.post('/social/stories/$storyId/like/', {});
+    return response['liked'] as bool? ?? false;
+  }
+
+  // ─── Remote API: Dashboard ──────────────────────────────────────────────────
+
+  @override
+  Future<ExploreDashboard> fetchDashboard() async {
+    final response = await _client.get('/explore/dashboard/');
+    return ExploreDashboard.fromApi(response);
+  }
+
+  @override
+  Future<bool> likeLocalShare(String shareId) async {
+    final response =
+        await _client.post('/explore/local-shares/$shareId/like/', {});
+    return response['liked'] as bool? ?? false;
+  }
+
   // ─── Helpers ────────────────────────────────────────────────────────────────
 
   static List<StoryViewer> _seedViewers() {
@@ -153,15 +213,5 @@ class ExploreRepositoryImpl implements ExploreRepository {
         avatarColor: const Color(0xFFE8A0A0),
       ),
     ];
-  }
-  
-  @override
-  Future<bool> likeStory(String storyId) async{
-    final response = await _client.post(
-    '/social/stories/$storyId/like/',
-    {},
-  );
-
-  return response['liked'] as bool? ?? false;
   }
 }
