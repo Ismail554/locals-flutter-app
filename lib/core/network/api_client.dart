@@ -101,6 +101,38 @@ class ApiClient {
     }
   }
 
+  
+Future<Map<String, dynamic>> patch(
+  String path,
+  Map<String, dynamic> body, {
+  bool requiresAuth = true,
+}) async {
+  final url = '$baseUrl$path';
+ 
+  try {
+    final headers = requiresAuth ? await _authHeaders : _baseHeaders;
+ 
+    _logRequest('PATCH', url, body);
+ 
+    final response = await http
+        .patch(Uri.parse(url), headers: headers, body: jsonEncode(body))
+        .timeout(_timeout);
+ 
+    _logResponse(response);
+ 
+    return _handleResponse(response);
+  } on SocketException {
+    _logError('PATCH', url, 'No internet connection');
+    throw const ApiException('No internet connection.');
+  } on HttpException {
+    _logError('PATCH', url, 'Network error');
+    throw const ApiException('Network error. Please try again.');
+  } on FormatException {
+    _logError('PATCH', url, 'Unexpected response format');
+    throw const ApiException('Unexpected response format.');
+  }
+}
+
   // ─── Logging ────────────────────────────────────────────────────────────────
 
   void _logRequest(String method, String url, Map<String, dynamic>? body) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/core/network/user_session.dart';
 import '../model/splash_model.dart';
 import '../repository/splash_repository.dart';
 
@@ -15,7 +16,6 @@ class SplashController extends ChangeNotifier {
     if (_hasStarted) return;
     _hasStarted = true;
 
-    // Allow splash animation to play
     await Future<void>.delayed(const Duration(seconds: 2));
 
     if (!context.mounted) return;
@@ -25,6 +25,9 @@ class SplashController extends ChangeNotifier {
     if (!context.mounted) return;
 
     if (isLoggedIn) {
+      await UserSession().fetchCurrentUser();
+
+      if (!context.mounted) return;
       context.go('/map');
     } else {
       context.go('/onboard');

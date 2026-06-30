@@ -47,50 +47,59 @@ class _EditProfileView extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: ListView(
-                padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                children: [
-                  EditProfileAvatarSection(
-                    avatarColor: controller.state.avatarColor,
-                    avatarImagePath: controller.state.avatarImagePath,
-                    isLoading: controller.isPickingPhoto,
-                    onChangePhoto: () => controller.changePhoto(context),
-                  ),
-                  SizedBox(height: 28.h),
-                  EditProfileFormField(
-                    label: context.l10n.editProfileName,
-                    controller: controller.nameController,
-                  ),
-                  SizedBox(height: 16.h),
-                  EditProfileFormField(
-                    label: context.l10n.editProfileLocation,
-                    controller: controller.locationController,
-                  ),
-                  SizedBox(height: 24.h),
-                  PrimaryButton(
-                    label: context.l10n.editProfileSaveChanges,
-                    onPressed: () => controller.saveChanges(context),
-                  ),
-                  SizedBox(height: 32.h),
-                  EditProfilePasswordSection(
-                    currentPasswordController:
-                        controller.currentPasswordController,
-                    newPasswordController: controller.newPasswordController,
-                    confirmPasswordController:
-                        controller.confirmPasswordController,
-                    obscureCurrentPassword: controller.obscureCurrentPassword,
-                    obscureNewPassword: controller.obscureNewPassword,
-                    obscureConfirmPassword: controller.obscureConfirmPassword,
-                    onToggleCurrentPassword:
-                        controller.toggleCurrentPasswordVisibility,
-                    onToggleNewPassword: controller.toggleNewPasswordVisibility,
-                    onToggleConfirmPassword:
-                        controller.toggleConfirmPasswordVisibility,
-                    onChangePassword: () =>
-                        controller.changePassword(context),
-                  ),
-                ],
-              ),
+              child: controller.state.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView(
+                      padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+                      children: [
+                        EditProfileAvatarSection(
+                          avatarColor: controller.state.avatarColor,
+                          avatarImagePath: controller.state.avatarImagePath,
+                          avatarUrl: controller.state.avatarUrl,
+                          isLoading: controller.isPickingPhoto,
+                          onChangePhoto: () => controller.changePhoto(context),
+                        ),
+                        SizedBox(height: 28.h),
+                        EditProfileFormField(
+                          label: context.l10n.editProfileName,
+                          controller: controller.nameController,
+                        ),
+                        SizedBox(height: 16.h),
+                        EditProfileFormField(
+                          label: context.l10n.editProfileLocation,
+                          controller: controller.locationController,
+                        ),
+                        SizedBox(height: 24.h),
+                        PrimaryButton(
+                          label: context.l10n.editProfileSaveChanges,
+                          onPressed: () {
+                            if (!controller.isSaving) controller.saveChanges(context);
+                          },
+                        ),
+                        SizedBox(height: 32.h),
+                        EditProfilePasswordSection(
+                          currentPasswordController:
+                              controller.currentPasswordController,
+                          newPasswordController:
+                              controller.newPasswordController,
+                          confirmPasswordController:
+                              controller.confirmPasswordController,
+                          obscureCurrentPassword:
+                              controller.obscureCurrentPassword,
+                          obscureNewPassword: controller.obscureNewPassword,
+                          obscureConfirmPassword:
+                              controller.obscureConfirmPassword,
+                          onToggleCurrentPassword:
+                              controller.toggleCurrentPasswordVisibility,
+                          onToggleNewPassword:
+                              controller.toggleNewPasswordVisibility,
+                          onToggleConfirmPassword:
+                              controller.toggleConfirmPasswordVisibility,
+                          onChangePassword: () =>
+                              controller.changePassword(context),
+                        ),
+                      ],
+                    ),
             ),
           ],
         ),

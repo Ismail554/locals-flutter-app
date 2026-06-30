@@ -7,6 +7,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 class EditProfileAvatarSection extends StatelessWidget {
   final Color avatarColor;
   final String? avatarImagePath;
+  final String? avatarUrl;
   final bool isLoading;
   final VoidCallback onChangePhoto;
 
@@ -14,14 +15,17 @@ class EditProfileAvatarSection extends StatelessWidget {
     super.key,
     required this.avatarColor,
     this.avatarImagePath,
+    this.avatarUrl,
     this.isLoading = false,
     required this.onChangePhoto,
   });
 
   @override
   Widget build(BuildContext context) {
-    final hasImage =
+    // A freshly picked local image takes priority over the server avatar
+    final hasLocalImage =
         avatarImagePath != null && File(avatarImagePath!).existsSync();
+    final hasNetworkImage = !hasLocalImage && avatarUrl != null;
 
     return Center(
       child: Stack(
@@ -36,9 +40,12 @@ class EditProfileAvatarSection extends StatelessWidget {
             child: CircleAvatar(
               radius: 52.r,
               backgroundColor: avatarColor,
-              backgroundImage:
-                  hasImage ? FileImage(File(avatarImagePath!)) : null,
-              child: hasImage
+              backgroundImage: hasLocalImage
+                  ? FileImage(File(avatarImagePath!))
+                  : hasNetworkImage
+                      ? NetworkImage(avatarUrl!) as ImageProvider
+                      : null,
+              child: hasLocalImage || hasNetworkImage
                   ? null
                   : Icon(
                       Icons.person,
