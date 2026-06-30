@@ -17,7 +17,7 @@ class PinDetailsSheet extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min, // Critical
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
@@ -69,13 +69,18 @@ class PinDetailsSheet extends StatelessWidget {
                           color: pin.accentColor ?? const Color(0xFFD4C4B0),
                           borderRadius: BorderRadius.circular(25.r),
                         ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.image_outlined,
-                            color: Colors.white70,
-                            size: 40,
-                          ),
-                        ),
+                        child: pin.imageUrl != null
+                            ? Image.network(
+                                pin.imageUrl!,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (_, child, progress) {
+                                  if (progress == null) return child;
+                                  return _placeholderIcon();
+                                },
+                                errorBuilder: (_, __, ___) =>
+                                    _placeholderIcon(),
+                              )
+                            : _placeholderIcon(),
                       ),
                     ),
                   ),
@@ -117,16 +122,16 @@ class PinDetailsSheet extends StatelessWidget {
                               ),
                               Spacer(),
                               Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              '+${pin.points}',
-                              style: TextStyle(
-                                color: AppColors.primaryPink,
-                                fontSize: 20.sp,
-                                fontWeight: FontWeight.bold,
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  '+${pin.points}',
+                                  style: TextStyle(
+                                    color: AppColors.primaryPink,
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
                             ],
                           ),
                           SizedBox(height: 6.h),
@@ -137,7 +142,6 @@ class PinDetailsSheet extends StatelessWidget {
                               color: AppColors.textSecondary,
                             ),
                           ),
-                          
                         ],
                       ),
                     ),
@@ -205,6 +209,16 @@ class PinDetailsSheet extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _placeholderIcon() {
+    return const Center(
+      child: Icon(
+        Icons.image_outlined,
+        color: Colors.white70,
+        size: 40,
       ),
     );
   }

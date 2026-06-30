@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locals/features/map/map/view/widgets/business_banner.dart';
+import 'package:locals/features/map/map/view/widgets/map_marker_icon_cache.dart';
 import 'package:provider/provider.dart';
 
 import '../controller/map_controller.dart';
@@ -35,6 +36,37 @@ class _MapView extends StatefulWidget {
 
 class _MapViewState extends State<_MapView> {
   GoogleMapController? mapController;
+  Set<Marker> _markers = {};
+  String? _markersBuiltForPinIds;
+
+  Future<void> _buildMarkers(MapController controller) async {
+    final pins = controller.state.pins;
+
+    // Skip rebuild if the same pin set was already turned into markers
+    final pinIdsKey = pins.map((p) => '${p.id}_${p.visited}').join(',');
+    if (pinIdsKey == _markersBuiltForPinIds) return;
+    _markersBuiltForPinIds = pinIdsKey;
+
+    final iconCache = MapMarkerIconCache.instance;
+    final markers = <Marker>{};
+
+    for (final pin in pins) {
+      final icon = await iconCache.iconFor(tag: pin.tag, visited: pin.visited);
+      markers.add(
+        Marker(
+          markerId: MarkerId(pin.id),
+          position: LatLng(pin.lat, pin.lng),
+          icon: icon,
+          infoWindow: InfoWindow(title: pin.name),
+          onTap: () => controller.onPinTap(context, pin.id),
+        ),
+      );
+    }
+
+    if (mounted) {
+      setState(() => _markers = markers);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,29 +77,31 @@ class _MapViewState extends State<_MapView> {
     final highlightedLocation = state.highlightedLocation;
     final bottomLocation = mission?.activeLocation ?? highlightedLocation;
 
-    final markers = state.pins.map((pin) {
-      return Marker(
-        markerId: MarkerId(pin.id),
-        position: LatLng(pin.lat * 90, pin.lng * 180),
-        infoWindow: InfoWindow(title: pin.name),
-        onTap: () => controller.onPinTap(context, pin.id),
-      );
-    }).toSet();
+    // Rebuild custom markers whenever the pin list changes
+    _buildMarkers(controller);
 
     return Stack(
       fit: StackFit.expand,
       children: [
         /// 🌍 REAL GOOGLE MAP
         GoogleMap(
-          initialCameraPosition: CameraPosition(
-            target: LatLng(23.8103, 90.4125),
-            zoom: 12,
+          initialCameraPosition: const CameraPosition(
+            target: LatLng(41.3851, 2.1734), // Barcelona, matches place data
+            zoom: 13,
           ),
-          markers: markers,
+          markers: _markers,
           onMapCreated: (c) => mapController = c,
           myLocationEnabled: true,
           zoomControlsEnabled: false,
         ),
+
+        if (state.isLoadingPins)
+          const Positioned(
+            top: 100,
+            left: 0,
+            right: 0,
+            child: Center(child: CircularProgressIndicator()),
+          ),
 
         /// TOP UI
         Positioned(
@@ -120,13 +154,11 @@ class _MapViewState extends State<_MapView> {
           right: 16.w,
           child: BusinessBanner(
             title: "Café del Born",
-            subtitle: null, // optional
+            subtitle: null,
             type: BannerType.businessOfTheMonth,
             onTap: () =>
                 controller.openRestaurantDetails(context, 'cafe_del_born'),
-            onClose: () {
-              // Optional: dismiss banner logic
-            },
+            onClose: () {},
           ),
         ),
 

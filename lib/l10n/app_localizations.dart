@@ -1064,11 +1064,11 @@ abstract class AppLocalizations {
   /// **'Businesses'**
   String get filtersBusinesses;
 
-  /// No description provided for @filtersHerbs.
+  /// No description provided for @filtersPoi.
   ///
   /// In en, this message translates to:
-  /// **'Herbs'**
-  String get filtersHerbs;
+  /// **'POI'**
+  String get filtersPoi;
 
   /// No description provided for @filtersBoth.
   ///

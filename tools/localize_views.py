@@ -107,7 +107,7 @@ REPLACEMENTS = [
     (r"'TYPE'", "context.l10n.filtersType"),
     (r"'STATUS'", "context.l10n.filtersStatus"),
     (r"'Businesses'", "context.l10n.filtersBusinesses"),
-    (r"'Herbs'", "context.l10n.filtersHerbs"),
+    (r"'POI'", "context.l10n.filtersPoi"),
     (r"'Both'", "context.l10n.filtersBoth"),
     (r"'Visited'", "context.l10n.filtersVisited"),
     (r"'Unvisited'", "context.l10n.filtersUnvisited"),

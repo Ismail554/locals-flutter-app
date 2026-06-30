@@ -210,7 +210,7 @@
   "filtersStatus": "STATUS",
   "filtersCategories": "CATEGORIES",
   "filtersBusinesses": "Businesses",
-  "filtersHerbs": "Herbs",
+  "filtersPoi": "POI",
   "filtersBoth": "Both",
   "filtersVisited": "Visited",
   "filtersUnvisited": "Unvisited",

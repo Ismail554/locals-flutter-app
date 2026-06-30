@@ -516,7 +516,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filtersBusinesses => 'Businesses';
 
   @override
-  String get filtersHerbs => 'Herbs';
+  String get filtersPoi => 'POI';
 
   @override
   String get filtersBoth => 'Both';

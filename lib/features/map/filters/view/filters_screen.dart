@@ -85,8 +85,8 @@ class _FiltersView extends StatelessWidget {
                           value: 'businesses',
                         ),
                         ProfileSegmentOption(
-                          label: l10n.filtersHerbs,
-                          value: 'herbs',
+                          label: l10n.filtersPoi,
+                          value: 'poi',
                         ),
                         ProfileSegmentOption(
                           label: l10n.filtersBoth,

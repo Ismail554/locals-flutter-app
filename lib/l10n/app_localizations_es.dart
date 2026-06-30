@@ -518,7 +518,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get filtersBusinesses => 'Negocios';
 
   @override
-  String get filtersHerbs => 'Hierbas';
+  String get filtersPoi => 'Punto de interés';
 
   @override
   String get filtersBoth => 'Ambos';

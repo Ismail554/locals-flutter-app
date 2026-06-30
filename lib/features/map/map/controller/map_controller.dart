@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/features/explore/events_progress_map/model/events_progress_map_args.dart';
@@ -15,69 +17,126 @@ class MapController extends ChangeNotifier {
   final MapRepository repo;
   MapModel state;
 
+  Timer? _searchDebounce;
+
   MapController(this.repo, {MapScreenArgs? screenArgs})
       : state = MapModel(
           activeMission: screenArgs?.mission?.toActiveMission(),
           selectedPinId: screenArgs?.focusedPinId,
           highlightedLocation: screenArgs?.highlightedLocation,
-        );
+        ) {
+    _loadPlaces();
+  }
+
+  // ─── Places Loading ─────────────────────────────────────────────────────────
+
+  Future<void> _loadPlaces() async {
+    state = state.copyWith(isLoadingPins: true);
+    notifyListeners();
+
+    try {
+      final pins = await repo.fetchPlaces(
+        search: state.searchQuery,
+        categorySlug: _resolveCategorySlug(),
+        placeType: _resolvePlaceType(),
+        visitStatus: _resolveVisitStatus(),
+      );
+      state = state.copyWith(pins: pins, isLoadingPins: false);
+    } catch (e) {
+      print('Places fetch error: $e');
+      state = state.copyWith(isLoadingPins: false);
+    }
+
+    notifyListeners();
+  }
+
+  String? _resolveCategorySlug() {
+    final selected = state.filters.selectedCategoryIds;
+    // API supports one category_slug at a time — use the first selected.
+    if (selected.isEmpty) return null;
+    return selected.first;
+  }
+
+  String? _resolvePlaceType() {
+    switch (state.filters.placeType) {
+      case PlaceTypeFilter.businesses:
+        return 'BUSINESS';
+      case PlaceTypeFilter.event:
+        return 'POI';
+      case PlaceTypeFilter.poi:
+        return null;
+    }
+  }
+
+  String? _resolveVisitStatus() {
+    switch (state.filters.visitStatus) {
+      case VisitStatusFilter.visited:
+        return 'VISITED';
+      case VisitStatusFilter.unvisited:
+        return 'UNVISITED';
+      case VisitStatusFilter.both:
+        return null;
+    }
+  }
+
+  // ─── Search & Filters ───────────────────────────────────────────────────────
 
   void setSearchQuery(String value) {
     state = state.copyWith(searchQuery: value);
     notifyListeners();
+
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 400), () {
+      _loadPlaces();
+    });
   }
 
   void applyFilters(MapFiltersState filters) {
     state = state.copyWith(filters: filters);
     notifyListeners();
+    _loadPlaces();
   }
 
-void onPinTap(BuildContext context, String pinId) {
-  print('✅ Pin tapped: $pinId');
+  // ─── Pin Interaction ────────────────────────────────────────────────────────
 
-  final pin = state.getPinById(pinId);
-  if (pin == null) {
-    print('❌ Pin not found: $pinId');
-    return;
+  void onPinTap(BuildContext context, String pinId) {
+    final pin = state.getPinById(pinId);
+    if (pin == null) return;
+
+    state = state.copyWith(
+      selectedPinId: state.selectedPinId == pinId ? null : pinId,
+    );
+    notifyListeners();
+
+    _showPinDetailsBottomSheet(context, pin);
   }
 
-  // Update selection state
-  state = state.copyWith(
-    selectedPinId: state.selectedPinId == pinId ? null : pinId,
-  );
-  notifyListeners();
+  void _showPinDetailsBottomSheet(BuildContext context, MapPinInfo pin) {
+    final details = MapPinDetails(
+      id: pin.id,
+      category: pin.category ?? 'PLACE',
+      name: pin.name,
+      address: pin.address ?? 'Unknown Address',
+      points: pin.points ?? 30,
+      accentColor: pin.accentColor ?? const Color(0xFFD4C4B0),
+      imageUrl: pin.imageUrl,
+    );
 
-  // Show Bottom Sheet
-  _showPinDetailsBottomSheet(context, pin);
-}
-
-void _showPinDetailsBottomSheet(BuildContext context, MapPinInfo pin) {
-  print('📍 Showing bottom sheet for: ${pin.name}');
-
-  final details = MapPinDetails(
-    id: pin.id,
-    category: pin.category ?? 'PLACE',
-    name: pin.name,
-    address: pin.address ?? 'Unknown Address',
-    points: pin.points ?? 30,
-    accentColor: pin.accentColor ?? const Color(0xFFD4C4B0),
-  );
-
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) => PinDetailsSheet(pin: details),
-  ).then((_) {
-    print('Bottom sheet closed');
-  });
-}
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => PinDetailsSheet(pin: details),
+    );
+  }
 
   void clearSelectedPin() {
     if (state.selectedPinId == null) return;
     state = state.copyWith(clearSelectedPin: true);
     notifyListeners();
   }
+
+  // ─── Navigation ─────────────────────────────────────────────────────────────
 
   Future<void> openSearch(BuildContext context) async {
     final result = await context.push<String>(
@@ -133,9 +192,15 @@ void _showPinDetailsBottomSheet(BuildContext context, MapPinInfo pin) {
   }
 
   void openRestaurantDetails(BuildContext context, String locationId) {
-  context.push(
-    '/restaurant_view_details',
-    extra: RestaurantViewDetailsArgs(locationId: locationId),
-  );
-}
+    context.push(
+      '/restaurant_view_details',
+      extra: RestaurantViewDetailsArgs(locationId: locationId),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    super.dispose();
+  }
 }
