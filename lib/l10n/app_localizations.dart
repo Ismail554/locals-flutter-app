@@ -1094,6 +1094,12 @@ abstract class AppLocalizations {
   /// **'Apply filters'**
   String get filtersApply;
 
+  /// No description provided for @shareCardCaptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Caption'**
+  String get shareCardCaptionHint;
+
   /// No description provided for @mapExploring.
   ///
   /// In en, this message translates to:

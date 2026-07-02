@@ -215,6 +215,7 @@
   "filtersVisited": "Visited",
   "filtersUnvisited": "Unvisited",
   "filtersApply": "Apply filters",
+  "shareCardCaptionHint" : "Caption",
   "mapExploring": "EXPLORING",
   "mapCompletion": "COMPLETION",
   "notificationsTitle": "Notifications",

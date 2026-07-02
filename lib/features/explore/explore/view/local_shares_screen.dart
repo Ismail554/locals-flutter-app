@@ -43,24 +43,42 @@ class _LocalSharesView extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: GridView.builder(
-                padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12.w,
-                  mainAxisSpacing: 12.h,
-                  childAspectRatio: 0.95,
-                ),
-                itemCount: controller.shares.length,
-                itemBuilder: (context, index) {
-                  final share = controller.shares[index];
-                  return LocalShareItem(
-                    share: share,
-                    onTap: () =>
-                        controller.openLocalShareDetail(context, share),
-                  );
-                },
-              ),
+              child: controller.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : controller.errorMessage != null &&
+                          controller.shares.isEmpty
+                      ? Center(
+                          child: Text(
+                            controller.errorMessage!,
+                            style: TextStyle(
+                              color: AppColors.levelGrey,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: controller.refresh,
+                          child: GridView.builder(
+                            padding:
+                                EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12.w,
+                              mainAxisSpacing: 12.h,
+                              childAspectRatio: 0.95,
+                            ),
+                            itemCount: controller.shares.length,
+                            itemBuilder: (context, index) {
+                              final share = controller.shares[index];
+                              return LocalShareItem(
+                                share: share,
+                                onTap: () => controller.openLocalShareDetail(
+                                    context, share),
+                              );
+                            },
+                          ),
+                        ),
             ),
           ],
         ),

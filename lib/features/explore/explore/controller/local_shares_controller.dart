@@ -1,92 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:locals/core/network/api_client.dart';
 import 'package:locals/shared/components/image_view/check_in_image_view.dart';
 import 'package:locals/shared/components/image_view/image_view_dialog.dart';
 import 'package:locals/shared/model/check_in_photo_model.dart';
 import '../../explore/model/explore_model.dart';
 
 class LocalSharesController extends ChangeNotifier {
-  final List<ExploreLocalShare> shares;
+  List<ExploreLocalShare> shares = const [];
+  bool isLoading = false;
+  String? errorMessage;
 
-  LocalSharesController() : shares = _getAllLocalShares();
+  final ApiClient _client = ApiClient();
 
-  static List<ExploreLocalShare> _getAllLocalShares() {
-    return [
-      ExploreLocalShare(
-        id: 'ls1',
-        imageColor: const Color(0xFFFFE4C4),
-        userName: 'Marta Roig',
-        timeAgo: '2d ago',
-        caption: 'Best cortado in the Born.',
-        likeCount: 24,
-      ),
-      ExploreLocalShare(
-        id: 'ls2',
-        imageColor: const Color(0xFFB0C4DE),
-        userName: 'Joan Bosch',
-        timeAgo: '5h ago',
-        caption: 'Tokyo Skytree at sunset.',
-        likeCount: 42,
-      ),
-      ExploreLocalShare(
-        id: 'ls3',
-        imageColor: const Color(0xFF4682B4),
-        userName: 'Aina V.',
-        timeAgo: '1d ago',
-        caption: 'Cozy evening at the bar.',
-        likeCount: 19,
-      ),
-      ExploreLocalShare(
-        id: 'ls4',
-        imageColor: const Color(0xFFD2B48C),
-        userName: 'Marta Roig',
-        timeAgo: '3h ago',
-        caption: 'Fresh pastries for breakfast.',
-        likeCount: 31,
-      ),
-      ExploreLocalShare(
-        id: 'ls5',
-        imageColor: const Color(0xFFFFDAB9),
-        userName: 'Joan Bosch',
-        timeAgo: '12h ago',
-        caption: 'Tapas night with friends.',
-        likeCount: 28,
-      ),
-      ExploreLocalShare(
-        id: 'ls6',
-        imageColor: const Color(0xFF708090),
-        userName: 'Aina V.',
-        timeAgo: 'Yesterday',
-        caption: 'Beautiful restaurant interior.',
-        likeCount: 15,
-      ),
-      // Duplicate some to match screenshot layout
-      ExploreLocalShare(
-        id: 'ls7',
-        imageColor: const Color(0xFFFFE4C4),
-        userName: 'Marta Roig',
-        timeAgo: '2d ago',
-        caption: 'Best cortado in the Born.',
-        likeCount: 24,
-      ),
-      ExploreLocalShare(
-        id: 'ls8',
-        imageColor: const Color(0xFFB0C4DE),
-        userName: 'Joan Bosch',
-        timeAgo: '5h ago',
-        caption: 'Amazing view from Skytree.',
-        likeCount: 24,
-      ),
-    ];
+  LocalSharesController() {
+    _loadFeed();
+  }
+
+  Future<void> _loadFeed() async {
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _client.get('/social/checkins/feed/');
+      final results = response['results'] as List? ?? [];
+      shares = results
+          .map((item) =>
+              _checkinToLocalShare(item as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      print('LocalShares feed error: $e');
+      errorMessage = 'Failed to load. Please try again.';
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> refresh() => _loadFeed();
+
+  /// Maps a `/social/checkins/feed/` item to `ExploreLocalShare`.
+  ExploreLocalShare _checkinToLocalShare(Map<String, dynamic> json) {
+    final author = json['author'] as Map<String, dynamic>?;
+    final authorName = author?['full_name'] as String? ?? '';
+    final initial = authorName.isNotEmpty ? authorName[0].toUpperCase() : 'U';
+
+    return ExploreLocalShare(
+      id: json['id'].toString(),
+      imageColor: const Color(0xFFD4C4B0),
+      userName: authorName,
+      userAvatarInitial: initial,
+      timeAgo: json['created_at_relative'] as String? ?? '',
+      caption: json['caption'] as String? ?? '',
+      likeCount: json['likes_count'] as int? ?? 0,
+      imageUrl: json['full_image_url'] as String?,
+      isLikedByUser: json['is_liked_by_user'] as bool? ?? false,
+    );
   }
 
   void openLocalShareDetail(BuildContext context, ExploreLocalShare share) {
-    // Reuse your existing ImageViewDialog
     final photo = CheckInPhoto(
       previewColor: share.imageColor,
       locationName: share.userName,
       timeAgo: share.timeAgo,
       caption: share.caption,
       likes: share.likeCount,
+      userInitial: share.userAvatarInitial,
     );
 
     ImageViewDialog.show(context, photo, viewType: ImageViewType.localShare);

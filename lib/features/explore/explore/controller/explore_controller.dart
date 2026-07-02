@@ -20,7 +20,7 @@ class ExploreController extends ChangeNotifier {
   ExploreController(this.repo, {StoryUploadService? storyUploadService})
       : storyUploadService = storyUploadService ?? StoryUploadService(),
         state = ExploreModel(
-          stories: repo.loadStories(), // "your story" slot only initially
+          stories: repo.loadStories(), 
         ) {
     _loadStoryFeed();
     _loadDashboard();

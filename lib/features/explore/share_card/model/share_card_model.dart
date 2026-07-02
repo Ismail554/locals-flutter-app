@@ -10,6 +10,7 @@ class ShareCardModel {
   final String? imagePath;
   final bool isSaving;
   final bool isSaved;
+  final String caption;
 
   const ShareCardModel({
     required this.cityLabel,
@@ -21,6 +22,7 @@ class ShareCardModel {
     this.imagePath,
     this.isSaving = false,
     this.isSaved = false,
+    this.caption = '',
   });
 
   ShareCardModel copyWith({
@@ -30,6 +32,7 @@ class ShareCardModel {
     bool clearImagePath = false,
     bool? isSaving,
     bool? isSaved,
+    String? caption,
   }) {
     return ShareCardModel(
       cityLabel: cityLabel,
@@ -41,6 +44,7 @@ class ShareCardModel {
       imagePath: clearImagePath ? null : (imagePath ?? this.imagePath),
       isSaving: isSaving ?? this.isSaving,
       isSaved: isSaved ?? this.isSaved,
+      caption: caption ?? this.caption,
     );
   }
 }

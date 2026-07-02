@@ -533,6 +533,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get filtersApply => 'Aplicar filtros';
 
   @override
+  String get shareCardCaptionHint => 'Subtítulo';
+
+  @override
   String get mapExploring => 'EXPLORANDO';
 
   @override

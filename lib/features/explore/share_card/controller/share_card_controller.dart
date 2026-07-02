@@ -21,6 +21,9 @@ class ShareCardController extends ChangeNotifier {
   final ShareCardArgs args;
   ShareCardModel state;
 
+  /// Caption field controller — driven by the text field in the UI
+  final TextEditingController captionController = TextEditingController();
+
   ShareCardController(
     this.repo,
     this.exploreRepo,
@@ -29,7 +32,14 @@ class ShareCardController extends ChangeNotifier {
     ImageSaveService? imageSaveService,
   })  : storyUploadService = storyUploadService ?? StoryUploadService(),
         imageSaveService = imageSaveService ?? const ImageSaveService(),
-        state = repo.load(args);
+        state = repo.load(args) {
+    captionController.addListener(_onCaptionChanged);
+  }
+
+  void _onCaptionChanged() {
+    state = state.copyWith(caption: captionController.text);
+    notifyListeners();
+  }
 
   Future<void> capturePhoto(BuildContext context) async {
     final imagePath = await Navigator.of(context, rootNavigator: true)
@@ -62,7 +72,6 @@ class ShareCardController extends ChangeNotifier {
 
   Future<void> addToStory(BuildContext context) async {
     if (state.imagePath != null) {
-      // Already have an image — add it locally (no upload needed, it's a share card)
       _addLocalImageToStory(state.imagePath!);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -76,24 +85,16 @@ class ShareCardController extends ChangeNotifier {
     if (!context.mounted || source == null) return;
 
     if (source == ShareCardMediaSource.camera) {
-      // Camera: capture locally, add to story locally
       await capturePhoto(context);
       if (!context.mounted || state.imagePath == null) return;
       _addLocalImageToStory(state.imagePath!);
     } else {
-      // Gallery: pick and upload to API, get server-backed slide
       try {
         final slide =
             await storyUploadService.pickAndUpload(context, exploreRepo);
         if (!context.mounted || slide == null) return;
 
-        // If slide has a local path, reflect it in the share card UI
         if (slide.imagePath != null) _applyImage(slide.imagePath!);
-
-        // Slide is already added to exploreRepo inside pickAndUpload → addSlideToYourStory
-        // (StoryUploadService calls repo.uploadStory which returns the slide,
-        //  then ExploreController calls repo.addSlideToYourStory — but here we
-        //  call addSlideToYourStory directly since we bypass ExploreController)
         exploreRepo.addSlideToYourStory(slide);
       } catch (e) {
         if (context.mounted) {
@@ -151,8 +152,6 @@ class ShareCardController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Add a local file path slide to your story without uploading to server.
-  /// Used for camera captures and share card images.
   void _addLocalImageToStory(String imagePath) {
     final slide = storyUploadService.slideFromPath(imagePath);
     exploreRepo.addSlideToYourStory(slide);
@@ -209,5 +208,12 @@ class ShareCardController extends ChangeNotifier {
         imageColor: Color(0xFFD4C4B0),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    captionController.removeListener(_onCaptionChanged);
+    captionController.dispose();
+    super.dispose();
   }
 }

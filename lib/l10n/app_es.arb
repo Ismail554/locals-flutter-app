@@ -172,6 +172,7 @@
   "missionsSubtitle": "Desafíos seleccionados para descubrir Barcelona.",
   "missionFilterNearby": "Cerca",
   "missionFilterActive": "Activas",
+  "shareCardCaptionHint" : "Subtítulo",
   "missionFilterCompleted": "Completadas",
   "missionFilterEvents": "Eventos",
   "missionStopsSection": "PARADAS",
