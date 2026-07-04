@@ -8,16 +8,8 @@ abstract class AchievementsRepository {
 class AchievementsRepositoryImpl implements AchievementsRepository {
   final ApiClient _client = ApiClient();
 
-  static const Map<String, String> _unlockedEmojis = {
-    'FIRST_CHECKIN': '🌱',
-    '10_VISITS': '📍',
-    'CAFE_CONNOISSEUR': '☕',
-    'NIGHT_OWL': '🌙',
-    '50_VISITS': '🏅',
-    'CITY_COMPLETE': '🏙️',
-    'GLOBETROTTER': '🌍',
-    'MISSION_MASTER': '🎖️',
-  };
+  static const String _lockedEmoji = '🔒';
+  static const String _unlockedEmoji = '🏆';
 
   @override
   Future<AchievementsModel> fetchAchievements() async {
@@ -28,14 +20,13 @@ class AchievementsRepositoryImpl implements AchievementsRepository {
 
     final items = rawAchievements.map((raw) {
       final map = raw as Map<String, dynamic>;
-      final ruleCode = map['rule_code'] as String? ?? '';
       final isUnlocked = map['is_unlocked'] as bool? ?? false;
 
       return AchievementItem(
         id: map['id'].toString(),
         title: map['title'] as String? ?? '',
         subtitle: map['description'] as String? ?? '',
-        emoji: isUnlocked ? (_unlockedEmojis[ruleCode] ?? '🏆') : '🔒',
+        emoji: isUnlocked ? _unlockedEmoji : _lockedEmoji,
         isUnlocked: isUnlocked,
       );
     }).toList();

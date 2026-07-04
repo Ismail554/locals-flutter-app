@@ -28,7 +28,9 @@ class RouteService {
     debugPrint("========== DIRECTIONS REQUEST ==========");
     debugPrint("URL: $url");
     debugPrint("Origin: ${origin.latitude}, ${origin.longitude}");
-    debugPrint("Destination: ${destination.latitude}, ${destination.longitude}");
+    debugPrint(
+      "Destination: ${destination.latitude}, ${destination.longitude}",
+    );
 
     try {
       final response = await http.get(url);
@@ -61,8 +63,7 @@ class RouteService {
         return [];
       }
 
-      final encoded =
-          routes.first["overview_polyline"]["points"] as String;
+      final encoded = routes.first["overview_polyline"]["points"] as String;
 
       debugPrint("Encoded Polyline Length: ${encoded.length}");
 
@@ -71,12 +72,7 @@ class RouteService {
       debugPrint("Decoded Points: ${decoded.length}");
 
       final points = decoded
-          .map(
-            (e) => LatLng(
-              e.latitude,
-              e.longitude,
-            ),
-          )
+          .map((e) => LatLng(e.latitude, e.longitude))
           .toList();
 
       debugPrint("Returning ${points.length} LatLng points.");
@@ -89,6 +85,82 @@ class RouteService {
       return [];
     }
   }
+
+  // Future<List<LatLng>> getRoute({
+  //   required LatLng origin,
+  //   required LatLng destination,
+  // }) async {
+  //   origin = const LatLng(41.3851, 2.1734);
+  //   destination = const LatLng(41.3891, 2.1774);
+
+  //   final url = Uri.parse(
+  //     "https://maps.googleapis.com/maps/api/directions/json"
+  //     "?origin=${origin.latitude},${origin.longitude}"
+  //     "&destination=${destination.latitude},${destination.longitude}"
+  //     "&mode=driving"
+  //     "&key=$_apiKey",
+  //   );
+
+  //   debugPrint("========== DIRECTIONS REQUEST ==========");
+  //   debugPrint("URL: $url");
+  //   debugPrint("Origin: ${origin.latitude}, ${origin.longitude}");
+  //   debugPrint(
+  //     "Destination: ${destination.latitude}, ${destination.longitude}",
+  //   );
+
+  //   try {
+  //     final response = await http.get(url);
+
+  //     debugPrint("HTTP Status: ${response.statusCode}");
+  //     debugPrint("Response Body:");
+  //     debugPrint(response.body);
+
+  //     if (response.statusCode != 200) {
+  //       throw Exception(
+  //         "Directions API failed with status ${response.statusCode}",
+  //       );
+  //     }
+
+  //     final json = jsonDecode(response.body);
+
+  //     debugPrint("Directions Status: ${json["status"]}");
+
+  //     if (json["status"] != "OK") {
+  //       debugPrint("Directions Error: ${json["error_message"]}");
+  //       return [];
+  //     }
+
+  //     final routes = json["routes"] as List;
+
+  //     debugPrint("Routes Found: ${routes.length}");
+
+  //     if (routes.isEmpty) {
+  //       debugPrint("No routes returned.");
+  //       return [];
+  //     }
+
+  //     final encoded = routes.first["overview_polyline"]["points"] as String;
+
+  //     debugPrint("Encoded Polyline Length: ${encoded.length}");
+
+  //     final decoded = PolylinePoints.decodePolyline(encoded);
+
+  //     debugPrint("Decoded Points: ${decoded.length}");
+
+  //     final points = decoded
+  //         .map((e) => LatLng(e.latitude, e.longitude))
+  //         .toList();
+
+  //     debugPrint("Returning ${points.length} LatLng points.");
+  //     debugPrint("========================================");
+
+  //     return points;
+  //   } catch (e, stackTrace) {
+  //     debugPrint("RouteService Error: $e");
+  //     debugPrintStack(stackTrace: stackTrace);
+  //     return [];
+  //   }
+  // }
 
   Future<double?> getDistance({
     required LatLng origin,

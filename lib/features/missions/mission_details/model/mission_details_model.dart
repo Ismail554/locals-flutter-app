@@ -6,6 +6,8 @@ class MissionStop {
   final String category;
   final String address;
   final MissionStopStatus status;
+  final double? latitude;
+  final double? longitude;
 
   const MissionStop({
     required this.number,
@@ -13,6 +15,8 @@ class MissionStop {
     required this.category,
     required this.address,
     required this.status,
+    this.latitude,
+    this.longitude,
   });
 }
 
@@ -39,53 +43,18 @@ class MissionDetailsModel {
     required this.stops,
   });
 
-  double get progress => progressCurrent / progressTotal;
+  double get progress =>
+      progressTotal == 0 ? 0 : progressCurrent / progressTotal;
 
-  static const coffeeCartographer = MissionDetailsModel(
-    id: '1',
-    title: 'Coffee Cartographer',
-    description: 'Visit 5 traditional cafés in the Born neighborhood.',
-    reward: 250,
-    totalStops: 5,
-    level: 'Easy',
-    progressCurrent: 2,
-    progressTotal: 7,
-    stops: [
-      MissionStop(
-        number: 1,
-        name: 'Café del Born',
-        category: 'Cafe',
-        address: 'Carrer del Born 12',
-        status: MissionStopStatus.completed,
-      ),
-      MissionStop(
-        number: 2,
-        name: 'Origem Coffee',
-        category: 'Cafe',
-        address: 'Plaça de Sant Agustí 2',
-        status: MissionStopStatus.completed,
-      ),
-      MissionStop(
-        number: 3,
-        name: 'Forn Baluard',
-        category: 'Bakery',
-        address: 'Carrer del Baluard 38',
-        status: MissionStopStatus.pending,
-      ),
-      MissionStop(
-        number: 4,
-        name: 'Federal Café',
-        category: 'Cafe',
-        address: 'Carrer del Parlament 39',
-        status: MissionStopStatus.pending,
-      ),
-      MissionStop(
-        number: 5,
-        name: "Satan's Coffee Corner",
-        category: 'Cafe',
-        address: "Carrer de l'Arc de Sant Ramon del Portell",
-        status: MissionStopStatus.pending,
-      ),
-    ],
-  );
+  factory MissionDetailsModel.empty() => const MissionDetailsModel(
+        id: '',
+        title: '',
+        description: '',
+        reward: 0,
+        totalStops: 0,
+        level: '',
+        progressCurrent: 0,
+        progressTotal: 0,
+        stops: [],
+      );
 }

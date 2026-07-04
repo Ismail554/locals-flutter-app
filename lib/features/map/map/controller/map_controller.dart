@@ -11,6 +11,7 @@ import 'package:locals/features/map/map/controller/route_service.dart';
 import 'package:locals/shared/components/pin_details_sheet.dart';
 import 'package:locals/shared/model/map_pin_details.dart';
 import 'package:locals/shared/model/map_pin_info.dart';
+import 'package:locals/shared/theme/app_colors.dart';
 import '../../filters/model/filters_model.dart';
 import '../../search/repository/map_search_repository.dart';
 import '../model/map_screen_args.dart';
@@ -59,8 +60,8 @@ class MapController extends ChangeNotifier {
           Polyline(
             polylineId: PolylineId('route'),
             points: points,
-            width: 40,
-            color: Colors.red,
+            width: 10,
+            color: AppColors.actionPink,
           ),
         },
       );

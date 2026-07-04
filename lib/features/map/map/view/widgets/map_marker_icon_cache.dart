@@ -24,6 +24,7 @@ class MapMarkerIconCache {
     _cache[key] = icon;
     return icon;
   }
+
   Future<void> preloadAll() async {
     for (final tag in MapPinTag.values) {
       await iconFor(tag: tag, visited: true);
@@ -33,7 +34,7 @@ class MapMarkerIconCache {
 
   Future<BitmapDescriptor> _loadFromAsset(
     String assetPath, {
-    int targetWidth = 96,
+    int targetWidth = 56,
   }) async {
     final data = await rootBundle.load(assetPath);
     final codec = await ui.instantiateImageCodec(

@@ -16,8 +16,8 @@ class MapPinMarker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.asset(
       tag.assetPath(visited: visited),
-      width: 40.w,
-      height: 48.h,
+      width: 20.w,
+      height: 28.h,
       fit: BoxFit.contain,
     );
   }
