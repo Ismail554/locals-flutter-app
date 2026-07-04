@@ -16,6 +16,8 @@ class RestaurantPhotosSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (photos.isEmpty) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -46,14 +48,18 @@ class RestaurantPhotosSection extends StatelessWidget {
                     child: SizedBox(
                       width: 100.w,
                       height: 100.h,
-                      child: ColoredBox(
-                        color: photo.color,
-                        child: Icon(
-                          Icons.image_outlined,
-                          color: AppColors.white.withValues(alpha: 0.5),
-                          size: 28.sp,
-                        ),
-                      ),
+                      child: photo.imageUrl != null
+                          ? Image.network(
+                              photo.imageUrl!,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (_, child, progress) {
+                                if (progress == null) return child;
+                                return _placeholder(photo.color);
+                              },
+                              errorBuilder: (_, __, ___) =>
+                                  _placeholder(photo.color),
+                            )
+                          : _placeholder(photo.color),
                     ),
                   ),
                 ),
@@ -62,6 +68,17 @@ class RestaurantPhotosSection extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _placeholder(Color color) {
+    return ColoredBox(
+      color: color,
+      child: Icon(
+        Icons.image_outlined,
+        color: AppColors.white.withValues(alpha: 0.5),
+        size: 28.sp,
+      ),
     );
   }
 }

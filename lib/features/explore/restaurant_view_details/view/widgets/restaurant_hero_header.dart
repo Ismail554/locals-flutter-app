@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_model.dart';
-import 'package:locals/features/map/map/view/widgets/business_banner.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
 class RestaurantHeroHeader extends StatelessWidget {
@@ -27,14 +26,34 @@ class RestaurantHeroHeader extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          ColoredBox(color: restaurant.heroColor),
-          Positioned.fill(
-            child: Icon(
-              Icons.image_outlined,
-              color: AppColors.white.withValues(alpha: 0.25),
-              size: 80.sp,
+          // Real image or color fallback — unchanged visual behaviour
+          if (restaurant.heroImageUrl != null)
+            Image.network(
+              restaurant.heroImageUrl!,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+              loadingBuilder: (_, child, progress) {
+                if (progress == null) return child;
+                return ColoredBox(color: restaurant.heroColor);
+              },
+              errorBuilder: (_, __, ___) =>
+                  ColoredBox(color: restaurant.heroColor),
+            )
+          else
+            ColoredBox(color: restaurant.heroColor),
+
+          // Fallback icon — only visible when no image URL
+          if (restaurant.heroImageUrl == null)
+            Positioned.fill(
+              child: Icon(
+                Icons.image_outlined,
+                color: AppColors.white.withValues(alpha: 0.25),
+                size: 80.sp,
+              ),
             ),
-          ),
+
+          // Top controls
           Positioned(
             top: MediaQuery.of(context).padding.top + 8.h,
             left: 20.w,
@@ -54,6 +73,8 @@ class RestaurantHeroHeader extends StatelessWidget {
               ],
             ),
           ),
+
+          // Bottom labels
           Positioned(
             left: 20.w,
             right: 20.w,
@@ -64,12 +85,10 @@ class RestaurantHeroHeader extends StatelessWidget {
                 Row(
                   children: [
                     _Tag(label: restaurant.category),
-
                     if (restaurant.hasLocalsSeal) ...[
                       SizedBox(width: 8.w),
                       _SealTag(),
                     ],
-
                     if (restaurant.businessOfTheMonth) ...[
                       SizedBox(width: 8.w),
                       _BusinessMonthTag(),
@@ -109,11 +128,7 @@ class _BusinessMonthTag extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.emoji_events,
-            color: Colors.white,
-            size: 16.sp,
-          ),
+          Icon(Icons.emoji_events, color: Colors.white, size: 16.sp),
           SizedBox(width: 4.w),
           Text(
             context.l10n.busniessOfTheMonth,

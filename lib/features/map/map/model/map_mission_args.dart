@@ -54,6 +54,8 @@ class MapActiveLocation {
   final String address;
   final int points;
   final Color imageColor;
+  final double latitude;
+final double longitude;
 
   const MapActiveLocation({
     this.locationId,
@@ -63,6 +65,8 @@ class MapActiveLocation {
     required this.address,
     required this.points,
     required this.imageColor,
+    required this.latitude,
+    required this.longitude,
   });
 
   String get resolvedLocationId =>

@@ -1,3 +1,4 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locals/shared/model/map_pin_info.dart';
 import '../../filters/model/filters_model.dart';
 import 'map_mission_args.dart';
@@ -11,6 +12,8 @@ class MapModel {
   final String? selectedPinId;
   final MapActiveMission? activeMission;
   final MapActiveLocation? highlightedLocation;
+  final bool showRoute;
+  final Set<Polyline> polylines;
 
   const MapModel({
     this.searchQuery = '',
@@ -21,6 +24,8 @@ class MapModel {
     this.highlightedLocation,
     this.pins = const [],
     this.isLoadingPins = false,
+    this.showRoute = false,
+    this.polylines = const {},
   });
 
   MapModel copyWith({
@@ -35,6 +40,8 @@ class MapModel {
     bool clearMission = false,
     MapActiveLocation? highlightedLocation,
     bool clearHighlightedLocation = false,
+    bool? showRoute,
+    Set<Polyline>? polylines, // ← parameter exists
   }) {
     return MapModel(
       searchQuery: searchQuery ?? this.searchQuery,
@@ -43,12 +50,15 @@ class MapModel {
           hasUnreadNotifications ?? this.hasUnreadNotifications,
       pins: pins ?? this.pins,
       isLoadingPins: isLoadingPins ?? this.isLoadingPins,
-      selectedPinId:
-          clearSelectedPin ? null : selectedPinId ?? this.selectedPinId,
+      selectedPinId: clearSelectedPin
+          ? null
+          : selectedPinId ?? this.selectedPinId,
       activeMission: clearMission ? null : activeMission ?? this.activeMission,
       highlightedLocation: clearHighlightedLocation
           ? null
           : highlightedLocation ?? this.highlightedLocation,
+      showRoute: showRoute ?? this.showRoute,
+      polylines: polylines ?? this.polylines,
     );
   }
 

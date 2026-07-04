@@ -1,13 +1,17 @@
+import 'package:locals/core/network/api_client.dart';
 import '../model/restaurant_view_details_model.dart';
 
 abstract class RestaurantViewDetailsRepository {
-  RestaurantViewDetailsModel load(String locationId);
+  Future<RestaurantViewDetailsModel> load(String locationId);
 }
 
 class RestaurantViewDetailsRepositoryImpl
     implements RestaurantViewDetailsRepository {
+  final ApiClient _client = ApiClient();
+
   @override
-  RestaurantViewDetailsModel load(String locationId) {
-    return RestaurantViewDetailsModel.byId(locationId);
+  Future<RestaurantViewDetailsModel> load(String locationId) async {
+    final response = await _client.get('/places/$locationId/');
+    return RestaurantViewDetailsModel.fromApi(response);
   }
 }

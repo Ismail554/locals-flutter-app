@@ -205,7 +205,9 @@ class ShareCardController extends ChangeNotifier {
         name: 'Café del Born',
         address: 'Carrer del Born 12',
         points: 50,
-        imageColor: Color(0xFFD4C4B0),
+        imageColor: Color(0xFFD4C4B0), 
+        latitude: 41.3833, 
+        longitude: 2.1833,
       ),
     );
   }

@@ -51,5 +51,10 @@
 	<string>Locals needs permission to save your share card photos to your library.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Locals needs camera access so you can capture photos for your share card and stories.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs your location to show directions.</string>
+
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs your location to show directions.</string>
 </dict>
 </plist>

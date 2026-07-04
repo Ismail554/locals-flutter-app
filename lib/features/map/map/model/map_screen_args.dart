@@ -5,10 +5,13 @@ class MapScreenArgs {
   final MapActiveLocation? highlightedLocation;
   final MapMissionArgs? mission;
 
+  final bool showRoute;
+
   const MapScreenArgs({
     this.focusedPinId,
     this.highlightedLocation,
     this.mission,
+    this.showRoute = false,
   });
 
   factory MapScreenArgs.fromExtra(Object? extra) {
@@ -18,6 +21,7 @@ class MapScreenArgs {
         mission: extra,
         focusedPinId: extra.activeLocation.mapPinId,
         highlightedLocation: extra.activeLocation,
+        showRoute: true,
       );
     }
     return const MapScreenArgs();

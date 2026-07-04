@@ -1,9 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locals/features/explore/events_progress_map/model/events_progress_map_args.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_args.dart';
+import 'package:locals/features/map/map/controller/location_service.dart';
+import 'package:locals/features/map/map/controller/route_service.dart';
 import 'package:locals/shared/components/pin_details_sheet.dart';
 import 'package:locals/shared/model/map_pin_details.dart';
 import 'package:locals/shared/model/map_pin_info.dart';
@@ -20,15 +24,52 @@ class MapController extends ChangeNotifier {
   Timer? _searchDebounce;
 
   MapController(this.repo, {MapScreenArgs? screenArgs})
-      : state = MapModel(
-          activeMission: screenArgs?.mission?.toActiveMission(),
-          selectedPinId: screenArgs?.focusedPinId,
-          highlightedLocation: screenArgs?.highlightedLocation,
-        ) {
+    : state = MapModel(
+        activeMission: screenArgs?.mission?.toActiveMission(),
+        selectedPinId: screenArgs?.focusedPinId,
+        highlightedLocation: screenArgs?.highlightedLocation,
+        showRoute: screenArgs?.showRoute ?? false,
+      ) {
     _loadPlaces();
   }
 
   // ─── Places Loading ─────────────────────────────────────────────────────────
+
+  Future<void> loadRoute() async {
+      debugPrint("Loading route...");
+  debugPrint("showRoute = ${state.showRoute}");
+    if (!state.showRoute) return;
+
+    final location = state.highlightedLocation;
+    if (location == null) return;
+    debugPrint("Location = $location");
+
+    try {
+      final current = await LocationService.currentLocation();
+
+      final destination = LatLng(location.latitude, location.longitude);
+
+      final points = await RouteService.instance.getRoute(
+        origin: current,
+        destination: destination,
+      );
+
+      state = state.copyWith(
+        polylines: {
+          Polyline(
+            polylineId: PolylineId('route'),
+            points: points,
+            width: 40,
+            color: Colors.red,
+          ),
+        },
+      );
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Route Error: $e');
+    }
+  }
 
   Future<void> _loadPlaces() async {
     state = state.copyWith(isLoadingPins: true);
@@ -41,18 +82,25 @@ class MapController extends ChangeNotifier {
         placeType: _resolvePlaceType(),
         visitStatus: _resolveVisitStatus(),
       );
-      state = state.copyWith(pins: pins, isLoadingPins: false);
-    } catch (e) {
-      print('Places fetch error: $e');
-      state = state.copyWith(isLoadingPins: false);
-    }
 
-    notifyListeners();
+      state = state.copyWith(pins: pins, isLoadingPins: false);
+
+      notifyListeners();
+
+      if (state.showRoute) {
+        await loadRoute();
+      }
+    } catch (e) {
+      debugPrint('Places fetch error: $e');
+
+      state = state.copyWith(isLoadingPins: false);
+
+      notifyListeners();
+    }
   }
 
   String? _resolveCategorySlug() {
     final selected = state.filters.selectedCategoryIds;
-    // API supports one category_slug at a time — use the first selected.
     if (selected.isEmpty) return null;
     return selected.first;
   }
@@ -152,10 +200,7 @@ class MapController extends ChangeNotifier {
   Future<void> openFilters(BuildContext context) async {
     await context.push<MapFiltersState>(
       '/filters',
-      extra: FiltersArgs(
-        initial: state.filters,
-        onApply: applyFilters,
-      ),
+      extra: FiltersArgs(initial: state.filters, onApply: applyFilters),
     );
   }
 
@@ -172,9 +217,7 @@ class MapController extends ChangeNotifier {
 
     context.push(
       '/restaurant_view_details',
-      extra: RestaurantViewDetailsArgs(
-        locationId: location.resolvedLocationId,
-      ),
+      extra: RestaurantViewDetailsArgs(locationId: location.resolvedLocationId),
     );
   }
 

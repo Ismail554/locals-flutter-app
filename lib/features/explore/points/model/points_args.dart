@@ -51,7 +51,9 @@ class PointsArgs {
         name: locationName,
         address: locationAddress ?? meta?.$2 ?? '',
         points: points,
-        imageColor: locationColor ?? meta?.$3 ?? const Color(0xFFD4C4B0),
+        imageColor: locationColor ?? meta?.$3 ?? const Color(0xFFD4C4B0), 
+        latitude: locationName == 'Café del Born' ? 41.3833 : 0, 
+        longitude: locationName == 'Café del Born' ? 2.1833 : 0,
       ),
     );
   }
