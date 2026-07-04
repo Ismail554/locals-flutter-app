@@ -38,20 +38,28 @@ class EventRouteCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  ColoredBox(color: event.imageColor),
-                  Positioned.fill(
-                    child: Icon(
-                      Icons.landscape_outlined,
-                      color: AppColors.white.withValues(alpha: 0.2),
-                      size: 72.sp,
-                    ),
-                  ),
+                  // Real image or color fallback
+                  if (event.imageUrl != null)
+                    Image.network(
+                      event.imageUrl!,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (_, child, progress) {
+                        if (progress == null) return child;
+                        return _colorBackground();
+                      },
+                      errorBuilder: (_, __, ___) => _colorBackground(),
+                    )
+                  else
+                    _colorBackground(),
+
+                  // Gradient + text overlay — unchanged
                   Positioned(
                     left: 0,
                     right: 0,
                     bottom: 0,
                     child: Container(
-                      padding: EdgeInsets.fromLTRB(16.w, 32.h, 16.w, 16.h),
+                      padding:
+                          EdgeInsets.fromLTRB(16.w, 32.h, 16.w, 16.h),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
@@ -68,7 +76,8 @@ class EventRouteCard extends StatelessWidget {
                           Text(
                             event.dateLabel,
                             style: TextStyle(
-                              color: AppColors.white.withValues(alpha: 0.85),
+                              color: AppColors.white
+                                  .withValues(alpha: 0.85),
                               fontSize: 11.sp,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.8,
@@ -92,7 +101,8 @@ class EventRouteCard extends StatelessWidget {
             ),
             Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              padding: EdgeInsets.symmetric(
+                  horizontal: 16.w, vertical: 12.h),
               color: AppColors.rankListItemBg,
               child: Row(
                 children: [
@@ -124,6 +134,22 @@ class EventRouteCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _colorBackground() {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ColoredBox(color: event.imageColor),
+        Center(
+          child: Icon(
+            Icons.landscape_outlined,
+            color: AppColors.white.withValues(alpha: 0.2),
+            size: 72.sp,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -18,8 +18,8 @@ class JoinEventScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedArgs = args ??
-        (GoRouterState.of(context).extra as JoinEventArgs?);
+    final resolvedArgs =
+        args ?? (GoRouterState.of(context).extra as JoinEventArgs?);
 
     return ChangeNotifierProvider(
       create: (_) => JoinEventController(
@@ -37,7 +37,50 @@ class _JoinEventView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<JoinEventController>();
+
+    // Loading
+    if (controller.isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.white,
+        body: SafeArea(
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
+    // Error
+    if (controller.errorMessage != null) {
+      return Scaffold(
+        backgroundColor: AppColors.white,
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Text(
+                controller.errorMessage!,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Null safety
     final event = controller.event;
+
+    if (event == null) {
+      return const Scaffold(
+        backgroundColor: AppColors.white,
+        body: SafeArea(
+          child: Center(
+            child: Text('No event found'),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -111,7 +154,9 @@ class _JoinEventView extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    event.isJoined ? context.l10n.joinEventJoined : context.l10n.joinEventButton,
+                    event.isJoined
+                        ? context.l10n.joinEventJoined
+                        : context.l10n.joinEventButton,
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w700,

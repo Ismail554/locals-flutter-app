@@ -3,19 +3,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
 class JoinEventHeroHeader extends StatelessWidget {
-  final String sponsor;
-  final String title;
-  final String dateLabel;
+  final String? sponsor;
+  final String? title;
+  final String? dateLabel;
   final Color heroColor;
-  final VoidCallback onBack;
+  final VoidCallback? onBack;
 
   const JoinEventHeroHeader({
     super.key,
-    required this.sponsor,
-    required this.title,
-    required this.dateLabel,
+    this.sponsor,
+    this.title,
+    this.dateLabel,
     required this.heroColor,
-    required this.onBack,
+    this.onBack,
   });
 
   @override
@@ -75,7 +75,7 @@ class JoinEventHeroHeader extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Text(
-                      'Sponsored · $sponsor',
+                      'Sponsored · ${sponsor ?? ''}',
                       style: TextStyle(
                         color: AppColors.white,
                         fontSize: 11.sp,
@@ -85,7 +85,7 @@ class JoinEventHeroHeader extends StatelessWidget {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    title,
+                    title ?? '',
                     style: TextStyle(
                       color: AppColors.white,
                       fontSize: 26.sp,
@@ -94,7 +94,7 @@ class JoinEventHeroHeader extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    dateLabel,
+                    dateLabel ?? '',
                     style: TextStyle(
                       color: AppColors.white.withValues(alpha: 0.9),
                       fontSize: 14.sp,

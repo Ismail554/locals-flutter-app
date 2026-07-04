@@ -27,7 +27,7 @@ class _EventsRoutesView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<EventsRoutesController>();
-    final events = controller.state.events;
+    final state = controller.state;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -45,18 +45,36 @@ class _EventsRoutesView extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: ListView.separated(
-                padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                itemCount: events.length,
-                separatorBuilder: (_, __) => SizedBox(height: 16.h),
-                itemBuilder: (context, index) {
-                  final event = events[index];
-                  return EventRouteCard(
-                    event: event,
-                    onTap: () => controller.openEvent(context, event.id),
-                  );
-                },
-              ),
+              child: state.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : state.errorMessage != null && state.events.isEmpty
+                      ? Center(
+                          child: Text(
+                            state.errorMessage!,
+                            style: TextStyle(
+                              color: AppColors.levelGrey,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: controller.refresh,
+                          child: ListView.separated(
+                            padding:
+                                EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+                            itemCount: state.events.length,
+                            separatorBuilder: (_, __) =>
+                                SizedBox(height: 16.h),
+                            itemBuilder: (context, index) {
+                              final event = state.events[index];
+                              return EventRouteCard(
+                                event: event,
+                                onTap: () => controller.openEvent(
+                                    context, event.id),
+                              );
+                            },
+                          ),
+                        ),
             ),
           ],
         ),

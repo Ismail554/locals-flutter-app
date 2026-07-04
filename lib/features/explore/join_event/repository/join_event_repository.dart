@@ -1,10 +1,17 @@
+import 'package:locals/core/network/api_client.dart';
 import '../model/join_event_model.dart';
 
 abstract class JoinEventRepository {
-  JoinEventModel load(String eventId);
+  Future<JoinEventModel> load(String eventId);
 }
 
 class JoinEventRepositoryImpl implements JoinEventRepository {
+  final ApiClient _client = ApiClient();
+
   @override
-  JoinEventModel load(String eventId) => JoinEventModel.byId(eventId);
+  Future<JoinEventModel> load(String eventId) async {
+    final response =
+        await _client.get('/gamification/missions/$eventId/');
+    return JoinEventModel.fromApi(response);
+  }
 }
