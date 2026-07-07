@@ -158,7 +158,7 @@ class ExploreFollowUser {
   final String name;
   final int level;
   final bool isFollowing;
-  final String? avatarUrl; // ← NEW: from API `avatar` field
+  final String? avatarUrl;
 
   const ExploreFollowUser({
     required this.id,
@@ -284,32 +284,45 @@ class ExploreFeaturedRoute {
 class ExploreLocalShare {
   final String id;
   final Color imageColor;
+
   final String userName;
   final String userAvatarInitial;
+  final String? userAvatarUrl;
+
+  final String placeName;
+
   final String timeAgo;
   final String caption;
   final int likeCount;
-  final String? imageUrl; // ← NEW: from API `full_image_url`
-  final bool isLikedByUser; // ← NEW: from API `is_liked_by_user`
+
+  final String? imageUrl;
+  final bool isLikedByUser;
 
   const ExploreLocalShare({
     required this.id,
     required this.imageColor,
     required this.userName,
-    this.userAvatarInitial = 'M',
+    required this.placeName,
+    this.userAvatarInitial = 'U',
+    this.userAvatarUrl,
     required this.timeAgo,
     required this.caption,
-    this.likeCount = 24,
+    this.likeCount = 0,
     this.imageUrl,
     this.isLikedByUser = false,
   });
 
-  ExploreLocalShare copyWith({bool? isLikedByUser, int? likeCount}) {
+  ExploreLocalShare copyWith({
+    bool? isLikedByUser,
+    int? likeCount,
+  }) {
     return ExploreLocalShare(
       id: id,
       imageColor: imageColor,
       userName: userName,
+      placeName: placeName,
       userAvatarInitial: userAvatarInitial,
+      userAvatarUrl: userAvatarUrl,
       timeAgo: timeAgo,
       caption: caption,
       likeCount: likeCount ?? this.likeCount,
@@ -318,14 +331,23 @@ class ExploreLocalShare {
     );
   }
 
-  /// Factory from `local_shares` API item.
-  /// Note: API doesn't return a user name for local shares — `category_name`
-  /// is used as a stand-in label since that's the closest descriptive field.
   factory ExploreLocalShare.fromApi(Map<String, dynamic> json) {
+    final author = json['author'] as Map<String, dynamic>?;
+
+    final fullName = author?['full_name'] as String? ?? '';
+    final avatar = author?['avatar'] as String?;
+
     return ExploreLocalShare(
       id: json['id'].toString(),
       imageColor: const Color(0xFFD4C4B0),
-      userName: json['category_name'] as String? ?? '',
+
+      userName: fullName,
+      userAvatarInitial:
+          fullName.isNotEmpty ? fullName[0].toUpperCase() : 'U',
+      userAvatarUrl: avatar,
+
+      placeName: json['place_name'] as String? ?? '',
+
       timeAgo: json['created_at_relative'] as String? ?? '',
       caption: json['caption'] as String? ?? '',
       likeCount: json['likes_count'] as int? ?? 0,
@@ -334,7 +356,6 @@ class ExploreLocalShare {
     );
   }
 }
-
 class ExploreModel {
   // "Your story" placeholder — always first in the list
   static const ExploreStory yourStoryPlaceholder = ExploreStory(

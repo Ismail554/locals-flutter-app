@@ -30,8 +30,9 @@ class ExploreDashboard {
           .map((e) => ExploreFollowUser.fromApi(e as Map<String, dynamic>))
           .toList(),
       featuredLocations: (json['featured_locations'] as List? ?? [])
-          .map((e) =>
-              ExploreFeaturedLocation.fromApi(e as Map<String, dynamic>))
+          .map(
+            (e) => ExploreFeaturedLocation.fromApi(e as Map<String, dynamic>),
+          )
           .toList(),
       newLocals: (json['new_locals'] as List? ?? [])
           .map((e) => ExploreNewLocal.fromApi(e as Map<String, dynamic>))
@@ -57,6 +58,7 @@ abstract class ExploreRepository {
 
   Future<ExploreDashboard> fetchDashboard();
   Future<bool> likeLocalShare(String shareId);
+  Future<void> toggleFollow(String userId);
 }
 
 class ExploreRepositoryImpl implements ExploreRepository {
@@ -190,9 +192,16 @@ class ExploreRepositoryImpl implements ExploreRepository {
 
   @override
   Future<bool> likeLocalShare(String shareId) async {
-    final response =
-        await _client.post('/explore/local-shares/$shareId/like/', {});
+    final response = await _client.post(
+      '/explore/local-shares/$shareId/like/',
+      {},
+    );
     return response['liked'] as bool? ?? false;
+  }
+
+  @override
+  Future<void> toggleFollow(String userId) async {
+    await _client.post('/social/profiles/$userId/follow/', {});
   }
 
   // ─── Helpers ────────────────────────────────────────────────────────────────

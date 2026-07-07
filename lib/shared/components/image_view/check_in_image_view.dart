@@ -17,7 +17,7 @@ class CheckInImageView extends StatelessWidget {
     super.key,
     required this.photo,
     required this.onClose,
-    this.viewType = ImageViewType.localShare, // Default to Local Shares style
+    this.viewType = ImageViewType.localShare,
   });
 
   @override
@@ -154,7 +154,7 @@ class CheckInImageView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              photo.locationName, // Using as user name for local share
+              photo.locationName,
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w600,

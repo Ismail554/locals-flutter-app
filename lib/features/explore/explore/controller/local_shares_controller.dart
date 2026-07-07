@@ -25,8 +25,7 @@ class LocalSharesController extends ChangeNotifier {
       final response = await _client.get('/social/checkins/feed/');
       final results = response['results'] as List? ?? [];
       shares = results
-          .map((item) =>
-              _checkinToLocalShare(item as Map<String, dynamic>))
+          .map((item) => _checkinToLocalShare(item as Map<String, dynamic>))
           .toList();
     } catch (e) {
       print('LocalShares feed error: $e');
@@ -42,14 +41,22 @@ class LocalSharesController extends ChangeNotifier {
   /// Maps a `/social/checkins/feed/` item to `ExploreLocalShare`.
   ExploreLocalShare _checkinToLocalShare(Map<String, dynamic> json) {
     final author = json['author'] as Map<String, dynamic>?;
+
     final authorName = author?['full_name'] as String? ?? '';
-    final initial = authorName.isNotEmpty ? authorName[0].toUpperCase() : 'U';
+    final authorAvatar = author?['avatar'] as String?;
 
     return ExploreLocalShare(
       id: json['id'].toString(),
       imageColor: const Color(0xFFD4C4B0),
+
       userName: authorName,
-      userAvatarInitial: initial,
+      userAvatarInitial: authorName.isNotEmpty
+          ? authorName[0].toUpperCase()
+          : 'U',
+      userAvatarUrl: authorAvatar,
+
+      placeName: json['place_name'] as String? ?? '',
+
       timeAgo: json['created_at_relative'] as String? ?? '',
       caption: json['caption'] as String? ?? '',
       likeCount: json['likes_count'] as int? ?? 0,

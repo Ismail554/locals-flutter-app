@@ -7,13 +7,13 @@ import 'package:locals/shared/theme/app_colors.dart';
 
 class LocalSharesSection extends StatelessWidget {
   final List<ExploreLocalShare> shares;
-  final ValueChanged<ExploreLocalShare> onPhotoTap;
+  final ValueChanged<ExploreLocalShare>? onPhotoTap;
   final VoidCallback onSeeAll;
 
   const LocalSharesSection({
     super.key,
     required this.shares,
-    required this.onPhotoTap,
+    this.onPhotoTap,
     required this.onSeeAll,
   });
 
@@ -45,7 +45,7 @@ class LocalSharesSection extends StatelessWidget {
             return Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => onPhotoTap(share),
+                onTap: onPhotoTap != null ? () => onPhotoTap!(share) : null,
                 borderRadius: BorderRadius.circular(12.r),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12.r),

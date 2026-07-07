@@ -18,10 +18,8 @@ class ExploreController extends ChangeNotifier {
   ExploreModel state;
 
   ExploreController(this.repo, {StoryUploadService? storyUploadService})
-      : storyUploadService = storyUploadService ?? StoryUploadService(),
-        state = ExploreModel(
-          stories: repo.loadStories(), 
-        ) {
+    : storyUploadService = storyUploadService ?? StoryUploadService(),
+      state = ExploreModel(stories: repo.loadStories()) {
     _loadStoryFeed();
     _loadDashboard();
   }
@@ -87,8 +85,7 @@ class ExploreController extends ChangeNotifier {
     await openStoryViewer(context, index);
   }
 
-  Future<void> _onYourStoryTap(
-      BuildContext context, ExploreStory story) async {
+  Future<void> _onYourStoryTap(BuildContext context, ExploreStory story) async {
     if (!story.hasStory) {
       await _pickAndUploadStory(context);
       return;
@@ -148,7 +145,8 @@ class ExploreController extends ChangeNotifier {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Failed to upload story. Please try again.')),
+            content: Text('Failed to upload story. Please try again.'),
+          ),
         );
       }
     }
@@ -261,8 +259,7 @@ class ExploreController extends ChangeNotifier {
   void openFeaturedLocations(BuildContext context) =>
       context.push('/featured_locations');
 
-  void openEventsRoutes(BuildContext context) =>
-      context.push('/events_routes');
+  void openEventsRoutes(BuildContext context) => context.push('/events_routes');
 
   void openLocationDetails(BuildContext context, String locationId) {
     context.push(
@@ -275,8 +272,7 @@ class ExploreController extends ChangeNotifier {
     context.push('/join_event', extra: JoinEventArgs(eventId: eventId));
   }
 
-  void openNotifications(BuildContext context) =>
-      context.push('/notification');
+  void openNotifications(BuildContext context) => context.push('/notification');
 
   void openFindLocals(BuildContext context) {
     context.push(
@@ -297,14 +293,36 @@ class ExploreController extends ChangeNotifier {
 
   void openProfile(BuildContext context) => context.push('/view_profile');
 
-  void toggleFollow(String id) {
+  Future<void> toggleFollow(String id) async {
+    final user = state.followLocals.firstWhere((u) => u.id == id);
+    final wasFollowing = user.isFollowing;
+
+    // Optimistic UI update
     state = state.copyWith(
-      followLocals: state.followLocals
-          .map((u) => u.id == id
-              ? u.copyWith(isFollowing: !u.isFollowing)
-              : u)
-          .toList(),
+      followLocals: state.followLocals.map((u) {
+        if (u.id != id) return u;
+
+        return u.copyWith(isFollowing: !wasFollowing);
+      }).toList(),
     );
+
     notifyListeners();
+
+    try {
+      await repo.toggleFollow(id);
+    } catch (e) {
+      debugPrint('Toggle follow failed: $e');
+
+      // Rollback
+      state = state.copyWith(
+        followLocals: state.followLocals.map((u) {
+          if (u.id != id) return u;
+
+          return u.copyWith(isFollowing: wasFollowing);
+        }).toList(),
+      );
+
+      notifyListeners();
+    }
   }
 }
