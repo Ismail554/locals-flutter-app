@@ -1,6 +1,7 @@
 enum MissionStopStatus { completed, pending }
 
 class MissionStop {
+  final String placeId;
   final int number;
   final String name;
   final String category;
@@ -9,12 +10,18 @@ class MissionStop {
   final double? latitude;
   final double? longitude;
 
+  final String city;
+  final String seal;
+
   const MissionStop({
+    required this.placeId,
     required this.number,
     required this.name,
     required this.category,
     required this.address,
     required this.status,
+    required this.city,
+    required this.seal,
     this.latitude,
     this.longitude,
   });

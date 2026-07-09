@@ -11,8 +11,8 @@ class MissionsController extends ChangeNotifier {
   String? errorMessage;
 
   // TODO: replace with real device location (e.g. via geolocator).
-  static const double _defaultLat = 41.38;
-  static const double _defaultLng = 2.17;
+  static const double _defaultLat = 23.777176;
+  static const double _defaultLng = 90.399452;
 
   MissionsController(this.repo) {
     _fetch();

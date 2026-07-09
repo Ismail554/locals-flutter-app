@@ -45,9 +45,7 @@ class _MissionDetailsView extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: MissionDetailsBackButton(
-                  onTap: () => context.pop(),
-                ),
+                child: MissionDetailsBackButton(onTap: () => context.pop()),
               ),
             ),
             SizedBox(height: 16.h),
@@ -67,7 +65,10 @@ class _MissionDetailsView extends StatelessWidget {
                       progress: mission.progress,
                     ),
                     SizedBox(height: 24.h),
-                    MissionDetailsStopsSection(stops: mission.stops),
+                    MissionDetailsStopsSection(
+                      stops: mission.stops,
+                      onStopTap: (stop) => controller.openStop(context, stop),
+                    ),
                   ],
                 ),
               ),

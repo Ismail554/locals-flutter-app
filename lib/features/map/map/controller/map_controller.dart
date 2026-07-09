@@ -1,16 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locals/features/explore/events_progress_map/model/events_progress_map_args.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_args.dart';
 import 'package:locals/features/map/map/controller/location_service.dart';
 import 'package:locals/features/map/map/controller/route_service.dart';
+import 'package:locals/features/missions/check_in/view/checkin_bottom_sheet.dart';
 import 'package:locals/shared/components/pin_details_sheet.dart';
 import 'package:locals/shared/model/map_pin_details.dart';
 import 'package:locals/shared/model/map_pin_info.dart';
+import 'package:locals/shared/model/map_pin_tag.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../../filters/model/filters_model.dart';
 import '../../search/repository/map_search_repository.dart';
@@ -24,81 +25,146 @@ class MapController extends ChangeNotifier {
 
   Timer? _searchDebounce;
 
+  bool get _isFocusedMode => state.showRoute && state.highlightedLocation != null;
+
   MapController(this.repo, {MapScreenArgs? screenArgs})
-    : state = MapModel(
-        activeMission: screenArgs?.mission?.toActiveMission(),
-        selectedPinId: screenArgs?.focusedPinId,
-        highlightedLocation: screenArgs?.highlightedLocation,
-        showRoute: screenArgs?.showRoute ?? false,
-      ) {
-    _loadPlaces();
+      : state = MapModel(
+          activeMission: screenArgs?.mission?.toActiveMission(),
+          selectedPinId: screenArgs?.focusedPinId,
+          highlightedLocation: screenArgs?.highlightedLocation,
+          showRoute: screenArgs?.showRoute ?? false,
+          initialCenter: screenArgs?.initialCenter,
+          initialZoom: screenArgs?.initialZoom,
+        ) {
+    _initContext();
+  }
+
+  Future<void> _initContext() async {
+    await _loadPlaces();
+
+    if (_isFocusedMode) {
+      await loadRoute();
+    }
   }
 
   // ─── Places Loading ─────────────────────────────────────────────────────────
 
-  Future<void> loadRoute() async {
-      debugPrint("Loading route...");
-  debugPrint("showRoute = ${state.showRoute}");
-    if (!state.showRoute) return;
+Future<void> loadRoute() async {
+  debugPrint("=== LOAD ROUTE ===");
+  if (!state.showRoute || state.highlightedLocation == null) return;
 
-    final location = state.highlightedLocation;
-    if (location == null) return;
-    debugPrint("Location = $location");
+  final location = state.highlightedLocation!;
 
-    try {
-      final current = await LocationService.currentLocation();
+  try {
+    final current = await LocationService.currentLocation();
+    final destination = LatLng(location.latitude, location.longitude);
 
-      final destination = LatLng(location.latitude, location.longitude);
+    debugPrint("Current: ${current.latitude}, ${current.longitude}");
+    debugPrint("Destination: ${destination.latitude}, ${destination.longitude}");
 
-      final points = await RouteService.instance.getRoute(
-        origin: current,
-        destination: destination,
-      );
+    final points = await RouteService.instance.getRoute(
+      origin: current,
+      destination: destination,
+    );
 
+    if (points.isNotEmpty) {
       state = state.copyWith(
         polylines: {
           Polyline(
-            polylineId: PolylineId('route'),
+            polylineId: const PolylineId('route'),
             points: points,
-            width: 10,
+            width: 8,
             color: AppColors.actionPink,
+            geodesic: true,
+            startCap: Cap.roundCap,
+            endCap: Cap.roundCap,
           ),
         },
       );
-
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Route Error: $e');
+      debugPrint("✅ Real curved route drawn with ${points.length} points");
+    } else {
+      // Fallback straight line
+      state = state.copyWith(
+        polylines: {
+          Polyline(
+            polylineId: const PolylineId('route'),
+            points: [current, destination],
+            width: 6,
+            color: Colors.orange,
+          ),
+        },
+      );
     }
+    notifyListeners();
+  } catch (e) {
+    debugPrint("Route Error: $e");
   }
+}
+
 
   Future<void> _loadPlaces() async {
     state = state.copyWith(isLoadingPins: true);
     notifyListeners();
 
     try {
-      final pins = await repo.fetchPlaces(
+      List<MapPinInfo> pins = await repo.fetchPlaces(
         search: state.searchQuery,
         categorySlug: _resolveCategorySlug(),
         placeType: _resolvePlaceType(),
         visitStatus: _resolveVisitStatus(),
       );
 
-      state = state.copyWith(pins: pins, isLoadingPins: false);
+      // === Focused Mode (Mission, Featured Route, Single Place) ===
+      if (_isFocusedMode && state.highlightedLocation != null) {
+        final targetId = state.highlightedLocation!.resolvedLocationId;
 
+        pins = pins.where((pin) => pin.id == targetId).toList();
+
+        // Fallback: Create pin from highlighted location if not returned by API
+        if (pins.isEmpty) {
+          final loc = state.highlightedLocation!;
+          pins = [
+            MapPinInfo(
+              id: loc.resolvedLocationId,
+              name: loc.name,
+              level: 1,                    // required field
+              lat: loc.latitude,
+              lng: loc.longitude,
+              tag: _getPinTag(loc.category),
+              visited: false,
+              category: loc.category,
+              address: loc.address,
+              points: loc.points,
+              accentColor: loc.imageColor,
+            ),
+          ];
+        }
+      }
+
+      state = state.copyWith(pins: pins, isLoadingPins: false);
       notifyListeners();
 
-      if (state.showRoute) {
+      if (_isFocusedMode) {
+        await Future.delayed(const Duration(milliseconds: 800));
         await loadRoute();
       }
     } catch (e) {
       debugPrint('Places fetch error: $e');
-
       state = state.copyWith(isLoadingPins: false);
-
       notifyListeners();
     }
   }
+
+  MapPinTag _getPinTag(String category) {
+    final cat = category.toLowerCase();
+    if (cat.contains('cafe') || cat.contains('coffee')) return MapPinTag.business;
+    if (cat.contains('bar')) return MapPinTag.business;
+    if (cat.contains('restaurant') || cat.contains('food')) return MapPinTag.business;
+    if (cat.contains('event')) return MapPinTag.sponsoredOrEvent;
+    return MapPinTag.pointOfInterest;
+  }
+
+  // ─── Helpers ───────────────────────────────────────────────────────────────
 
   String? _resolveCategorySlug() {
     final selected = state.filters.selectedCategoryIds;
@@ -126,24 +192,6 @@ class MapController extends ChangeNotifier {
       case VisitStatusFilter.both:
         return null;
     }
-  }
-
-  // ─── Search & Filters ───────────────────────────────────────────────────────
-
-  void setSearchQuery(String value) {
-    state = state.copyWith(searchQuery: value);
-    notifyListeners();
-
-    _searchDebounce?.cancel();
-    _searchDebounce = Timer(const Duration(milliseconds: 400), () {
-      _loadPlaces();
-    });
-  }
-
-  void applyFilters(MapFiltersState filters) {
-    state = state.copyWith(filters: filters);
-    notifyListeners();
-    _loadPlaces();
   }
 
   // ─── Pin Interaction ────────────────────────────────────────────────────────
@@ -185,13 +233,31 @@ class MapController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ─── Check-In ───────────────────────────────────────────────────────────────
+
+  Future<void> checkIn(BuildContext context) async {
+    final location = state.highlightedLocation ?? state.activeMission?.activeLocation;
+    if (location == null) return;
+
+    final result = await showCheckInSheet(
+      context,
+      placeId: location.resolvedLocationId,
+      placeName: location.name,
+    );
+
+    if (result == null || !context.mounted) return;
+
+    await _loadPlaces();
+
+    if (result.missionCompleted && context.mounted) {
+      context.pop();
+    }
+  }
+
   // ─── Navigation ─────────────────────────────────────────────────────────────
 
   Future<void> openSearch(BuildContext context) async {
-    final result = await context.push<String>(
-      '/map_search',
-      extra: state.searchQuery,
-    );
+    final result = await context.push<String>('/map_search', extra: state.searchQuery);
     if (result != null && result.trim().isNotEmpty) {
       MapSearchRepositoryImpl().addRecentSearch(result.trim());
       setSearchQuery(result.trim());
@@ -212,8 +278,7 @@ class MapController extends ChangeNotifier {
   }
 
   void openActiveLocationDetails(BuildContext context) {
-    final location =
-        state.highlightedLocation ?? state.activeMission?.activeLocation;
+    final location = state.highlightedLocation ?? state.activeMission?.activeLocation;
     if (location == null) return;
 
     context.push(
@@ -240,6 +305,22 @@ class MapController extends ChangeNotifier {
       '/restaurant_view_details',
       extra: RestaurantViewDetailsArgs(locationId: locationId),
     );
+  }
+
+  void setSearchQuery(String value) {
+    state = state.copyWith(searchQuery: value);
+    notifyListeners();
+
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 400), () {
+      _loadPlaces();
+    });
+  }
+
+  void applyFilters(MapFiltersState filters) {
+    state = state.copyWith(filters: filters);
+    notifyListeners();
+    _loadPlaces();
   }
 
   @override

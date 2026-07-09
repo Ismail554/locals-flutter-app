@@ -14,15 +14,12 @@ class MissionDetailsController extends ChangeNotifier {
   String? errorMessage;
 
   MissionDetailsController(this.repo, {this.missionId}) {
-    if (missionId != null) {
-      _fetch(missionId!);
-    }
+    if (missionId != null) _fetch(missionId!);
   }
 
   Future<void> _fetch(String id) async {
     isLoading = true;
     notifyListeners();
-
     try {
       state = await repo.fetchMissionDetails(id);
       errorMessage = null;
@@ -32,6 +29,35 @@ class MissionDetailsController extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  void openStop(BuildContext context, MissionStop stop) {
+    if (stop.latitude == null || stop.longitude == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Location coordinates not available')),
+      );
+      return;
+    }
+
+    context.go(
+      '/map',
+      extra: MapMissionArgs(
+        city: stop.city,
+        completedCount: state.progressCurrent,
+        totalCount: state.progressTotal,
+        activeLocation: MapActiveLocation(
+          locationId: stop.placeId,
+          category: stop.category,
+          seal: stop.seal,
+          name: stop.name,
+          address: stop.address,
+          points: state.reward,
+          imageColor: const Color(0xFFD4C4B0),
+          latitude: stop.latitude!,
+          longitude: stop.longitude!,
+        ),
+      ),
+    );
   }
 
   Future<void> continueMission(BuildContext context) async {
@@ -56,37 +82,36 @@ class MissionDetailsController extends ChangeNotifier {
     isStarting = false;
     notifyListeners();
 
+    // Get next pending stop
     final nextStop = state.stops.firstWhere(
       (s) => s.status == MissionStopStatus.pending,
-      orElse: () => state.stops.isNotEmpty
-          ? state.stops.first
-          : const MissionStop(
-              number: 0,
-              name: '',
-              category: '',
-              address: '',
-              status: MissionStopStatus.pending,
-            ),
+      orElse: () => state.stops.firstOrNull ?? const MissionStop(
+        number: 0, name: '', category: '', address: '',
+        status: MissionStopStatus.pending, placeId: '',
+        city: '', seal: '',
+      ),
     );
 
-    if (!context.mounted) return;
+    if (!context.mounted || nextStop.latitude == null || nextStop.longitude == null) {
+      return;
+    }
 
     context.go(
       '/map',
       extra: MapMissionArgs(
-        city: 'Barcelona',
+        city: nextStop.city.isNotEmpty ? nextStop.city : 'Barcelona',
         completedCount: state.progressCurrent,
         totalCount: state.progressTotal,
         activeLocation: MapActiveLocation(
-          locationId: state.id,
+          locationId: nextStop.placeId,
           category: nextStop.category,
-          seal: 'Seal',
+          seal: nextStop.seal,
           name: nextStop.name,
           address: nextStop.address,
           points: state.reward,
           imageColor: const Color(0xFFD4C4B0),
-          latitude: nextStop.latitude ?? 41.3833,
-          longitude: nextStop.longitude ?? 2.1833,
+          latitude: nextStop.latitude!,
+          longitude: nextStop.longitude!,
         ),
       ),
     );

@@ -22,22 +22,25 @@ class MissionDetailsRepositoryImpl implements MissionDetailsRepository {
       final isCompleted = map['is_completed'] as bool? ?? false;
 
       return MissionStop(
+        placeId: place['id'].toString(),
         number: _asInt(map['order']),
-        name: place['name'] as String? ?? '',
-        category: category?['name'] as String? ?? '',
-        address: place['address'] as String? ?? '',
+        name: place['name'] ?? '',
+        category: category?['name'] ?? '',
+        address: place['address'] ?? '',
+        city: place['city']?['name'] ?? '',
+        seal: place['seal']?['name'] ?? '',
         status: isCompleted
             ? MissionStopStatus.completed
             : MissionStopStatus.pending,
         latitude: double.tryParse(place['latitude']?.toString() ?? ''),
         longitude: double.tryParse(place['longitude']?.toString() ?? ''),
       );
-    }).toList()
-      ..sort((a, b) => a.number.compareTo(b.number));
+    }).toList()..sort((a, b) => a.number.compareTo(b.number));
 
     final totalStops = stops.length;
-    final progressCurrent =
-        stops.where((s) => s.status == MissionStopStatus.completed).length;
+    final progressCurrent = stops
+        .where((s) => s.status == MissionStopStatus.completed)
+        .length;
 
     return MissionDetailsModel(
       id: response['id'].toString(),
@@ -48,11 +51,11 @@ class MissionDetailsRepositoryImpl implements MissionDetailsRepository {
       level: (response['difficulty'] as String? ?? '').toUpperCase(),
       progressCurrent: progressCurrent,
       progressTotal: totalStops,
-      stops: stops,
+      stops: stops,  
     );
   }
 
-    @override
+  @override
   Future<void> startMission(String missionId) async {
     await _client.post('/gamification/missions/$missionId/start/', {});
   }

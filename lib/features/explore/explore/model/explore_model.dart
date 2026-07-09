@@ -178,7 +178,7 @@ class ExploreFollowUser {
     );
   }
 
-  /// Factory from `suggested_users` API item
+
   factory ExploreFollowUser.fromApi(Map<String, dynamic> json) {
     return ExploreFollowUser(
       id: json['id'].toString(),

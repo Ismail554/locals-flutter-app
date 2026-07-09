@@ -70,7 +70,7 @@ final double longitude;
   });
 
   String get resolvedLocationId =>
-      locationId ?? locationIdForName(name) ?? 'cafe_del_born';
+      locationId ?? locationIdForName(name) ?? '';
 
   String get mapPinId => mapPinIdForLocationId(locationId ?? locationIdForName(name));
 }

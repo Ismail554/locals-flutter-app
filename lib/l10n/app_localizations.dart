@@ -1208,6 +1208,78 @@ abstract class AppLocalizations {
   /// **'Global'**
   String get rankScopeGlobal;
 
+  /// Label for the button that opens the check-in sheet from the map
+  ///
+  /// In en, this message translates to:
+  /// **'Check In'**
+  String get checkInButtonLabel;
+
+  /// Title of the check-in bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Check In'**
+  String get checkInTitle;
+
+  /// Hint text for the check-in caption field
+  ///
+  /// In en, this message translates to:
+  /// **'Say something about this spot...'**
+  String get checkInCaptionHint;
+
+  /// Submit button label on the check-in sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Check-In'**
+  String get checkInSubmit;
+
+  /// Option to take a photo with the camera
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get checkInCamera;
+
+  /// Option to pick a photo from the gallery
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Gallery'**
+  String get checkInGallery;
+
+  /// Placeholder text on the empty photo picker
+  ///
+  /// In en, this message translates to:
+  /// **'Add a photo'**
+  String get checkInAddPhoto;
+
+  /// Title shown on successful check-in
+  ///
+  /// In en, this message translates to:
+  /// **'Checked In!'**
+  String get checkInSuccessTitle;
+
+  /// Points earned message after check-in
+  ///
+  /// In en, this message translates to:
+  /// **'You earned {points} points'**
+  String checkInPointsEarned(int points);
+
+  /// Banner shown when the check-in completes the mission
+  ///
+  /// In en, this message translates to:
+  /// **'Mission Complete!'**
+  String get checkInMissionComplete;
+
+  /// Section header for newly unlocked achievements
+  ///
+  /// In en, this message translates to:
+  /// **'ACHIEVEMENTS UNLOCKED'**
+  String get checkInAchievementsUnlocked;
+
+  /// Button to dismiss the check-in result sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get checkInContinue;
+
   /// No description provided for @rankScopeFollowers.
   ///
   /// In en, this message translates to:

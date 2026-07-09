@@ -588,6 +588,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rankScopeGlobal => 'Global';
 
   @override
+  String get checkInButtonLabel => 'Check In';
+
+  @override
+  String get checkInTitle => 'Check In';
+
+  @override
+  String get checkInCaptionHint => 'Say something about this spot...';
+
+  @override
+  String get checkInSubmit => 'Submit Check-In';
+
+  @override
+  String get checkInCamera => 'Take Photo';
+
+  @override
+  String get checkInGallery => 'Choose from Gallery';
+
+  @override
+  String get checkInAddPhoto => 'Add a photo';
+
+  @override
+  String get checkInSuccessTitle => 'Checked In!';
+
+  @override
+  String checkInPointsEarned(int points) {
+    return 'You earned $points points';
+  }
+
+  @override
+  String get checkInMissionComplete => 'Mission Complete!';
+
+  @override
+  String get checkInAchievementsUnlocked => 'ACHIEVEMENTS UNLOCKED';
+
+  @override
+  String get checkInContinue => 'Continue';
+
+  @override
   String get rankScopeFollowers => 'Followers';
 
   @override

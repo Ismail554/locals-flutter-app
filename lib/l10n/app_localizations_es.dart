@@ -592,6 +592,44 @@ class AppLocalizationsEs extends AppLocalizations {
   String get rankScopeGlobal => 'Global';
 
   @override
+  String get checkInButtonLabel => 'Registrarse';
+
+  @override
+  String get checkInTitle => 'Registrar Visita';
+
+  @override
+  String get checkInCaptionHint => 'Cuéntanos algo sobre este lugar...';
+
+  @override
+  String get checkInSubmit => 'Confirmar Registro';
+
+  @override
+  String get checkInCamera => 'Tomar Foto';
+
+  @override
+  String get checkInGallery => 'Elegir de la Galería';
+
+  @override
+  String get checkInAddPhoto => 'Añade una foto';
+
+  @override
+  String get checkInSuccessTitle => '¡Registro Exitoso!';
+
+  @override
+  String checkInPointsEarned(int points) {
+    return 'Ganaste $points puntos';
+  }
+
+  @override
+  String get checkInMissionComplete => '¡Misión Completada!';
+
+  @override
+  String get checkInAchievementsUnlocked => 'LOGROS DESBLOQUEADOS';
+
+  @override
+  String get checkInContinue => 'Continuar';
+
+  @override
   String get rankScopeFollowers => 'Seguidores';
 
   @override

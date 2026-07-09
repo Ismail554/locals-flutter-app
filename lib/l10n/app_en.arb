@@ -234,6 +234,60 @@
   "rankScopeCity": "City",
   "rankScopeCountry": "Country",
   "rankScopeGlobal": "Global",
+  "checkInButtonLabel": "Check In",
+"@checkInButtonLabel": {
+  "description": "Label for the button that opens the check-in sheet from the map"
+},
+"checkInTitle": "Check In",
+"@checkInTitle": {
+  "description": "Title of the check-in bottom sheet"
+},
+"checkInCaptionHint": "Say something about this spot...",
+"@checkInCaptionHint": {
+  "description": "Hint text for the check-in caption field"
+},
+"checkInSubmit": "Submit Check-In",
+"@checkInSubmit": {
+  "description": "Submit button label on the check-in sheet"
+},
+"checkInCamera": "Take Photo",
+"@checkInCamera": {
+  "description": "Option to take a photo with the camera"
+},
+"checkInGallery": "Choose from Gallery",
+"@checkInGallery": {
+  "description": "Option to pick a photo from the gallery"
+},
+"checkInAddPhoto": "Add a photo",
+"@checkInAddPhoto": {
+  "description": "Placeholder text on the empty photo picker"
+},
+"checkInSuccessTitle": "Checked In!",
+"@checkInSuccessTitle": {
+  "description": "Title shown on successful check-in"
+},
+"checkInPointsEarned": "You earned {points} points",
+"@checkInPointsEarned": {
+  "description": "Points earned message after check-in",
+  "placeholders": {
+    "points": {
+      "type": "int",
+      "example": "50"
+    }
+  }
+},
+"checkInMissionComplete": "Mission Complete!",
+"@checkInMissionComplete": {
+  "description": "Banner shown when the check-in completes the mission"
+},
+"checkInAchievementsUnlocked": "ACHIEVEMENTS UNLOCKED",
+"@checkInAchievementsUnlocked": {
+  "description": "Section header for newly unlocked achievements"
+},
+"checkInContinue": "Continue",
+"@checkInContinue": {
+  "description": "Button to dismiss the check-in result sheet"
+},
   "rankScopeFollowers": "Followers",
   "rankPeriodWeekly": "Weekly",
   "rankPeriodMonthly": "Monthly",

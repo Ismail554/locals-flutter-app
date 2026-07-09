@@ -22,175 +22,90 @@ class RouteService {
       "?origin=${origin.latitude},${origin.longitude}"
       "&destination=${destination.latitude},${destination.longitude}"
       "&mode=driving"
+      "&alternatives=false"
+      "&language=en"
       "&key=$_apiKey",
     );
 
-    debugPrint("========== DIRECTIONS REQUEST ==========");
-    debugPrint("URL: $url");
-    debugPrint("Origin: ${origin.latitude}, ${origin.longitude}");
-    debugPrint(
-      "Destination: ${destination.latitude}, ${destination.longitude}",
-    );
+    if (kDebugMode) {
+      debugPrint("========== DIRECTIONS REQUEST ==========");
+      debugPrint("URL: $url");
+      debugPrint("Origin: ${origin.latitude}, ${origin.longitude}");
+      debugPrint("Destination: ${destination.latitude}, ${destination.longitude}");
+    }
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 15));
 
-      debugPrint("HTTP Status: ${response.statusCode}");
-      debugPrint("Response Body:");
-      debugPrint(response.body);
+      if (kDebugMode) {
+        debugPrint("HTTP Status: ${response.statusCode}");
+      }
 
       if (response.statusCode != 200) {
-        throw Exception(
-          "Directions API failed with status ${response.statusCode}",
-        );
+        debugPrint("Directions API HTTP Error: ${response.statusCode}");
+        return [];
       }
 
       final json = jsonDecode(response.body);
 
-      debugPrint("Directions Status: ${json["status"]}");
+      if (kDebugMode) {
+        debugPrint("Directions Status: ${json["status"]}");
+      }
 
       if (json["status"] != "OK") {
-        debugPrint("Directions Error: ${json["error_message"]}");
+        final errorMsg = json["error_message"] ?? 'Unknown error';
+        if (kDebugMode) debugPrint("Directions Error: $errorMsg");
         return [];
       }
 
-      final routes = json["routes"] as List;
-
-      debugPrint("Routes Found: ${routes.length}");
+      final routes = json["routes"] as List<dynamic>;
 
       if (routes.isEmpty) {
-        debugPrint("No routes returned.");
+        if (kDebugMode) debugPrint("No routes returned.");
         return [];
       }
 
       final encoded = routes.first["overview_polyline"]["points"] as String;
-
-      debugPrint("Encoded Polyline Length: ${encoded.length}");
-
       final decoded = PolylinePoints.decodePolyline(encoded);
 
-      debugPrint("Decoded Points: ${decoded.length}");
+      if (kDebugMode) {
+        debugPrint("Decoded Points: ${decoded.length}");
+        debugPrint("========================================");
+      }
 
-      final points = decoded
-          .map((e) => LatLng(e.latitude, e.longitude))
-          .toList();
-
-      debugPrint("Returning ${points.length} LatLng points.");
-      debugPrint("========================================");
-
-      return points;
+      return decoded.map((e) => LatLng(e.latitude, e.longitude)).toList();
     } catch (e, stackTrace) {
-      debugPrint("RouteService Error: $e");
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint("RouteService Error: $e");
+        debugPrintStack(stackTrace: stackTrace);
+      }
       return [];
     }
   }
 
-  // Future<List<LatLng>> getRoute({
-  //   required LatLng origin,
-  //   required LatLng destination,
-  // }) async {
-  //   origin = const LatLng(41.3851, 2.1734);
-  //   destination = const LatLng(41.3891, 2.1774);
-
-  //   final url = Uri.parse(
-  //     "https://maps.googleapis.com/maps/api/directions/json"
-  //     "?origin=${origin.latitude},${origin.longitude}"
-  //     "&destination=${destination.latitude},${destination.longitude}"
-  //     "&mode=driving"
-  //     "&key=$_apiKey",
-  //   );
-
-  //   debugPrint("========== DIRECTIONS REQUEST ==========");
-  //   debugPrint("URL: $url");
-  //   debugPrint("Origin: ${origin.latitude}, ${origin.longitude}");
-  //   debugPrint(
-  //     "Destination: ${destination.latitude}, ${destination.longitude}",
-  //   );
-
-  //   try {
-  //     final response = await http.get(url);
-
-  //     debugPrint("HTTP Status: ${response.statusCode}");
-  //     debugPrint("Response Body:");
-  //     debugPrint(response.body);
-
-  //     if (response.statusCode != 200) {
-  //       throw Exception(
-  //         "Directions API failed with status ${response.statusCode}",
-  //       );
-  //     }
-
-  //     final json = jsonDecode(response.body);
-
-  //     debugPrint("Directions Status: ${json["status"]}");
-
-  //     if (json["status"] != "OK") {
-  //       debugPrint("Directions Error: ${json["error_message"]}");
-  //       return [];
-  //     }
-
-  //     final routes = json["routes"] as List;
-
-  //     debugPrint("Routes Found: ${routes.length}");
-
-  //     if (routes.isEmpty) {
-  //       debugPrint("No routes returned.");
-  //       return [];
-  //     }
-
-  //     final encoded = routes.first["overview_polyline"]["points"] as String;
-
-  //     debugPrint("Encoded Polyline Length: ${encoded.length}");
-
-  //     final decoded = PolylinePoints.decodePolyline(encoded);
-
-  //     debugPrint("Decoded Points: ${decoded.length}");
-
-  //     final points = decoded
-  //         .map((e) => LatLng(e.latitude, e.longitude))
-  //         .toList();
-
-  //     debugPrint("Returning ${points.length} LatLng points.");
-  //     debugPrint("========================================");
-
-  //     return points;
-  //   } catch (e, stackTrace) {
-  //     debugPrint("RouteService Error: $e");
-  //     debugPrintStack(stackTrace: stackTrace);
-  //     return [];
-  //   }
-  // }
-
+  // Keep your existing getDistance and getDuration methods...
   Future<double?> getDistance({
     required LatLng origin,
     required LatLng destination,
   }) async {
-    final url = Uri.parse(
-      "https://maps.googleapis.com/maps/api/directions/json"
-      "?origin=${origin.latitude},${origin.longitude}"
-      "&destination=${destination.latitude},${destination.longitude}"
-      "&mode=driving"
-      "&key=$_apiKey",
-    );
-
     try {
-      final response = await http.get(url);
+      final url = Uri.parse(
+        "https://maps.googleapis.com/maps/api/directions/json"
+        "?origin=${origin.latitude},${origin.longitude}"
+        "&destination=${destination.latitude},${destination.longitude}"
+        "&mode=driving"
+        "&key=$_apiKey",
+      );
 
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
       if (response.statusCode != 200) return null;
 
       final json = jsonDecode(response.body);
+      if (json["status"] != "OK") return null;
 
-      if (json["status"] != "OK") {
-        debugPrint("Distance API Status: ${json["status"]}");
-        return null;
-      }
-
-      return (json["routes"][0]["legs"][0]["distance"]["value"] as num)
-              .toDouble() /
-          1000;
+      return (json["routes"][0]["legs"][0]["distance"]["value"] as num).toDouble() / 1000;
     } catch (e) {
-      debugPrint("Distance Error: $e");
+      if (kDebugMode) debugPrint("Distance Error: $e");
       return null;
     }
   }
@@ -199,29 +114,24 @@ class RouteService {
     required LatLng origin,
     required LatLng destination,
   }) async {
-    final url = Uri.parse(
-      "https://maps.googleapis.com/maps/api/directions/json"
-      "?origin=${origin.latitude},${origin.longitude}"
-      "&destination=${destination.latitude},${destination.longitude}"
-      "&mode=driving"
-      "&key=$_apiKey",
-    );
-
     try {
-      final response = await http.get(url);
+      final url = Uri.parse(
+        "https://maps.googleapis.com/maps/api/directions/json"
+        "?origin=${origin.latitude},${origin.longitude}"
+        "&destination=${destination.latitude},${destination.longitude}"
+        "&mode=driving"
+        "&key=$_apiKey",
+      );
 
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
       if (response.statusCode != 200) return null;
 
       final json = jsonDecode(response.body);
+      if (json["status"] != "OK") return null;
 
-      if (json["status"] != "OK") {
-        debugPrint("Duration API Status: ${json["status"]}");
-        return null;
-      }
-
-      return json["routes"][0]["legs"][0]["duration"]["text"];
+      return json["routes"][0]["legs"][0]["duration"]["text"] as String?;
     } catch (e) {
-      debugPrint("Duration Error: $e");
+      if (kDebugMode) debugPrint("Duration Error: $e");
       return null;
     }
   }

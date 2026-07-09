@@ -14,6 +14,9 @@ class MapModel {
   final MapActiveLocation? highlightedLocation;
   final bool showRoute;
   final Set<Polyline> polylines;
+  final List<MapActiveLocation>? routeStops;
+  final LatLng? initialCenter;              
+  final double? initialZoom;
 
   const MapModel({
     this.searchQuery = '',
@@ -26,6 +29,9 @@ class MapModel {
     this.isLoadingPins = false,
     this.showRoute = false,
     this.polylines = const {},
+    this.routeStops,
+    this.initialCenter,
+    this.initialZoom,
   });
 
   MapModel copyWith({
@@ -41,7 +47,7 @@ class MapModel {
     MapActiveLocation? highlightedLocation,
     bool clearHighlightedLocation = false,
     bool? showRoute,
-    Set<Polyline>? polylines, // ← parameter exists
+    Set<Polyline>? polylines,
   }) {
     return MapModel(
       searchQuery: searchQuery ?? this.searchQuery,

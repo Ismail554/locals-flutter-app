@@ -101,37 +101,81 @@ class ApiClient {
     }
   }
 
-  
-Future<Map<String, dynamic>> patch(
-  String path,
-  Map<String, dynamic> body, {
-  bool requiresAuth = true,
-}) async {
-  final url = '$baseUrl$path';
- 
-  try {
-    final headers = requiresAuth ? await _authHeaders : _baseHeaders;
- 
-    _logRequest('PATCH', url, body);
- 
-    final response = await http
-        .patch(Uri.parse(url), headers: headers, body: jsonEncode(body))
-        .timeout(_timeout);
- 
-    _logResponse(response);
- 
-    return _handleResponse(response);
-  } on SocketException {
-    _logError('PATCH', url, 'No internet connection');
-    throw const ApiException('No internet connection.');
-  } on HttpException {
-    _logError('PATCH', url, 'Network error');
-    throw const ApiException('Network error. Please try again.');
-  } on FormatException {
-    _logError('PATCH', url, 'Unexpected response format');
-    throw const ApiException('Unexpected response format.');
+  Future<Map<String, dynamic>> patch(
+    String path,
+    Map<String, dynamic> body, {
+    bool requiresAuth = true,
+  }) async {
+    final url = '$baseUrl$path';
+
+    try {
+      final headers = requiresAuth ? await _authHeaders : _baseHeaders;
+
+      _logRequest('PATCH', url, body);
+
+      final response = await http
+          .patch(Uri.parse(url), headers: headers, body: jsonEncode(body))
+          .timeout(_timeout);
+
+      _logResponse(response);
+
+      return _handleResponse(response);
+    } on SocketException {
+      _logError('PATCH', url, 'No internet connection');
+      throw const ApiException('No internet connection.');
+    } on HttpException {
+      _logError('PATCH', url, 'Network error');
+      throw const ApiException('Network error. Please try again.');
+    } on FormatException {
+      _logError('PATCH', url, 'Unexpected response format');
+      throw const ApiException('Unexpected response format.');
+    }
   }
-}
+
+  // Add this method inside ApiClient, near post()/get()/patch()
+
+  Future<Map<String, dynamic>> postMultipart(
+    String path, {
+    required Map<String, String> fields,
+    required Map<String, File> files,
+    bool requiresAuth = true,
+  }) async {
+    final url = '$baseUrl$path';
+
+    try {
+      final authHeaders = requiresAuth ? await _authHeaders : _baseHeaders;
+      final headers = Map<String, String>.from(authHeaders)
+        ..remove('Content-Type');
+
+      _logRequest('POST (multipart)', url, fields);
+
+      final request = http.MultipartRequest('POST', Uri.parse(url))
+        ..headers.addAll(headers)
+        ..fields.addAll(fields);
+
+      for (final entry in files.entries) {
+        request.files.add(
+          await http.MultipartFile.fromPath(entry.key, entry.value.path),
+        );
+      }
+
+      final streamed = await request.send().timeout(_timeout);
+      final response = await http.Response.fromStream(streamed);
+
+      _logResponse(response);
+
+      return _handleResponse(response);
+    } on SocketException {
+      _logError('POST', url, 'No internet connection');
+      throw const ApiException('No internet connection.');
+    } on HttpException {
+      _logError('POST', url, 'Network error');
+      throw const ApiException('Network error. Please try again.');
+    } on FormatException {
+      _logError('POST', url, 'Unexpected response format');
+      throw const ApiException('Unexpected response format.');
+    }
+  }
 
   // ─── Logging ────────────────────────────────────────────────────────────────
 
