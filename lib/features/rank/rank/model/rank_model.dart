@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum RankScope { city, country, global, followers }
 
 enum RankPeriod { weekly, monthly, allTime }
@@ -8,6 +10,7 @@ class PodiumUser {
   final int score;
   final bool isCrowned;
   final String? storyUserId;
+  final String? avatar;
 
   const PodiumUser({
     required this.rank,
@@ -15,6 +18,7 @@ class PodiumUser {
     required this.score,
     this.isCrowned = false,
     this.storyUserId,
+    this.avatar,
   });
 }
 
@@ -25,6 +29,7 @@ class RankEntry {
   final int score;
   final bool isCurrentUser;
   final String? storyUserId;
+  final String? avatar;
 
   const RankEntry({
     required this.rank,
@@ -33,6 +38,7 @@ class RankEntry {
     required this.score,
     this.isCurrentUser = false,
     this.storyUserId,
+    this.avatar,
   });
 }
 
@@ -41,30 +47,14 @@ class RankModel {
   final RankPeriod selectedPeriod;
   final List<PodiumUser> podium;
   final List<RankEntry> entries;
+  final RankEntry? currentUser;
 
   const RankModel({
     this.selectedScope = RankScope.city,
     this.selectedPeriod = RankPeriod.weekly,
-    this.podium = const [
-      PodiumUser(rank: 2, name: 'Marc B.', score: 11280),
-      PodiumUser(
-        rank: 1,
-        name: 'Marta',
-        score: 12450,
-        isCrowned: true,
-        storyUserId: 'marta',
-      ),
-      PodiumUser(rank: 3, name: 'Júlia P.', score: 10720),
-    ],
-    this.entries = const [
-      RankEntry(rank: 4, name: 'Paul s.', level: 19, score: 9540, storyUserId: 'paul'),
-      RankEntry(rank: 5, name: 'Núria T.', level: 18, score: 9100),
-      RankEntry(rank: 6, name: 'You', level: 12, score: 6380, isCurrentUser: true),
-      RankEntry(rank: 7, name: 'Pol', level: 11, score: 4380),
-      RankEntry(rank: 8, name: 'Laia M.', level: 18, score: 3980),
-      RankEntry(rank: 9, name: 'Ann F.', level: 18, score: 3540),
-      RankEntry(rank: 10, name: 'Oriol C.', level: 18, score: 3320),
-    ],
+    this.podium = const [],
+    this.entries = const [],
+    this.currentUser,
   });
 
   RankModel copyWith({
@@ -72,12 +62,14 @@ class RankModel {
     RankPeriod? selectedPeriod,
     List<PodiumUser>? podium,
     List<RankEntry>? entries,
+    RankEntry? currentUser,
   }) {
     return RankModel(
       selectedScope: selectedScope ?? this.selectedScope,
       selectedPeriod: selectedPeriod ?? this.selectedPeriod,
       podium: podium ?? this.podium,
       entries: entries ?? this.entries,
+      currentUser: currentUser ?? this.currentUser,
     );
   }
 }
