@@ -54,7 +54,6 @@ class _MapViewState extends State<_MapView> {
   bool _hasCenteredInitially = false;
   String? _lastRouteLocationKey;
 
-  // Store current location for marker
   LatLng? _currentUserLocation;
 
   Future<void> _buildMarkers(MapController controller) async {
@@ -85,7 +84,7 @@ class _MapViewState extends State<_MapView> {
       );
     }
 
-    // Add Current Location Marker
+    // Current Location Pin
     if (_currentUserLocation != null) {
       markers.add(
         Marker(
@@ -106,11 +105,9 @@ class _MapViewState extends State<_MapView> {
       final loc = await LocationService.currentLocation();
       setState(() => _currentUserLocation = loc);
     } catch (e) {
-      debugPrint("Could not get current location for marker: $e");
+      debugPrint("Could not get current location marker: $e");
     }
   }
-
-  // Keep your _boundsFromLatLngList and _fitRouteToBounds methods...
 
   LatLngBounds _boundsFromLatLngList(List<LatLng> points) {
     if (points.isEmpty) {
@@ -194,7 +191,6 @@ class _MapViewState extends State<_MapView> {
 
       if (_lastRouteLocationKey != locationKey) {
         _lastRouteLocationKey = locationKey;
-
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) _fitRouteToBounds(controller);
         });
@@ -218,7 +214,7 @@ class _MapViewState extends State<_MapView> {
           ),
           markers: _markers,
           polylines: state.polylines,
-          myLocationEnabled: true,           // Blue dot
+          myLocationEnabled: true,
           myLocationButtonEnabled: true,
           zoomControlsEnabled: false,
           compassEnabled: true,
@@ -233,6 +229,30 @@ class _MapViewState extends State<_MapView> {
           },
         ),
 
+        // Live Tracking Button
+        Positioned(
+          right: 16.w,
+          bottom: 180.h,
+          child: FloatingActionButton.small(
+            backgroundColor: controller.isTrackingLive 
+                ? AppColors.actionPink 
+                : Colors.white,
+            onPressed: () {
+              if (controller.isTrackingLive) {
+                controller.stopLiveTracking();
+              } else {
+                controller.startLiveTracking();
+              }
+            },
+            child: Icon(
+              controller.isTrackingLive 
+                  ? Icons.location_off 
+                  : Icons.my_location,
+              color: controller.isTrackingLive ? Colors.white : AppColors.actionPink,
+            ),
+          ),
+        ),
+
         if (state.isLoadingPins)
           const Positioned(
             top: 100,
@@ -240,7 +260,8 @@ class _MapViewState extends State<_MapView> {
             right: 0,
             child: Center(child: CircularProgressIndicator()),
           ),
-        // Top UI (unchanged)
+
+        // Top UI
         Positioned(
           top: 0,
           left: 0,
@@ -304,7 +325,10 @@ class _MapViewState extends State<_MapView> {
             bottom: 108.h,
             child: SafeArea(
               top: false,
-              child: _CheckInFab(onTap: () => controller.checkIn(context)),
+              child: _CheckInFab(
+                onTap: () => controller.checkIn(context),
+                enabled: controller.isNearDestination,
+              ),
             ),
           ),
           Positioned(
@@ -328,22 +352,26 @@ class _MapViewState extends State<_MapView> {
   }
 }
 
-// Keep your _CheckInFab widget unchanged
 class _CheckInFab extends StatelessWidget {
   final VoidCallback onTap;
+  final bool enabled;
 
-  const _CheckInFab({required this.onTap, super.key});
+  const _CheckInFab({
+    super.key,
+    required this.onTap,
+    this.enabled = true,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.actionPink,
+      color: enabled ? AppColors.actionPink : Colors.grey.shade400,
       borderRadius: BorderRadius.circular(24.r),
       elevation: 4,
       shadowColor: Colors.black.withOpacity(0.2),
       child: InkWell(
         borderRadius: BorderRadius.circular(24.r),
-        onTap: onTap,
+        onTap: enabled ? onTap : null,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
           child: Row(

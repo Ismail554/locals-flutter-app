@@ -34,9 +34,7 @@ class _RankView extends StatelessWidget {
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: controller.isLoading && state.podium.isEmpty
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
+            ? const Center(child: CircularProgressIndicator())
             : CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
@@ -80,7 +78,7 @@ class _RankView extends StatelessWidget {
                         hasStory: (user) => controller.hasStory(user.storyUserId),
                         isStoryViewed: (user) =>
                             controller.isStoryViewed(user.storyUserId),
-                        onUserTap: (_) => controller.openViewProfile(context),
+                        onUserTap: (user) => controller.openViewProfile(context, user.storyUserId ?? user.rank.toString()),
                         onAvatarTap: (user) =>
                             controller.onPodiumAvatarTap(context, user),
                       ),
@@ -100,7 +98,7 @@ class _RankView extends StatelessWidget {
                                 controller.isStoryViewed(entry.storyUserId),
                             onTap: entry.isCurrentUser
                                 ? null
-                                : () => controller.openViewProfile(context),
+                                : () => controller.openViewProfile(context, entry.storyUserId ?? entry.rank.toString()),
                             onAvatarTap: () =>
                                 controller.onListAvatarTap(context, entry),
                           );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/core/network/api_client.dart';
+import 'package:locals/features/rank/view_profile/model/view_profile_args.dart';
 import 'package:locals/shared/story/user_story_launcher.dart';
 import '../model/rank_model.dart';
 import '../repository/rank_repository.dart';
@@ -43,8 +44,8 @@ class RankController extends ChangeNotifier {
     fetchLeaderboard();
   }
 
-  void openViewProfile(BuildContext context) {
-    context.push('/view_profile');
+  void openViewProfile(BuildContext context, String userId) {
+    context.push('/view_profile', extra: ViewProfileArgs(userId: userId));
   }
 
   bool hasStory(String? storyUserId) => UserStoryLauncher.hasStory(storyUserId);

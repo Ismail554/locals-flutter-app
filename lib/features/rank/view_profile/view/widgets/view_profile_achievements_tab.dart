@@ -10,6 +10,18 @@ class ViewProfileAchievementsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (achievements.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(32.0),
+          child: Text(
+            'No achievements yet',
+            style: TextStyle(color: AppColors.textSecondary),
+          ),
+        ),
+      );
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -17,21 +29,35 @@ class ViewProfileAchievementsTab extends StatelessWidget {
         crossAxisCount: 3,
         crossAxisSpacing: 10.w,
         mainAxisSpacing: 10.h,
-        childAspectRatio: 1.1,
+        childAspectRatio: 1.05,
       ),
       itemCount: achievements.length,
       itemBuilder: (context, index) {
         final item = achievements[index];
+        final isUnlocked = item.isUnlocked;
+
         return Container(
           padding: EdgeInsets.all(12.w),
           decoration: BoxDecoration(
-            color: AppColors.chipUnselected,
+            color: isUnlocked 
+                ? AppColors.chipUnselected 
+                : AppColors.chipUnselected.withOpacity(0.6),
             borderRadius: BorderRadius.circular(16.r),
+            border: isUnlocked 
+                ? Border.all(color: AppColors.actionPink.withOpacity(0.4), width: 1.5)
+                : null,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(item.icon, color: item.color, size: 28.sp),
+              Opacity(
+                opacity: isUnlocked ? 1.0 : 0.45,
+                child: Icon(
+                  item.icon, 
+                  color: item.color, 
+                  size: 34.sp,
+                ),
+              ),
               SizedBox(height: 8.h),
               Text(
                 item.label,
@@ -39,11 +65,22 @@ class ViewProfileAchievementsTab extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: AppColors.black,
+                  color: isUnlocked ? AppColors.black : AppColors.textSecondary,
                   fontSize: 11.sp,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: isUnlocked ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
+              if (isUnlocked && item.pointsAwarded > 0) ...[
+                SizedBox(height: 4.h),
+                Text(
+                  '+${item.pointsAwarded}',
+                  style: TextStyle(
+                    color: AppColors.actionPink,
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ],
           ),
         );

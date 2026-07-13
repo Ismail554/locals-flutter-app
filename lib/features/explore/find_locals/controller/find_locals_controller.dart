@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/features/explore/explore/repository/explore_repository.dart';
+import 'package:locals/features/rank/view_profile/model/view_profile_args.dart';
 import 'package:locals/shared/story/user_story_launcher.dart';
 import '../../explore/model/explore_model.dart';
 import '../model/find_locals_args.dart';
@@ -13,11 +14,11 @@ class FindLocalsController extends ChangeNotifier {
   FindLocalsModel state;
 
   FindLocalsController(this.repo, this.args)
-      : state = FindLocalsModel(
-          users: const [],
-          stories: List<ExploreStory>.from(args.stories),
-          isLoading: true,
-        ) {
+    : state = FindLocalsModel(
+        users: const [],
+        stories: List<ExploreStory>.from(args.stories),
+        isLoading: true,
+      ) {
     _loadSuggestions();
   }
 
@@ -28,7 +29,7 @@ class FindLocalsController extends ChangeNotifier {
     try {
       final users = await repo.fetchSuggestions();
 
-      // Sync with any follow-state changes already made on the Explore screen
+      // Sync with any follow-state changes
       final followById = {for (final u in args.followLocals) u.id: u};
       final synced = users.map((user) {
         final existing = followById[user.id];
@@ -56,8 +57,11 @@ class FindLocalsController extends ChangeNotifier {
     // Optimistic update
     state = state.copyWith(
       users: state.users
-          .map((user) =>
-              user.id == id ? user.copyWith(isFollowing: !wasFollowing) : user)
+          .map(
+            (user) => user.id == id
+                ? user.copyWith(isFollowing: !wasFollowing)
+                : user,
+          )
           .toList(),
     );
     notifyListeners();
@@ -70,8 +74,11 @@ class FindLocalsController extends ChangeNotifier {
       // Rollback on failure
       state = state.copyWith(
         users: state.users
-            .map((user) =>
-                user.id == id ? user.copyWith(isFollowing: wasFollowing) : user)
+            .map(
+              (user) => user.id == id
+                  ? user.copyWith(isFollowing: wasFollowing)
+                  : user,
+            )
             .toList(),
       );
       notifyListeners();
@@ -86,8 +93,8 @@ class FindLocalsController extends ChangeNotifier {
     );
   }
 
-  void openProfile(BuildContext context) {
-    context.push('/view_profile');
+  void openProfile(BuildContext context, String userId) {
+    context.push('/view_profile', extra: ViewProfileArgs(userId: userId));
   }
 
   bool hasStory(String userId) => UserStoryLauncher.hasStory(userId);

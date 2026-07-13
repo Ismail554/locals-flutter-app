@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:locals/shared/components/map/scrollable_map_canvas.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:locals/features/map/map/view/widgets/map_marker_icon_cache.dart';
 import 'package:locals/shared/model/map_pin_info.dart';
 
 class ViewProfileMapTab extends StatefulWidget {
@@ -13,17 +14,76 @@ class ViewProfileMapTab extends StatefulWidget {
 }
 
 class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
-  String? _selectedPinId;
+  GoogleMapController? mapController;
+  String? selectedPinId;
 
-  void _onPinTap(String pinId) {
-    setState(() {
-      _selectedPinId = _selectedPinId == pinId ? null : pinId;
-    });
+  final Set<Marker> _markers = {};
+
+  Future<void> _buildMarkers() async {
+    _markers.clear();
+    final iconCache = MapMarkerIconCache.instance;
+
+    for (final pin in widget.pins) {
+      final icon = await iconCache.iconFor(
+        tag: pin.tag,
+        visited: pin.visited,
+      );
+
+      _markers.add(
+        Marker(
+          markerId: MarkerId(pin.id),
+          position: LatLng(pin.lat, pin.lng),
+          icon: icon,
+          infoWindow: InfoWindow(title: pin.name),
+          onTap: () => setState(() => selectedPinId = pin.id),
+        ),
+      );
+    }
+
+    if (mounted) setState(() {});
   }
 
-  void _clearSelectedPin() {
-    if (_selectedPinId == null) return;
-    setState(() => _selectedPinId = null);
+  Future<void> _centerOnPins() async {
+    if (mapController == null || widget.pins.isEmpty) return;
+
+    if (widget.pins.length == 1) {
+      // Single pin → zoom in
+      final pin = widget.pins.first;
+      await mapController!.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(pin.lat, pin.lng),
+          16.5,
+        ),
+      );
+    } else {
+      // Multiple pins → fit bounds
+      double minLat = widget.pins.first.lat;
+      double maxLat = widget.pins.first.lat;
+      double minLng = widget.pins.first.lng;
+      double maxLng = widget.pins.first.lng;
+
+      for (final pin in widget.pins) {
+        if (pin.lat < minLat) minLat = pin.lat;
+        if (pin.lat > maxLat) maxLat = pin.lat;
+        if (pin.lng < minLng) minLng = pin.lng;
+        if (pin.lng > maxLng) maxLng = pin.lng;
+      }
+
+      final bounds = LatLngBounds(
+        southwest: LatLng(minLat, minLng),
+        northeast: LatLng(maxLat, maxLng),
+      );
+
+      await mapController!.animateCamera(
+        CameraUpdate.newLatLngBounds(bounds, 60),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _buildMarkers();
   }
 
   @override
@@ -33,11 +93,23 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
       child: SizedBox(
         height: 280.h,
         width: double.infinity,
-        child: ScrollableMapCanvas(
-          pins: widget.pins,
-          selectedPinId: _selectedPinId,
-          onPinTap: _onPinTap,
-          onBackgroundTap: _clearSelectedPin,
+        child: GoogleMap(
+          initialCameraPosition: const CameraPosition(
+            target: LatLng(41.3851, 2.1734),
+            zoom: 13,
+          ),
+          markers: _markers,
+          myLocationEnabled: false,
+          zoomControlsEnabled: false,
+          mapToolbarEnabled: false,
+          compassEnabled: true,
+          onMapCreated: (GoogleMapController controller) {
+            mapController = controller;
+            // Center on pins after map is ready
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _centerOnPins();
+            });
+          },
         ),
       ),
     );

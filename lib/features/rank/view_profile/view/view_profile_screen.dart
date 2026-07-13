@@ -27,7 +27,7 @@ class ViewProfileScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ViewProfileController(
         ViewProfileRepositoryImpl(),
-        userId: args?.userId,
+        userId: args!.userId,
       ),
       child: const _ViewProfileView(),
     );

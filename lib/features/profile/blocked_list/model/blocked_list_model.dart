@@ -16,7 +16,7 @@ class BlockedUser {
     return BlockedUser(
       id: json['id'].toString(),
       name: json['full_name'] as String? ?? '',
-      level: json['level'] as int? ?? 1,
+      level: json['level'] as int? ?? 0,
       avatarUrl: json['avatar'] as String?,
     );
   }

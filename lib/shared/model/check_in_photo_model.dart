@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CheckInPhoto {
+  final String? id;
+  final String? imageUrl;
   final Color previewColor;
   final String locationName;
   final String timeAgo;
@@ -9,6 +11,8 @@ class CheckInPhoto {
   final String? userInitial;
 
   const CheckInPhoto({
+    this.id,
+    this.imageUrl,
     required this.previewColor,
     required this.locationName,
     required this.timeAgo,

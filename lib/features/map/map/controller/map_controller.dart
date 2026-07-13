@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locals/features/explore/events_progress_map/model/events_progress_map_args.dart';
@@ -24,18 +25,23 @@ class MapController extends ChangeNotifier {
   MapModel state;
 
   Timer? _searchDebounce;
+  StreamSubscription<LatLng>? _locationSubscription;
+  bool isNearDestination = false;
+  bool isTrackingLive = false;
+  bool get isFocusedMode => _isFocusedMode;
 
-  bool get _isFocusedMode => state.showRoute && state.highlightedLocation != null;
+  bool get _isFocusedMode =>
+      state.showRoute && state.highlightedLocation != null;
 
   MapController(this.repo, {MapScreenArgs? screenArgs})
-      : state = MapModel(
-          activeMission: screenArgs?.mission?.toActiveMission(),
-          selectedPinId: screenArgs?.focusedPinId,
-          highlightedLocation: screenArgs?.highlightedLocation,
-          showRoute: screenArgs?.showRoute ?? false,
-          initialCenter: screenArgs?.initialCenter,
-          initialZoom: screenArgs?.initialZoom,
-        ) {
+    : state = MapModel(
+        activeMission: screenArgs?.mission?.toActiveMission(),
+        selectedPinId: screenArgs?.focusedPinId,
+        highlightedLocation: screenArgs?.highlightedLocation,
+        showRoute: screenArgs?.showRoute ?? false,
+        initialCenter: screenArgs?.initialCenter,
+        initialZoom: screenArgs?.initialZoom,
+      ) {
     _initContext();
   }
 
@@ -47,60 +53,96 @@ class MapController extends ChangeNotifier {
     }
   }
 
+void startLiveTracking() {
+    if (isTrackingLive) return;
+    isTrackingLive = true;
+
+    _locationSubscription?.cancel();
+    _locationSubscription = LocationService.locationStream().listen((currentLoc) {
+      final destination = state.highlightedLocation;
+      if (destination == null) return;
+
+      final destLatLng = LatLng(destination.latitude, destination.longitude);
+      final distance = Geolocator.distanceBetween(
+        currentLoc.latitude,
+        currentLoc.longitude,
+        destLatLng.latitude,
+        destLatLng.longitude,
+      );
+
+      final nearNow = distance < 50;
+
+      if (nearNow != isNearDestination) {
+        isNearDestination = nearNow;
+        notifyListeners();
+      }
+    });
+    notifyListeners();
+  }
+
+  void stopLiveTracking() {
+    _locationSubscription?.cancel();
+    _locationSubscription = null;
+    isTrackingLive = false;
+    isNearDestination = false;
+    notifyListeners();
+  }
+
   // ─── Places Loading ─────────────────────────────────────────────────────────
 
-Future<void> loadRoute() async {
-  debugPrint("=== LOAD ROUTE ===");
-  if (!state.showRoute || state.highlightedLocation == null) return;
+  Future<void> loadRoute() async {
+    debugPrint("=== LOAD ROUTE ===");
+    if (!state.showRoute || state.highlightedLocation == null) return;
 
-  final location = state.highlightedLocation!;
+    final location = state.highlightedLocation!;
 
-  try {
-    final current = await LocationService.currentLocation();
-    final destination = LatLng(location.latitude, location.longitude);
+    try {
+      final current = await LocationService.currentLocation();
+      final destination = LatLng(location.latitude, location.longitude);
 
-    debugPrint("Current: ${current.latitude}, ${current.longitude}");
-    debugPrint("Destination: ${destination.latitude}, ${destination.longitude}");
-
-    final points = await RouteService.instance.getRoute(
-      origin: current,
-      destination: destination,
-    );
-
-    if (points.isNotEmpty) {
-      state = state.copyWith(
-        polylines: {
-          Polyline(
-            polylineId: const PolylineId('route'),
-            points: points,
-            width: 8,
-            color: AppColors.actionPink,
-            geodesic: true,
-            startCap: Cap.roundCap,
-            endCap: Cap.roundCap,
-          ),
-        },
+      debugPrint("Current: ${current.latitude}, ${current.longitude}");
+      debugPrint(
+        "Destination: ${destination.latitude}, ${destination.longitude}",
       );
-      debugPrint("✅ Real curved route drawn with ${points.length} points");
-    } else {
-      // Fallback straight line
-      state = state.copyWith(
-        polylines: {
-          Polyline(
-            polylineId: const PolylineId('route'),
-            points: [current, destination],
-            width: 6,
-            color: Colors.orange,
-          ),
-        },
+
+      final points = await RouteService.instance.getRoute(
+        origin: current,
+        destination: destination,
       );
+
+      if (points.isNotEmpty) {
+        state = state.copyWith(
+          polylines: {
+            Polyline(
+              polylineId: const PolylineId('route'),
+              points: points,
+              width: 8,
+              color: AppColors.actionPink,
+              geodesic: true,
+              startCap: Cap.roundCap,
+              endCap: Cap.roundCap,
+            ),
+          },
+        );
+        debugPrint("✅ Real curved route drawn with ${points.length} points");
+      } else {
+        // Fallback straight line
+        state = state.copyWith(
+          polylines: {
+            Polyline(
+              polylineId: const PolylineId('route'),
+              points: [current, destination],
+              width: 6,
+              color: Colors.orange,
+            ),
+          },
+        );
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Route Error: $e");
     }
-    notifyListeners();
-  } catch (e) {
-    debugPrint("Route Error: $e");
   }
-}
-
 
   Future<void> _loadPlaces() async {
     state = state.copyWith(isLoadingPins: true);
@@ -127,7 +169,7 @@ Future<void> loadRoute() async {
             MapPinInfo(
               id: loc.resolvedLocationId,
               name: loc.name,
-              level: 1,                    // required field
+              level: 1, // required field
               lat: loc.latitude,
               lng: loc.longitude,
               tag: _getPinTag(loc.category),
@@ -157,9 +199,11 @@ Future<void> loadRoute() async {
 
   MapPinTag _getPinTag(String category) {
     final cat = category.toLowerCase();
-    if (cat.contains('cafe') || cat.contains('coffee')) return MapPinTag.business;
+    if (cat.contains('cafe') || cat.contains('coffee'))
+      return MapPinTag.business;
     if (cat.contains('bar')) return MapPinTag.business;
-    if (cat.contains('restaurant') || cat.contains('food')) return MapPinTag.business;
+    if (cat.contains('restaurant') || cat.contains('food'))
+      return MapPinTag.business;
     if (cat.contains('event')) return MapPinTag.sponsoredOrEvent;
     return MapPinTag.pointOfInterest;
   }
@@ -236,7 +280,8 @@ Future<void> loadRoute() async {
   // ─── Check-In ───────────────────────────────────────────────────────────────
 
   Future<void> checkIn(BuildContext context) async {
-    final location = state.highlightedLocation ?? state.activeMission?.activeLocation;
+    final location =
+        state.highlightedLocation ?? state.activeMission?.activeLocation;
     if (location == null) return;
 
     final result = await showCheckInSheet(
@@ -257,7 +302,10 @@ Future<void> loadRoute() async {
   // ─── Navigation ─────────────────────────────────────────────────────────────
 
   Future<void> openSearch(BuildContext context) async {
-    final result = await context.push<String>('/map_search', extra: state.searchQuery);
+    final result = await context.push<String>(
+      '/map_search',
+      extra: state.searchQuery,
+    );
     if (result != null && result.trim().isNotEmpty) {
       MapSearchRepositoryImpl().addRecentSearch(result.trim());
       setSearchQuery(result.trim());
@@ -278,7 +326,8 @@ Future<void> loadRoute() async {
   }
 
   void openActiveLocationDetails(BuildContext context) {
-    final location = state.highlightedLocation ?? state.activeMission?.activeLocation;
+    final location =
+        state.highlightedLocation ?? state.activeMission?.activeLocation;
     if (location == null) return;
 
     context.push(

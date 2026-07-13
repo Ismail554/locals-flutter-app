@@ -80,7 +80,7 @@ class _FindLocalsView extends StatelessWidget {
                               child: FindLocalCard(
                                 user: user,
                                 story: story,
-                                onCardTap: () => controller.openProfile(context),
+                                onCardTap: () => controller.openProfile(context, user.id),
                                 onAvatarTap: () =>
                                     controller.openUserStory(context, user.id),
                                 onFollowTap: () =>

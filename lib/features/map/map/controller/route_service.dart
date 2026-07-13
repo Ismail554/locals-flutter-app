@@ -83,7 +83,7 @@ class RouteService {
     }
   }
 
-  // Keep your existing getDistance and getDuration methods...
+  // Keep your distance and duration methods
   Future<double?> getDistance({
     required LatLng origin,
     required LatLng destination,

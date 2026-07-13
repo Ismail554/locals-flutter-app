@@ -25,6 +25,7 @@ class RestaurantPhoto {
       timeAgo: timeAgo,
       caption: caption,
       likes: likes,
+      imageUrl: imageUrl,
     );
   }
 
