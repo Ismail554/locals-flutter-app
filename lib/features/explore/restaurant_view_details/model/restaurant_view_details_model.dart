@@ -101,7 +101,7 @@ class RestaurantViewDetailsModel {
     this.businessOfTheMonth = false,
   });
 
-  String get shareUrl => 'https://local.app/l/$id';
+  String get shareUrl => 'https://clubby-andy-irksomely.ngrok-free.dev/l/$id';
 
   String get mapPinId => switch (id) {
     'sagrada_familia' => 'sagrada',

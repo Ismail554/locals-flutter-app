@@ -160,6 +160,17 @@ final appRouter = GoRouter(
       },
     ),
     GoRoute(
+      path: "/l/:id",
+
+      builder: (context, state) {
+        return RestaurantViewDetailsScreen(
+          args: RestaurantViewDetailsArgs(
+            locationId: state.pathParameters["id"]!,
+          ),
+        );
+      },
+    ),
+    GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
       path: '/events_progress_map',
       builder: (context, state) {
@@ -312,8 +323,7 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/qr-scan',
-      builder: (context, state) =>
-          QRScanScreen(placeId: state.extra as String),
+      builder: (context, state) => QRScanScreen(placeId: state.extra as String),
     ),
     GoRoute(
       path: '/qr-scan-status',
