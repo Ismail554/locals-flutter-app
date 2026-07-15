@@ -32,10 +32,7 @@ class RestaurantViewDetailsScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => RestaurantViewDetailsController(
         RestaurantViewDetailsRepositoryImpl(),
-        resolvedArgs ??
-            const RestaurantViewDetailsArgs(
-              locationId: 'forn_baluard',
-            ),
+        resolvedArgs ?? const RestaurantViewDetailsArgs(locationId: 'forn_baluard'),
       ),
       child: const _RestaurantViewDetailsView(),
     );
@@ -49,17 +46,13 @@ class _RestaurantViewDetailsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = context.watch<RestaurantViewDetailsController>();
 
-    // Loading State
     if (controller.isLoading) {
       return const Scaffold(
         backgroundColor: AppColors.white,
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
-    // Error State
     if (controller.errorMessage != null) {
       return Scaffold(
         backgroundColor: AppColors.white,
@@ -69,10 +62,7 @@ class _RestaurantViewDetailsView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  controller.errorMessage!,
-                  textAlign: TextAlign.center,
-                ),
+                Text(controller.errorMessage!, textAlign: TextAlign.center),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: controller.refresh,
@@ -102,12 +92,7 @@ class _RestaurantViewDetailsView extends StatelessWidget {
               onRefresh: controller.refresh,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.fromLTRB(
-                  20.w,
-                  20.h,
-                  20.w,
-                  24.h,
-                ),
+                padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 24.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -140,16 +125,14 @@ class _RestaurantViewDetailsView extends StatelessWidget {
                     RestaurantActionButtons(
                       hasVisited: restaurant.hasVisited,
                       onBeenHereTap: () => controller.checkIn(context),
-                      onDirectionsTap: () =>
-                          controller.openDirections(context),
+                      onDirectionsTap: () => controller.openDirections(context),
                     ),
 
                     SizedBox(height: 24.h),
 
                     RestaurantPhotosSection(
                       photos: restaurant.photos,
-                      onPhotoTap: (photo) =>
-                          controller.openPhoto(context, photo),
+                      onPhotoTap: (photo) => controller.openPhoto(context, photo),
                     ),
 
                     SizedBox(height: 24.h),

@@ -501,5 +501,28 @@
   "cameraCouldNotOpen": "Could not open the camera. Please try again.",
   "shareCardTakePhoto": "Take photo",
   "shareCardChooseGallery": "Choose from gallery",
-  "likes": "LIKES"
+  "likes": "LIKES",
+  "@@locale": "en",
+  "qrCodeScanTitle": "QR Code Scan",
+  "@qrCodeScanTitle": {
+    "description": "Title for QR scan screen"
+  },
+  "qrScanInstruction": "Position the QR code in the frame",
+  "@qrScanInstruction": {},
+  "positionQrCodeHere": "Position QR code here",
+  "@positionQrCodeHere": {},
+  "tapToScan": "Tap to scan",
+  "@tapToScan": {},
+  "qrVerified": "QR Verified!",
+  "@qrVerified": {},
+  "qrScanFailed": "Scan Failed",
+  "@qrScanFailed": {},
+  "qrTooFar": "You're too far from the location",
+  "@qrTooFar": {},
+  "continueButton": "Continue",
+  "@continueButton": {},
+  "checkInSuccess": "You're checked in. Thank you for visiting!",
+  "@checkInSuccess": {},
+  "checkInTooFar": "You need to be closer to check in",
+  "@checkInTooFar": {}
 }

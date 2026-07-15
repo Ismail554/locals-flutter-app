@@ -1042,4 +1042,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get likes => 'LIKES';
+
+  @override
+  String get qrCodeScanTitle => 'QR Code Scan';
+
+  @override
+  String get qrScanInstruction => 'Position the QR code in the frame';
+
+  @override
+  String get positionQrCodeHere => 'Position QR code here';
+
+  @override
+  String get tapToScan => 'Tap to scan';
+
+  @override
+  String get qrVerified => 'QR Verified!';
+
+  @override
+  String get qrScanFailed => 'Scan Failed';
+
+  @override
+  String get qrTooFar => 'You\'re too far from the location';
+
+  @override
+  String get continueButton => 'Continue';
+
+  @override
+  String get checkInSuccess => 'You\'re checked in. Thank you for visiting!';
+
+  @override
+  String get checkInTooFar => 'You need to be closer to check in';
 }

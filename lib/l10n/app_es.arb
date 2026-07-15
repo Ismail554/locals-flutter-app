@@ -327,5 +327,28 @@
   "shareCardTakePhoto": "Tomar foto",
   "shareCardChooseGallery": "Elegir de la galería",
   "authConfirmPasswordHint" : "authConfirmPasswordHint",
-  "likes" : "Gustos"
+  "likes" : "Gustos",
+  "@@locale": "es",
+  "qrCodeScanTitle": "Escáner de Código QR",
+  "@qrCodeScanTitle": {
+    "description": "Título para pantalla de escaneo QR"
+  },
+  "qrScanInstruction": "Coloca el código QR en el marco",
+  "@qrScanInstruction": {},
+  "positionQrCodeHere": "Posiciona el código QR aquí",
+  "@positionQrCodeHere": {},
+  "tapToScan": "Toca para escanear",
+  "@tapToScan": {},
+  "qrVerified": "¡QR Verificado!",
+  "@qrVerified": {},
+  "qrScanFailed": "Escaneo Fallido",
+  "@qrScanFailed": {},
+  "qrTooFar": "Estás demasiado lejos de la ubicación",
+  "@qrTooFar": {},
+  "continueButton": "Continuar",
+  "@continueButton": {},
+  "checkInSuccess": "Has hecho check-in. ¡Gracias por visitarnos!",
+  "@checkInSuccess": {},
+  "checkInTooFar": "Debes estar más cerca para hacer check-in",
+  "@checkInTooFar": {}
 }

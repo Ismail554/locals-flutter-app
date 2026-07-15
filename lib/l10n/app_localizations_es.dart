@@ -1050,4 +1050,34 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get likes => 'Gustos';
+
+  @override
+  String get qrCodeScanTitle => 'Escáner de Código QR';
+
+  @override
+  String get qrScanInstruction => 'Coloca el código QR en el marco';
+
+  @override
+  String get positionQrCodeHere => 'Posiciona el código QR aquí';
+
+  @override
+  String get tapToScan => 'Toca para escanear';
+
+  @override
+  String get qrVerified => '¡QR Verificado!';
+
+  @override
+  String get qrScanFailed => 'Escaneo Fallido';
+
+  @override
+  String get qrTooFar => 'Estás demasiado lejos de la ubicación';
+
+  @override
+  String get continueButton => 'Continuar';
+
+  @override
+  String get checkInSuccess => 'Has hecho check-in. ¡Gracias por visitarnos!';
+
+  @override
+  String get checkInTooFar => 'Debes estar más cerca para hacer check-in';
 }

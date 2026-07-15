@@ -22,7 +22,7 @@ class RestaurantViewDetailsController extends ChangeNotifier {
     _load();
   }
 
-  Future<void> _load() async {
+Future<void> _load() async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
@@ -53,25 +53,29 @@ class RestaurantViewDetailsController extends ChangeNotifier {
 
   void checkIn(BuildContext context) {
     if (restaurant == null) return;
-    if (!restaurant!.hasVisited) {
-      restaurant = restaurant!.copyWith(hasVisited: true);
-      notifyListeners();
+
+    if (restaurant!.hasVisited) {
+      context.push('/points', extra: restaurant!.toPointsArgs());
+    } else {
+      context.push(
+        '/qr-scan',
+        extra: restaurant!.id,
+      );
     }
-    context.push('/points', extra: restaurant!.toPointsArgs());
   }
 
 void openDirections(BuildContext context) {
-  if (restaurant == null) return;
+    if (restaurant == null) return;
 
-  context.go(
-    "/map",
-    extra: MapScreenArgs(
-      focusedPinId: restaurant!.mapPinId,
-      highlightedLocation: restaurant!.toMapLocation(),
-      showRoute: true,
-    ),
-  );
-}
+    context.go(
+      "/map",
+      extra: MapScreenArgs(
+        focusedPinId: restaurant!.mapPinId,
+        highlightedLocation: restaurant!.toMapLocation(),
+        showRoute: true,
+      ),
+    );
+  }
 
   void share(BuildContext context) {
     if (restaurant == null) return;

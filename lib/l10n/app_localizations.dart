@@ -2065,6 +2065,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'LIKES'**
   String get likes;
+
+  /// Title for QR scan screen
+  ///
+  /// In en, this message translates to:
+  /// **'QR Code Scan'**
+  String get qrCodeScanTitle;
+
+  /// No description provided for @qrScanInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Position the QR code in the frame'**
+  String get qrScanInstruction;
+
+  /// No description provided for @positionQrCodeHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Position QR code here'**
+  String get positionQrCodeHere;
+
+  /// No description provided for @tapToScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to scan'**
+  String get tapToScan;
+
+  /// No description provided for @qrVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'QR Verified!'**
+  String get qrVerified;
+
+  /// No description provided for @qrScanFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Failed'**
+  String get qrScanFailed;
+
+  /// No description provided for @qrTooFar.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re too far from the location'**
+  String get qrTooFar;
+
+  /// No description provided for @continueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueButton;
+
+  /// No description provided for @checkInSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re checked in. Thank you for visiting!'**
+  String get checkInSuccess;
+
+  /// No description provided for @checkInTooFar.
+  ///
+  /// In en, this message translates to:
+  /// **'You need to be closer to check in'**
+  String get checkInTooFar;
 }
 
 class _AppLocalizationsDelegate

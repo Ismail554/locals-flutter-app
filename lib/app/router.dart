@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/features/explore/explore/view/local_shares_screen.dart';
+import 'package:locals/features/explore/restaurant_view_details/model/qr_checkin_result.dart';
+import 'package:locals/features/explore/restaurant_view_details/view/qr_scan_screen.dart';
+import 'package:locals/features/explore/restaurant_view_details/view/qr_scan_status_screen.dart';
 import 'app_scaffold.dart';
 import '../features/splash/view/splash_screen.dart';
 import '../features/onboard/view/onboard_screen.dart';
@@ -306,6 +309,16 @@ final appRouter = GoRouter(
         final args = state.extra! as StoryViewerArgs;
         return StoryViewScreen(args: args);
       },
+    ),
+    GoRoute(
+      path: '/qr-scan',
+      builder: (context, state) =>
+          QRScanScreen(placeId: state.extra as String),
+    ),
+    GoRoute(
+      path: '/qr-scan-status',
+      builder: (context, state) =>
+          QRScanStatusScreen(result: state.extra as QRCheckInResult),
     ),
   ],
 );
