@@ -24,8 +24,7 @@
         android:label="locals">
 
         <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_GOOGLE_MAPS_KEY"/>
+            android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCYQRVdNqPcWksRcR9Q4EOqH8fQfjyEu-Y"/>
 
         <activity
             android:name=".MainActivity"

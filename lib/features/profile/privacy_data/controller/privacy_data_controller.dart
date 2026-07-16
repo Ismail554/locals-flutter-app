@@ -7,6 +7,7 @@ import '../repository/privacy_data_repository.dart';
 class PrivacyDataController extends ChangeNotifier {
   final PrivacyDataRepository repo;
   PrivacyDataModel state = const PrivacyDataModel();
+  bool isLoading = false;
 
   PrivacyDataController(this.repo);
 
@@ -27,8 +28,27 @@ class PrivacyDataController extends ChangeNotifier {
     final shouldDelete = await PremiumConfirmDialog.showDeleteAccount(context);
     if (!shouldDelete || !context.mounted) return;
 
-    await repo.deleteAccount();
-    if (!context.mounted) return;
-    context.go('/login');
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      await repo.deleteAccount();
+
+      if (context.mounted) {
+        context.go('/login'); // Logout after delete
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to delete account. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 }

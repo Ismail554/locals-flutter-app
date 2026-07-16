@@ -177,6 +177,38 @@ class ApiClient {
     }
   }
 
+
+  
+Future<Map<String, dynamic>> delete(
+  String path, {
+  bool requiresAuth = true,
+}) async {
+  final url = '$baseUrl$path';
+ 
+  try {
+    final headers = requiresAuth ? await _authHeaders : _baseHeaders;
+ 
+    _logRequest('DELETE', url, null);
+ 
+    final response = await http
+        .delete(Uri.parse(url), headers: headers)
+        .timeout(_timeout);
+ 
+    _logResponse(response);
+ 
+    return _handleResponse(response);
+  } on SocketException {
+    _logError('DELETE', url, 'No internet connection');
+    throw const ApiException('No internet connection.');
+  } on HttpException {
+    _logError('DELETE', url, 'Network error');
+    throw const ApiException('Network error. Please try again.');
+  } on FormatException {
+    _logError('DELETE', url, 'Unexpected response format');
+    throw const ApiException('Unexpected response format.');
+  }
+}
+
   // ─── Logging ────────────────────────────────────────────────────────────────
 
   void _logRequest(String method, String url, Map<String, dynamic>? body) {

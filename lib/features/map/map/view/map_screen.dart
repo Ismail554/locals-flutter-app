@@ -208,6 +208,7 @@ class _MapViewState extends State<_MapView> {
       fit: StackFit.expand,
       children: [
         GoogleMap(
+          mapType: MapType.satellite,
           initialCameraPosition: const CameraPosition(
             target: LatLng(41.3851, 2.1734),
             zoom: 13,

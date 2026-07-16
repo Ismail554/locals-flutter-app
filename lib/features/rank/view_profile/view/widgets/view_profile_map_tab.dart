@@ -94,6 +94,7 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
         height: 280.h,
         width: double.infinity,
         child: GoogleMap(
+          mapType: MapType.satellite,
           initialCameraPosition: const CameraPosition(
             target: LatLng(41.3851, 2.1734),
             zoom: 13,
