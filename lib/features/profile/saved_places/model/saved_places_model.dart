@@ -12,25 +12,23 @@ class SavedPlace {
     required this.name,
     required this.imageColor,
   });
+
+  factory SavedPlace.fromApi(Map<String, dynamic> json) {
+    final place = json['place'] as Map<String, dynamic>? ?? json;
+
+    return SavedPlace(
+      id: place['id'].toString(),
+      category: (place['category']?['name'] as String? ?? 'PLACE').toUpperCase(),
+      name: place['name'] as String? ?? 'Unknown Place',
+      imageColor: const Color(0xFFD4C4B0), 
+    );
+  }
 }
 
 class SavedPlacesModel {
   final List<SavedPlace> places;
 
   const SavedPlacesModel({
-    this.places = const [
-      SavedPlace(
-        id: 'cafe_del_born',
-        category: 'CAFE',
-        name: 'Café del Born',
-        imageColor: Color(0xFFD4C4B0),
-      ),
-      SavedPlace(
-        id: 'forn_baluard',
-        category: 'BAKERY',
-        name: 'Forn Baluard',
-        imageColor: Color(0xFFE8D8C8),
-      ),
-    ],
+    this.places = const [],
   });
 }

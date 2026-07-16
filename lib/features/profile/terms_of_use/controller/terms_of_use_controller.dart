@@ -4,12 +4,23 @@ import '../repository/terms_of_use_repository.dart';
 
 class TermsOfUseController extends ChangeNotifier {
   final TermsOfUseRepository repo;
-  TermsOfUseModel state = const TermsOfUseModel();
+  TermsOfUseModel state = TermsOfUseModel();
 
-  TermsOfUseController(this.repo);
+  bool isLoading = true;
+
+  TermsOfUseController(this.repo){
+    load();
+  }
 
   Future<void> load() async {
-    state = await repo.load();
+    isLoading = true;
+    notifyListeners();
+    try {
+      state = await repo.load();
+    } catch (e) {
+      debugPrint('Terms of use load error: $e');
+    }
+    isLoading = false;
     notifyListeners();
   }
 }

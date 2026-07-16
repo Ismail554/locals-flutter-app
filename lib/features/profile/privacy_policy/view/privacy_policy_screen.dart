@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/shared/model/legal_document_section.dart';
 import 'package:provider/provider.dart';
 import 'package:locals/shared/components/legal_document_body.dart';
 import 'package:locals/shared/components/profile_screen_header.dart';
@@ -15,8 +16,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) =>
-          PrivacyPolicyController(PrivacyPolicyRepositoryImpl())..load(),
+      create: (_) => PrivacyPolicyController(PrivacyPolicyRepositoryImpl()),
       child: const _PrivacyPolicyView(),
     );
   }
@@ -27,7 +27,15 @@ class _PrivacyPolicyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<PrivacyPolicyController>().state;
+    final controller = context.watch<PrivacyPolicyController>();
+    final state = controller.state;
+
+    if (controller.isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -46,13 +54,64 @@ class _PrivacyPolicyView extends StatelessWidget {
               flex: 1,
               fit: FlexFit.tight,
               child: LegalDocumentBody(
-                lastUpdated: state.lastUpdated,
-                sections: state.sections,
+                lastUpdated: _formatDate(state.updatedAt ?? ''),
+                sections: _parseContent(state.content ?? '', state.title),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _formatDate(String isoDate) {
+    try {
+      final date = DateTime.parse(isoDate);
+      return "${date.day} ${_monthName(date.month)} ${date.year}";
+    } catch (e) {
+      return "July 15, 2026";
+    }
+  }
+
+  String _monthName(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[month - 1];
+  }
+
+  List<LegalDocumentSection> _parseContent(String content, String? title) {
+    final lines = content.split('\n');
+    final sections = <LegalDocumentSection>[];
+
+    String currentTitle = '';
+    List<String> currentParagraphs = [];
+
+    for (var line in lines) {
+      line = line.trim();
+      if (line.isEmpty) continue;
+
+      if (line.startsWith(RegExp(r'^\d+\.')) || line.startsWith(RegExp(r'^[A-Z]'))) {
+        if (currentTitle.isNotEmpty) {
+          sections.add(LegalDocumentSection(
+            title: currentTitle,
+            paragraphs: List.from(currentParagraphs),
+          ));
+        }
+        currentTitle = line;
+        currentParagraphs.clear();
+      } else {
+        currentParagraphs.add(line);
+      }
+    }
+
+    if (currentTitle.isNotEmpty) {
+      sections.add(LegalDocumentSection(
+        title: currentTitle,
+        paragraphs: currentParagraphs,
+      ));
+    }
+
+    return sections.isEmpty
+        ? [LegalDocumentSection(title: title ?? "Privacy Policy", paragraphs: [content])]
+        : sections;
   }
 }

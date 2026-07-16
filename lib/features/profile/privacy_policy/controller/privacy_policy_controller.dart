@@ -1,15 +1,28 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import '../model/privacy_policy_model.dart';
 import '../repository/privacy_policy_repository.dart';
 
 class PrivacyPolicyController extends ChangeNotifier {
   final PrivacyPolicyRepository repo;
-  PrivacyPolicyModel state = const PrivacyPolicyModel();
+  PrivacyPolicyModel state = PrivacyPolicyModel();
 
-  PrivacyPolicyController(this.repo);
+  bool isLoading = true;
+
+  PrivacyPolicyController(this.repo) {
+    load();
+  }
 
   Future<void> load() async {
-    state = await repo.load();
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      state = await repo.load();
+    } catch (e) {
+      debugPrint('Privacy policy load error: $e');
+    }
+
+    isLoading = false;
     notifyListeners();
   }
 }

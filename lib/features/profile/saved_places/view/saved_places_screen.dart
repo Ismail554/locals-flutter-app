@@ -28,6 +28,13 @@ class _SavedPlacesView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = context.watch<SavedPlacesController>();
 
+    if (controller.isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(

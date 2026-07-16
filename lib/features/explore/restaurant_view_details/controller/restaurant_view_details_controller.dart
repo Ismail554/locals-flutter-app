@@ -45,10 +45,27 @@ Future<void> _load() async {
     notifyListeners();
   }
 
-  void toggleSaved() {
+  Future<void> toggleSaved() async {
     if (restaurant == null) return;
-    restaurant = restaurant!.copyWith(isSaved: !restaurant!.isSaved);
+
+    final wasSaved = restaurant!.isSaved;
+
+    // Optimistic update
+    restaurant = restaurant!.copyWith(isSaved: !wasSaved);
     notifyListeners();
+
+    try {
+      if (!wasSaved) {
+        await repo.savePlace(restaurant!.id);
+      } else {
+        await repo.unsavePlace(restaurant!.id);
+      }
+    } catch (e) {
+      // Rollback on error
+      restaurant = restaurant!.copyWith(isSaved: wasSaved);
+      notifyListeners();
+      debugPrint('Save/unsave error: $e');
+    }
   }
 
   void checkIn(BuildContext context) {
