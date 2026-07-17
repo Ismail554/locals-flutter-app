@@ -8,6 +8,7 @@ import 'package:locals/features/explore/events_progress_map/model/events_progres
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_args.dart';
 import 'package:locals/features/map/map/controller/location_service.dart';
 import 'package:locals/features/map/map/controller/route_service.dart';
+import 'package:locals/features/map/map/model/map_mission_args.dart';
 import 'package:locals/features/missions/check_in/view/checkin_bottom_sheet.dart';
 import 'package:locals/shared/components/pin_details_sheet.dart';
 import 'package:locals/shared/model/map_pin_details.dart';
@@ -49,6 +50,7 @@ class MapController extends ChangeNotifier {
     await _loadPlaces();
 
     if (_isFocusedMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
       await loadRoute();
     }
   }
@@ -197,6 +199,65 @@ void startLiveTracking() {
     }
   }
 
+void showRouteToPin(String pinId) {
+  final pin = state.getPinById(pinId);
+  if (pin == null) {
+    debugPrint("❌ Pin not found: $pinId");
+    return;
+  }
+
+  debugPrint("📍 Showing route to pin: ${pin.name}");
+
+  state = state.copyWith(
+    highlightedLocation: MapActiveLocation(
+      locationId: pin.id,
+      category: pin.category ?? 'PLACE',
+      seal: 'Local spot',
+      name: pin.name,
+      address: pin.address ?? '',
+      points: pin.points ?? 30,
+      imageColor: pin.accentColor ?? const Color(0xFFD4C4B0),
+      latitude: pin.lat,
+      longitude: pin.lng,
+    ),
+    showRoute: true,
+    selectedPinId: null,
+  );
+
+  notifyListeners();
+
+  // Load the actual polyline route
+  loadRoute();
+}
+
+  /// Call this from Pin Details Sheet when user taps "Directions"
+void openDirectionsFromPin(String pinId) {
+  final pin = state.getPinById(pinId);
+  if (pin == null) return;
+
+  // Set focused mode
+  state = state.copyWith(
+    highlightedLocation: MapActiveLocation(
+      locationId: pin.id,
+      category: pin.category ?? 'PLACE',
+      seal: 'Local spot',
+      name: pin.name,
+      address: pin.address ?? '',
+      points: pin.points ?? 30,
+      imageColor: pin.accentColor ?? const Color(0xFFD4C4B0),
+      latitude: pin.lat,
+      longitude: pin.lng,
+    ),
+    showRoute: true,
+    selectedPinId: null, // optional: clear selection
+  );
+
+  notifyListeners();
+
+  // Load the route
+  loadRoute();
+}
+
   MapPinTag _getPinTag(String category) {
     final cat = category.toLowerCase();
     if (cat.contains('cafe') || cat.contains('coffee'))
@@ -261,13 +322,15 @@ void startLiveTracking() {
       points: pin.points ?? 30,
       accentColor: pin.accentColor ?? const Color(0xFFD4C4B0),
       imageUrl: pin.imageUrl,
+      latitude: pin.lat,
+      longitude: pin.lng,
     );
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => PinDetailsSheet(pin: details),
+      builder: (context) => PinDetailsSheet(pin: details, controller: this),
     );
   }
 

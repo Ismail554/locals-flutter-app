@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_args.dart';
+import 'package:locals/features/map/map/controller/map_controller.dart';
+import 'package:locals/features/map/map/model/map_mission_args.dart';
+import 'package:locals/features/map/map/model/map_screen_args.dart';
 import 'package:locals/shared/model/map_pin_details.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:provider/provider.dart';
 
 class PinDetailsSheet extends StatelessWidget {
   final MapPinDetails pin;
+  final MapController controller;
 
-  const PinDetailsSheet({super.key, required this.pin});
+  const PinDetailsSheet({super.key, required this.pin, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +166,7 @@ class PinDetailsSheet extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => _openRestaurantDetails(context),
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: AppColors.primaryPink),
                     shape: RoundedRectangleBorder(
@@ -178,7 +186,7 @@ class PinDetailsSheet extends StatelessWidget {
               SizedBox(width: 12.w),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => controller.showRouteToPin(pin.id),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryPink,
                     shape: RoundedRectangleBorder(
@@ -213,13 +221,26 @@ class PinDetailsSheet extends StatelessWidget {
     );
   }
 
+  void _openRestaurantDetails(BuildContext context) {
+    Navigator.pop(context);
+    context.push(
+      '/restaurant_view_details',
+      extra: RestaurantViewDetailsArgs(locationId: pin.id),
+    );
+  }
+
+  void _openDirections(BuildContext context) {
+  Navigator.pop(context); // Close bottom sheet
+
+  // Get the controller from context
+  final controller = context.read<MapController>();
+
+  controller.openDirectionsFromPin(pin.id);
+}
+
   Widget _placeholderIcon() {
     return const Center(
-      child: Icon(
-        Icons.image_outlined,
-        color: Colors.white70,
-        size: 40,
-      ),
+      child: Icon(Icons.image_outlined, color: Colors.white70, size: 40),
     );
   }
 }

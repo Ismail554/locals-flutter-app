@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'dart:ui';
 
 class MapPinDetails {
   final String id;
@@ -7,7 +7,9 @@ class MapPinDetails {
   final String address;
   final int points;
   final Color? accentColor;
-  final String? imageUrl; // or asset path
+  final String? imageUrl;
+  final double? latitude;
+  final double? longitude;
 
   const MapPinDetails({
     required this.id,
@@ -17,5 +19,7 @@ class MapPinDetails {
     required this.points,
     this.accentColor,
     this.imageUrl,
+    this.latitude,
+    this.longitude,
   });
 }

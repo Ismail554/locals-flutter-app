@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/features/map/map/controller/location_service.dart';
@@ -28,10 +29,13 @@ class MapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final resolvedArgs = screenArgs ?? MapScreenArgs.fromExtra(
+      GoRouterState.of(context).extra,
+    );
     return ChangeNotifierProvider(
       create: (_) => MapController(
         MapRepositoryImpl(),
-        screenArgs: screenArgs,
+        screenArgs: resolvedArgs,
       ),
       child: const _MapView(),
     );
