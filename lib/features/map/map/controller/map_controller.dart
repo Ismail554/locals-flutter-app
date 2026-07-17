@@ -330,7 +330,7 @@ void openDirectionsFromPin(String pinId) {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => PinDetailsSheet(pin: details, controller: this),
+      builder: (context) => PinDetailsSheet(pin: pin, controller: this),
     );
   }
 

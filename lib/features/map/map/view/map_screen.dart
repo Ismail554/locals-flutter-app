@@ -94,7 +94,7 @@ class _MapViewState extends State<_MapView> {
         Marker(
           markerId: const MarkerId('current_location'),
           position: _currentUserLocation!,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           infoWindow: const InfoWindow(title: "You are here"),
         ),
       );

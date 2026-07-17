@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_args.dart';
 import 'package:locals/features/map/map/controller/map_controller.dart';
 import 'package:locals/features/map/map/model/map_mission_args.dart';
 import 'package:locals/features/map/map/model/map_screen_args.dart';
-import 'package:locals/shared/model/map_pin_details.dart';
+import 'package:locals/shared/model/map_pin_info.dart';   // ← Use this
 import 'package:locals/shared/theme/app_colors.dart';
-import 'package:provider/provider.dart';
 
 class PinDetailsSheet extends StatelessWidget {
-  final MapPinDetails pin;
+  final MapPinInfo pin;           // ← Changed to MapPinInfo
   final MapController controller;
 
-  const PinDetailsSheet({super.key, required this.pin, required this.controller});
+  const PinDetailsSheet({
+    super.key,
+    required this.pin,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +104,7 @@ class PinDetailsSheet extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                pin.category.toUpperCase(),
+                                pin.category?.toUpperCase() ?? 'PLACE',
                                 style: TextStyle(
                                   color: AppColors.primaryPink,
                                   fontSize: 13.sp,
@@ -128,11 +130,11 @@ class PinDetailsSheet extends StatelessWidget {
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              Spacer(),
+                              const Spacer(),
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text(
-                                  '+${pin.points}',
+                                  '+${pin.points ?? 30}',
                                   style: TextStyle(
                                     color: AppColors.primaryPink,
                                     fontSize: 20.sp,
@@ -144,7 +146,7 @@ class PinDetailsSheet extends StatelessWidget {
                           ),
                           SizedBox(height: 6.h),
                           Text(
-                            pin.address,
+                            pin.address ?? 'Unknown Address',
                             style: TextStyle(
                               fontSize: 14.sp,
                               color: AppColors.textSecondary,
@@ -228,15 +230,6 @@ class PinDetailsSheet extends StatelessWidget {
       extra: RestaurantViewDetailsArgs(locationId: pin.id),
     );
   }
-
-  void _openDirections(BuildContext context) {
-  Navigator.pop(context); // Close bottom sheet
-
-  // Get the controller from context
-  final controller = context.read<MapController>();
-
-  controller.openDirectionsFromPin(pin.id);
-}
 
   Widget _placeholderIcon() {
     return const Center(
