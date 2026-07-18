@@ -88,6 +88,7 @@ class _ExploreView extends StatelessWidget {
                 onLocalTap: (id) => controller.openLocationDetails(context, id),
               ),
 
+              // Safe Featured Route Section
               if (state.featuredRoute != null) ...[
                 SizedBox(height: 24.h),
                 ExploreFeaturedRoutesSection(
@@ -95,7 +96,7 @@ class _ExploreView extends StatelessWidget {
                   onAllEvents: () => controller.openEventsRoutes(context),
                   onRouteTap: () => controller.openJoinEvent(
                     context,
-                    state.featuredRoute!.id,
+                    state.featuredRoute!.id,   // Still safe because of if check
                   ),
                 ),
               ],

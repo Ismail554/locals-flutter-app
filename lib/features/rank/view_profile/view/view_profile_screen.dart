@@ -24,10 +24,14 @@ class ViewProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Safe args resolution
+    final resolvedArgs = args ?? 
+        (GoRouterState.of(context).extra as ViewProfileArgs?);
+
     return ChangeNotifierProvider(
       create: (_) => ViewProfileController(
         ViewProfileRepositoryImpl(),
-        userId: args!.userId,
+        userId: resolvedArgs?.userId ?? '', // Safe fallback
       ),
       child: const _ViewProfileView(),
     );
@@ -52,7 +56,7 @@ class _ViewProfileView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: context.l10n.viewProfileTitle(state.name),
+                title: context.l10n.viewProfileTitle(state.name ?? ''),
                 onBack: () => context.pop(),
                 onMorePressed: () => controller.showMoreOptions(context),
               ),
@@ -67,9 +71,9 @@ class _ViewProfileView extends StatelessWidget {
                 child: Column(
                   children: [
                     ViewProfileHeaderSection(
-                      name: state.name,
-                      level: state.level,
-                      location: state.location,
+                      name: state.name ?? '',
+                      level: state.level ?? 1,
+                      location: state.location ?? '',
                       hasStory: controller.hasStory,
                       isStoryViewed: controller.isStoryViewed,
                       onAvatarTap: () => controller.openStory(context),
@@ -77,20 +81,15 @@ class _ViewProfileView extends StatelessWidget {
 
                     SizedBox(height: 20.h),
 
-                    // Action Buttons with Toggle Logic
                     ViewProfileActionButtons(
                       isFollowing: state.isFollowing,
                       onFollowTap: controller.toggleFollow,
                       isPhotosActive: isPhotosActive,
                       onSecondaryButtonTap: () {
                         if (isPhotosActive) {
-                          controller.selectTab(
-                            ViewProfileTab.map,
-                          ); // Go to Profile Details
+                          controller.selectTab(ViewProfileTab.map);
                         } else {
-                          controller.selectTab(
-                            ViewProfileTab.photos,
-                          ); // Go to Photos
+                          controller.selectTab(ViewProfileTab.photos);
                         }
                       },
                     ),
@@ -98,14 +97,13 @@ class _ViewProfileView extends StatelessWidget {
                     SizedBox(height: 16.h),
 
                     ViewProfileStatsRow(
-                      visits: state.visits,
-                      followers: state.followers,
-                      likes: state.likes,
+                      visits: state.visits ?? 0,
+                      followers: state.followers ?? 0,
+                      likes: state.likes ?? 0,
                     ),
 
                     SizedBox(height: 20.h),
 
-                    // Show Segmented Control (Map / Achievements) only when Profile Details is active
                     if (!isPhotosActive) ...[
                       ProfileSegmentedControl(
                         options: [
@@ -129,15 +127,15 @@ class _ViewProfileView extends StatelessWidget {
                     // Tab Content
                     switch (state.selectedTab) {
                       ViewProfileTab.photos => ViewProfilePhotosTab(
-                        photos: state.photos,
+                        photos: state.photos ?? [],
                         onPhotoTap: (photo) =>
                             controller.openPhoto(context, photo),
                       ),
                       ViewProfileTab.map => ViewProfileMapTab(
-                        pins: state.mapPins,
+                        pins: state.mapPins ?? [],
                       ),
                       ViewProfileTab.achievements => ViewProfileAchievementsTab(
-                        achievements: state.achievements,
+                        achievements: state.achievements ?? [],
                       ),
                     },
                   ],

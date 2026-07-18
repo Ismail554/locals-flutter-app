@@ -269,6 +269,7 @@ class ExploreController extends ChangeNotifier {
   }
 
   void openJoinEvent(BuildContext context, String eventId) {
+    if (eventId.isEmpty) return;
     context.push('/join_event', extra: JoinEventArgs(eventId: eventId));
   }
 

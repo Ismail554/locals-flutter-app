@@ -22,21 +22,15 @@ import 'widgets/map_search_bar.dart';
 class MapScreen extends StatelessWidget {
   final MapScreenArgs? screenArgs;
 
-  const MapScreen({
-    super.key,
-    this.screenArgs,
-  });
+  const MapScreen({super.key, this.screenArgs});
 
   @override
   Widget build(BuildContext context) {
-    final resolvedArgs = screenArgs ?? MapScreenArgs.fromExtra(
-      GoRouterState.of(context).extra,
-    );
+    final resolvedArgs =
+        screenArgs ?? MapScreenArgs.fromExtra(GoRouterState.of(context).extra);
     return ChangeNotifierProvider(
-      create: (_) => MapController(
-        MapRepositoryImpl(),
-        screenArgs: resolvedArgs,
-      ),
+      create: (_) =>
+          MapController(MapRepositoryImpl(), screenArgs: resolvedArgs),
       child: const _MapView(),
     );
   }
@@ -53,24 +47,48 @@ class _MapViewState extends State<_MapView> {
   GoogleMapController? mapController;
 
   Set<Marker> _markers = {};
-  String? _markersBuiltForPinIds;
+  String? _lastMarkersKey;
 
-  bool _hasCenteredInitially = false;
   String? _lastRouteLocationKey;
-
   LatLng? _currentUserLocation;
 
-  Future<void> _buildMarkers(MapController controller) async {
+  bool _isBuildingMarkers = false;
+
+  // ─── Current Location ─────────────────────────────────────────────────────
+
+  Future<void> _updateCurrentLocation() async {
+    try {
+      final loc = await LocationService.currentLocation();
+      if (!mounted) return;
+
+      setState(() => _currentUserLocation = loc);
+      _rebuildMarkers(); // Only rebuild once location is ready
+    } catch (e) {
+      debugPrint("Could not get current location: $e");
+    }
+  }
+
+  Future<void> _rebuildMarkers() async {
+    if (_isBuildingMarkers) return;
+    _isBuildingMarkers = true;
+
+    final controller = context.read<MapController>();
     final pins = controller.state.pins;
-    final pinIdsKey = pins.map((p) => '${p.id}_${p.visited}').join(',');
 
-    if (pinIdsKey == _markersBuiltForPinIds) return;
+    final currentKey = pins.map((p) => '${p.id}_${p.visited}').join(',') +
+        (_currentUserLocation?.toString() ?? '');
 
-    _markersBuiltForPinIds = pinIdsKey;
+    if (currentKey == _lastMarkersKey) {
+      _isBuildingMarkers = false;
+      return;
+    }
+
+    _lastMarkersKey = currentKey;
 
     final iconCache = MapMarkerIconCache.instance;
     final markers = <Marker>{};
 
+    // Add place pins
     for (final pin in pins) {
       final icon = await iconCache.iconFor(
         tag: pin.tag,
@@ -88,7 +106,7 @@ class _MapViewState extends State<_MapView> {
       );
     }
 
-    // Current Location Pin
+    // Add Current Location Pin
     if (_currentUserLocation != null) {
       markers.add(
         Marker(
@@ -96,28 +114,25 @@ class _MapViewState extends State<_MapView> {
           position: _currentUserLocation!,
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           infoWindow: const InfoWindow(title: "You are here"),
+          anchor: const Offset(0.5, 0.5),
         ),
       );
     }
 
-    if (!mounted) return;
-    setState(() => _markers = markers);
+    if (mounted) {
+      setState(() => _markers = markers);
+    }
+
+    _isBuildingMarkers = false;
   }
 
-  Future<void> _updateCurrentLocation() async {
-    try {
-      final loc = await LocationService.currentLocation();
-      setState(() => _currentUserLocation = loc);
-    } catch (e) {
-      debugPrint("Could not get current location marker: $e");
-    }
-  }
+  // ─── Helper Methods ───────────────────────────────────────────────────────
 
   LatLngBounds _boundsFromLatLngList(List<LatLng> points) {
     if (points.isEmpty) {
       return LatLngBounds(
-        southwest: const LatLng(41.3851, 2.1734),
-        northeast: const LatLng(41.3851, 2.1734),
+        southwest: const LatLng(23.7809, 90.407992),
+        northeast: const LatLng(23.7809, 90.407992),
       );
     }
 
@@ -172,10 +187,18 @@ class _MapViewState extends State<_MapView> {
     );
   }
 
+  // ─── Lifecycle ────────────────────────────────────────────────────────────
+
   @override
   void initState() {
     super.initState();
     _updateCurrentLocation();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _rebuildMarkers();
   }
 
   @override
@@ -187,11 +210,10 @@ class _MapViewState extends State<_MapView> {
     final highlightedLocation = state.highlightedLocation;
     final bottomLocation = mission?.activeLocation ?? highlightedLocation;
 
-    _buildMarkers(controller);
-
     // Route camera fitting
     if (state.polylines.isNotEmpty && highlightedLocation != null) {
-      final locationKey = '${highlightedLocation.latitude},${highlightedLocation.longitude}';
+      final locationKey =
+          '${highlightedLocation.latitude},${highlightedLocation.longitude}';
 
       if (_lastRouteLocationKey != locationKey) {
         _lastRouteLocationKey = locationKey;
@@ -201,7 +223,7 @@ class _MapViewState extends State<_MapView> {
       }
     }
 
-    // Initial centering
+    // Initial centering for highlighted location
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && state.highlightedLocation != null) {
         _centerOnHighlighted(controller);
@@ -212,9 +234,9 @@ class _MapViewState extends State<_MapView> {
       fit: StackFit.expand,
       children: [
         GoogleMap(
-          mapType: MapType.satellite,
+          mapType: MapType.normal,
           initialCameraPosition: const CameraPosition(
-            target: LatLng(41.3851, 2.1734),
+            target: LatLng(23.7809, 90.407992),
             zoom: 13,
           ),
           markers: _markers,
@@ -224,12 +246,10 @@ class _MapViewState extends State<_MapView> {
           zoomControlsEnabled: false,
           compassEnabled: true,
 
-          onMapCreated: (GoogleMapController controller) {
-            mapController = controller;
+          onMapCreated: (GoogleMapController ctrl) {
+            mapController = ctrl;
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted && state.highlightedLocation != null) {
-                _centerOnHighlighted(context.read<MapController>());
-              }
+              _updateCurrentLocation();
             });
           },
         ),
@@ -239,8 +259,8 @@ class _MapViewState extends State<_MapView> {
           right: 16.w,
           bottom: 180.h,
           child: FloatingActionButton.small(
-            backgroundColor: controller.isTrackingLive 
-                ? AppColors.actionPink 
+            backgroundColor: controller.isTrackingLive
+                ? AppColors.actionPink
                 : Colors.white,
             onPressed: () {
               if (controller.isTrackingLive) {
@@ -250,10 +270,12 @@ class _MapViewState extends State<_MapView> {
               }
             },
             child: Icon(
-              controller.isTrackingLive 
-                  ? Icons.location_off 
+              controller.isTrackingLive
+                  ? Icons.location_off
                   : Icons.my_location,
-              color: controller.isTrackingLive ? Colors.white : AppColors.actionPink,
+              color: controller.isTrackingLive
+                  ? Colors.white
+                  : AppColors.actionPink,
             ),
           ),
         ),
@@ -266,7 +288,7 @@ class _MapViewState extends State<_MapView> {
             child: Center(child: CircularProgressIndicator()),
           ),
 
-        // Top UI
+        // Top UI (Search, Filters, Notifications)
         Positioned(
           top: 0,
           left: 0,
@@ -311,6 +333,7 @@ class _MapViewState extends State<_MapView> {
           ),
         ),
 
+        // Business Banner
         Positioned(
           top: 140.h,
           left: 16.w,
@@ -319,11 +342,13 @@ class _MapViewState extends State<_MapView> {
             title: "Café del Born",
             subtitle: null,
             type: BannerType.businessOfTheMonth,
-            onTap: () => controller.openRestaurantDetails(context, 'cafe_del_born'),
+            onTap: () =>
+                controller.openRestaurantDetails(context, 'cafe_del_born'),
             onClose: () {},
           ),
         ),
 
+        // Bottom UI
         if (bottomLocation != null) ...[
           Positioned(
             right: 16.w,
@@ -361,11 +386,7 @@ class _CheckInFab extends StatelessWidget {
   final VoidCallback onTap;
   final bool enabled;
 
-  const _CheckInFab({
-    super.key,
-    required this.onTap,
-    this.enabled = true,
-  });
+  const _CheckInFab({super.key, required this.onTap, this.enabled = true});
 
   @override
   Widget build(BuildContext context) {
@@ -382,7 +403,11 @@ class _CheckInFab extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.camera_alt_outlined, color: AppColors.white, size: 18.sp),
+              Icon(
+                Icons.camera_alt_outlined,
+                color: AppColors.white,
+                size: 18.sp,
+              ),
               SizedBox(width: 8.w),
               Text(
                 context.l10n.checkInButtonLabel,

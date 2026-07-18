@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:locals/features/map/map/controller/location_service.dart';
 import 'package:locals/features/map/map/view/widgets/map_marker_icon_cache.dart';
 import 'package:locals/shared/model/map_pin_info.dart';
 
@@ -18,11 +19,27 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
   String? selectedPinId;
 
   final Set<Marker> _markers = {};
+  LatLng? _currentUserLocation;
+
+  // ─── Current Location ─────────────────────────────────────────────────────
+
+  Future<void> _updateCurrentLocation() async {
+    try {
+      final loc = await LocationService.currentLocation();
+      if (!mounted) return;
+
+      setState(() => _currentUserLocation = loc);
+      _buildMarkers();
+    } catch (e) {
+      debugPrint("Could not get current location in profile map: $e");
+    }
+  }
 
   Future<void> _buildMarkers() async {
     _markers.clear();
     final iconCache = MapMarkerIconCache.instance;
 
+    // Add user pins
     for (final pin in widget.pins) {
       final icon = await iconCache.iconFor(
         tag: pin.tag,
@@ -40,14 +57,36 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
       );
     }
 
+    // Add Current Location Pin
+    if (_currentUserLocation != null) {
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('current_location'),
+          position: _currentUserLocation!,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          infoWindow: const InfoWindow(title: "You are here"),
+          anchor: const Offset(0.5, 0.5),
+        ),
+      );
+    }
+
     if (mounted) setState(() {});
   }
 
   Future<void> _centerOnPins() async {
-    if (mapController == null || widget.pins.isEmpty) return;
+    if (mapController == null) return;
+
+    // If we have current location and no pins, center on user
+    if (widget.pins.isEmpty && _currentUserLocation != null) {
+      await mapController!.animateCamera(
+        CameraUpdate.newLatLngZoom(_currentUserLocation!, 15.0),
+      );
+      return;
+    }
+
+    if (widget.pins.isEmpty) return;
 
     if (widget.pins.length == 1) {
-      // Single pin → zoom in
       final pin = widget.pins.first;
       await mapController!.animateCamera(
         CameraUpdate.newLatLngZoom(
@@ -56,7 +95,6 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
         ),
       );
     } else {
-      // Multiple pins → fit bounds
       double minLat = widget.pins.first.lat;
       double maxLat = widget.pins.first.lat;
       double minLng = widget.pins.first.lng;
@@ -84,6 +122,7 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
   void initState() {
     super.initState();
     _buildMarkers();
+    _updateCurrentLocation();        // ← Added
   }
 
   @override
@@ -94,19 +133,19 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
         height: 280.h,
         width: double.infinity,
         child: GoogleMap(
-          mapType: MapType.satellite,
+          mapType: MapType.normal,
           initialCameraPosition: const CameraPosition(
-            target: LatLng(41.3851, 2.1734),
+            target: LatLng(23.7809, 90.407992), // Dhaka default
             zoom: 13,
           ),
           markers: _markers,
-          myLocationEnabled: false,
+          myLocationEnabled: true,
+          myLocationButtonEnabled: false,   // Hide default button (we have custom)
           zoomControlsEnabled: false,
           mapToolbarEnabled: false,
           compassEnabled: true,
           onMapCreated: (GoogleMapController controller) {
             mapController = controller;
-            // Center on pins after map is ready
             WidgetsBinding.instance.addPostFrameCallback((_) {
               _centerOnPins();
             });

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:locals/features/map/map/controller/location_service.dart';
 import 'package:locals/features/map/map/view/widgets/map_marker_icon_cache.dart';
 import 'package:locals/shared/components/profile_screen_header.dart';
 import 'package:locals/shared/components/profile_segmented_control.dart';
@@ -36,10 +37,27 @@ class _MyMapViewState extends State<_MyMapView> {
   GoogleMapController? mapController;
   final Set<Marker> _markers = {};
 
+  LatLng? _currentUserLocation;
+
+  // ─── Current Location ─────────────────────────────────────────────────────
+
+  Future<void> _updateCurrentLocation() async {
+    try {
+      final loc = await LocationService.currentLocation();
+      if (!mounted) return;
+
+      setState(() => _currentUserLocation = loc);
+      _buildMarkers(context.read<MyMapController>().state);
+    } catch (e) {
+      debugPrint("Could not get current location: $e");
+    }
+  }
+
   Future<void> _buildMarkers(MyMapModel state) async {
     _markers.clear();
     final iconCache = MapMarkerIconCache.instance;
 
+    // Add place pins
     for (final pin in state.filteredPins) {
       final icon = await iconCache.iconFor(
         tag: pin.tag,
@@ -57,48 +75,77 @@ class _MyMapViewState extends State<_MyMapView> {
       );
     }
 
+    // Add Current Location Pin
+    if (_currentUserLocation != null) {
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('current_location'),
+          position: _currentUserLocation!,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          infoWindow: const InfoWindow(title: "You are here"),
+          anchor: const Offset(0.5, 0.5),
+        ),
+      );
+    }
+
     if (mounted) setState(() {});
   }
 
   Future<void> _centerOnPins() async {
-  if (mapController == null || _markers.isEmpty) return;
+    if (mapController == null) return;
 
-  if (_markers.length == 1) {
-    final marker = _markers.first;
-    await mapController!.animateCamera(
-      CameraUpdate.newLatLngZoom(marker.position, 16.5),
-    );
-  } else {
-    double minLat = 90.0;
-    double maxLat = -90.0;
-    double minLng = 180.0;
-    double maxLng = -180.0;
-
-    for (final marker in _markers) {
-      final pos = marker.position;
-      if (pos.latitude < minLat) minLat = pos.latitude;
-      if (pos.latitude > maxLat) maxLat = pos.latitude;
-      if (pos.longitude < minLng) minLng = pos.longitude;
-      if (pos.longitude > maxLng) maxLng = pos.longitude;
+    if (_markers.isEmpty) {
+      // Center on current location if available
+      if (_currentUserLocation != null) {
+        await mapController!.animateCamera(
+          CameraUpdate.newLatLngZoom(_currentUserLocation!, 15.0),
+        );
+      }
+      return;
     }
 
-    final bounds = LatLngBounds(
-      southwest: LatLng(minLat, minLng),
-      northeast: LatLng(maxLat, maxLng),
-    );
+    if (_markers.length == 1) {
+      final marker = _markers.first;
+      await mapController!.animateCamera(
+        CameraUpdate.newLatLngZoom(marker.position, 16.5),
+      );
+    } else {
+      double minLat = 90.0;
+      double maxLat = -90.0;
+      double minLng = 180.0;
+      double maxLng = -180.0;
 
-    await mapController!.animateCamera(
-      CameraUpdate.newLatLngBounds(bounds, 80),
-    );
+      for (final marker in _markers) {
+        final pos = marker.position;
+        if (pos.latitude < minLat) minLat = pos.latitude;
+        if (pos.latitude > maxLat) maxLat = pos.latitude;
+        if (pos.longitude < minLng) minLng = pos.longitude;
+        if (pos.longitude > maxLng) maxLng = pos.longitude;
+      }
+
+      final bounds = LatLngBounds(
+        southwest: LatLng(minLat, minLng),
+        northeast: LatLng(maxLat, maxLng),
+      );
+
+      await mapController!.animateCamera(
+        CameraUpdate.newLatLngBounds(bounds, 80),
+      );
+    }
   }
-}
+
+  @override
+  void initState() {
+    super.initState();
+    _updateCurrentLocation();
+  }
 
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<MyMapController>();
     final state = controller.state;
 
-    _buildMarkers(state);
+    _buildMarkers(state);   // Safe to call here (optimized inside)
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -144,10 +191,10 @@ class _MyMapViewState extends State<_MyMapView> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20.r),
                   child: GoogleMap(
-                    mapType: MapType.satellite,
+                    mapType: MapType.normal,
                     initialCameraPosition: const CameraPosition(
-                      target: LatLng(41.3851, 2.1734),
-                      zoom: 14,
+                      target: LatLng(23.7809, 90.407992), // Dhaka default
+                      zoom: 12,
                     ),
                     markers: _markers,
                     myLocationEnabled: true,
