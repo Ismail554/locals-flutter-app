@@ -96,14 +96,14 @@ class _RestaurantViewDetailsView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (restaurant.businessOfTheMonth) ...[
-                      BusinessBanner(
-                        title: "Business of the Month",
-                        type: BannerType.businessOfTheMonth,
-                        onTap: () {},
-                      ),
-                      SizedBox(height: 20.h),
-                    ],
+                    // if (restaurant.businessOfTheMonth) ...[
+                    //   BusinessBanner(
+                    //     title: "Business of the Month",
+                    //     type: BannerType.businessOfTheMonth,
+                    //     onTap: () {},
+                    //   ),
+                    //   SizedBox(height: 20.h),
+                    // ],
 
                     RestaurantDescriptionSection(
                       shortDescription: restaurant.shortDescription,

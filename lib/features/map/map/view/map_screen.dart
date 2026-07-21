@@ -75,7 +75,8 @@ class _MapViewState extends State<_MapView> {
     final controller = context.read<MapController>();
     final pins = controller.state.pins;
 
-    final currentKey = pins.map((p) => '${p.id}_${p.visited}').join(',') +
+    final currentKey =
+        pins.map((p) => '${p.id}_${p.visited}').join(',') +
         (_currentUserLocation?.toString() ?? '');
 
     if (currentKey == _lastMarkersKey) {
@@ -90,10 +91,7 @@ class _MapViewState extends State<_MapView> {
 
     // Add place pins
     for (final pin in pins) {
-      final icon = await iconCache.iconFor(
-        tag: pin.tag,
-        visited: pin.visited,
-      );
+      final icon = await iconCache.iconFor(tag: pin.tag, visited: pin.visited);
 
       markers.add(
         Marker(
@@ -337,11 +335,8 @@ class _MapViewState extends State<_MapView> {
           left: 16.w,
           right: 16.w,
           child: BusinessBanner(
-            title: "Café del Born",
-            subtitle: null,
             type: BannerType.businessOfTheMonth,
-            onTap: () =>
-                controller.openRestaurantDetails(context, 'cafe_del_born'),
+            onTap: (placeId) => controller.openRestaurantDetails(context, placeId),
             onClose: () {},
           ),
         ),
