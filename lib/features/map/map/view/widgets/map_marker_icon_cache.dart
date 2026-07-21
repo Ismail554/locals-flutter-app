@@ -34,7 +34,7 @@ class MapMarkerIconCache {
 
   Future<BitmapDescriptor> _loadFromAsset(
     String assetPath, {
-    int targetWidth = 56,
+    int targetWidth = 30,
   }) async {
     final data = await rootBundle.load(assetPath);
     final codec = await ui.instantiateImageCodec(

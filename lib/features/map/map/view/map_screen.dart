@@ -253,8 +253,6 @@ class _MapViewState extends State<_MapView> {
             });
           },
         ),
-
-        // Live Tracking Button
         Positioned(
           right: 16.w,
           bottom: 180.h,

@@ -120,7 +120,7 @@ void startLiveTracking() {
               points: points,
               width: 8,
               color: AppColors.actionPink,
-              geodesic: true,
+              geodesic: false,
               startCap: Cap.roundCap,
               endCap: Cap.roundCap,
             ),
@@ -225,17 +225,13 @@ void showRouteToPin(String pinId) {
   );
 
   notifyListeners();
-
-  // Load the actual polyline route
   loadRoute();
 }
 
-  /// Call this from Pin Details Sheet when user taps "Directions"
 void openDirectionsFromPin(String pinId) {
   final pin = state.getPinById(pinId);
   if (pin == null) return;
 
-  // Set focused mode
   state = state.copyWith(
     highlightedLocation: MapActiveLocation(
       locationId: pin.id,
@@ -249,22 +245,22 @@ void openDirectionsFromPin(String pinId) {
       longitude: pin.lng,
     ),
     showRoute: true,
-    selectedPinId: null, // optional: clear selection
+    selectedPinId: null, 
   );
 
   notifyListeners();
-
-  // Load the route
   loadRoute();
 }
 
   MapPinTag _getPinTag(String category) {
     final cat = category.toLowerCase();
-    if (cat.contains('cafe') || cat.contains('coffee'))
+    if (cat.contains('cafe') || cat.contains('coffee')) {
       return MapPinTag.business;
+    }
     if (cat.contains('bar')) return MapPinTag.business;
-    if (cat.contains('restaurant') || cat.contains('food'))
+    if (cat.contains('restaurant') || cat.contains('food')) {
       return MapPinTag.business;
+    }
     if (cat.contains('event')) return MapPinTag.sponsoredOrEvent;
     return MapPinTag.pointOfInterest;
   }

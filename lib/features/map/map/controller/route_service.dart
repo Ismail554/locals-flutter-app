@@ -22,7 +22,7 @@ class RouteService {
       "?origin=${origin.latitude},${origin.longitude}"
       "&destination=${destination.latitude},${destination.longitude}"
       "&mode=driving"
-      "&alternatives=false"
+      "&alternatives=true"
       "&language=en"
       "&key=$_apiKey",
     );
@@ -31,7 +31,9 @@ class RouteService {
       debugPrint("========== DIRECTIONS REQUEST ==========");
       debugPrint("URL: $url");
       debugPrint("Origin: ${origin.latitude}, ${origin.longitude}");
-      debugPrint("Destination: ${destination.latitude}, ${destination.longitude}");
+      debugPrint(
+        "Destination: ${destination.latitude}, ${destination.longitude}",
+      );
     }
 
     try {
@@ -65,15 +67,47 @@ class RouteService {
         return [];
       }
 
-      final encoded = routes.first["overview_polyline"]["points"] as String;
-      final decoded = PolylinePoints.decodePolyline(encoded);
+      final bestRoute = _selectBestRoute(routes);
+      if (bestRoute == null) {
+        if (kDebugMode) debugPrint("No valid route found.");
+        return [];
+      }
+
+      final points = <LatLng>[];
+      final legs = bestRoute["legs"] as List<dynamic>? ?? const [];
+
+      for (final leg in legs) {
+        final steps =
+            (leg as Map<String, dynamic>)["steps"] as List<dynamic>? ??
+            const [];
+        for (final step in steps) {
+          final stepMap = step as Map<String, dynamic>;
+          final encoded = stepMap["polyline"]?["points"] as String?;
+          if (encoded == null || encoded.isEmpty) continue;
+
+          final decoded = PolylinePoints.decodePolyline(encoded);
+          points.addAll(
+            decoded.map((e) => LatLng(e.latitude, e.longitude)).toList(),
+          );
+        }
+      }
+
+      if (points.isEmpty) {
+        final encoded = bestRoute["overview_polyline"]?["points"] as String?;
+        if (encoded == null || encoded.isEmpty) {
+          return [];
+        }
+
+        final decoded = PolylinePoints.decodePolyline(encoded);
+        return decoded.map((e) => LatLng(e.latitude, e.longitude)).toList();
+      }
 
       if (kDebugMode) {
-        debugPrint("Decoded Points: ${decoded.length}");
+        debugPrint("Decoded Points: ${points.length}");
         debugPrint("========================================");
       }
 
-      return decoded.map((e) => LatLng(e.latitude, e.longitude)).toList();
+      return points;
     } catch (e, stackTrace) {
       if (kDebugMode) {
         debugPrint("RouteService Error: $e");
@@ -81,6 +115,31 @@ class RouteService {
       }
       return [];
     }
+  }
+
+  Map<String, dynamic>? _selectBestRoute(List<dynamic> routes) {
+    Map<String, dynamic>? bestRoute;
+    double? bestDistance;
+
+    for (final route in routes) {
+      if (route is! Map<String, dynamic>) continue;
+
+      final legs = route["legs"] as List<dynamic>? ?? const [];
+      if (legs.isEmpty) continue;
+
+      final firstLeg = legs.first as Map<String, dynamic>;
+      final distanceValue = firstLeg["distance"]?["value"] as num?;
+      final distance = distanceValue?.toDouble();
+
+      if (distance == null) continue;
+
+      if (bestRoute == null || distance < (bestDistance ?? double.infinity)) {
+        bestRoute = route;
+        bestDistance = distance;
+      }
+    }
+
+    return bestRoute;
   }
 
   // Keep your distance and duration methods
@@ -103,7 +162,9 @@ class RouteService {
       final json = jsonDecode(response.body);
       if (json["status"] != "OK") return null;
 
-      return (json["routes"][0]["legs"][0]["distance"]["value"] as num).toDouble() / 1000;
+      return (json["routes"][0]["legs"][0]["distance"]["value"] as num)
+              .toDouble() /
+          1000;
     } catch (e) {
       if (kDebugMode) debugPrint("Distance Error: $e");
       return null;

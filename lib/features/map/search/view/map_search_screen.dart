@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/map_search_controller.dart';
@@ -122,13 +123,18 @@ class _MapSearchViewState extends State<_MapSearchView> {
                 ],
               ),
               SizedBox(height: 24.h),
-              if (state.recentSearches.isNotEmpty) ...[
+              if (state.searchResults.isNotEmpty) ...[
                 MapSearchSection(
-                  icon: Icons.history,
-                  title: context.l10n.mapSearchRecent,
-                  items: state.recentSearches,
-                  onItemTap: (value) =>
-                      controller.selectSuggestion(context, value),
+                  icon: Icons.search,
+                  title: "Results",
+                  items: state.searchResults.map((p) => p.name).toList(),
+                  onItemTap: (value) {
+                    // Find the full pin and return it
+                    final pin = state.searchResults.firstWhere(
+                      (p) => p.name == value,
+                    );
+                    context.pop(pin.id); 
+                  },
                 ),
                 SizedBox(height: 24.h),
               ],
