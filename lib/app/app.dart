@@ -31,6 +31,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final localeController = context.watch<LocaleController>();
     return ChangeNotifierProvider<LocaleController>.value(
       value: widget.localeController,
       child: NeumorphicTheme(
@@ -42,7 +43,7 @@ class _MyAppState extends State<MyApp> {
         child: MaterialApp.router(
           title: 'locals',
           debugShowCheckedModeBanner: false,
-          locale: widget.localeController.locale,
+          locale: localeController.locale,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           localeResolutionCallback: (deviceLocale, supportedLocales) {

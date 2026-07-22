@@ -69,15 +69,15 @@ class _HelpSupportView extends StatelessWidget {
                         : () => controller.sendEmail(context),
                   ),
                   SizedBox(height: 24.h),
-                  Center(
-                    child: Text(
-                      'Version ${state.appVersion}',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 13.sp,
-                      ),
-                    ),
-                  ),
+                  // Center(
+                  //   child: Text(
+                  //     'Version ${state.appVersion}',
+                  //     style: TextStyle(
+                  //       color: AppColors.textSecondary,
+                  //       fontSize: 13.sp,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

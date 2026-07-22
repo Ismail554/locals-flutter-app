@@ -205,6 +205,7 @@ class RestaurantViewDetailsModel {
       visitorAvatarColors: avatarColors,
       visitors: visitors,
       hasVisited: visitStatus != 'UNVISITED',
+      isSaved: json['is_saved'] as bool? ?? false,
       businessOfTheMonth: json['is_business_of_the_month'] as bool? ?? false,
     );
   }

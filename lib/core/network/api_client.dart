@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:locals/core/localization/api_locale.dart';
 import 'token_manager.dart';
 
 class ApiException implements Exception {
@@ -29,7 +30,7 @@ class ApiClient {
   Map<String, String> get _baseHeaders => {
     'Content-Type': 'application/json',
     'Accept': '*/*',
-    'Accept-Language': 'en',
+    'Accept-Language': ApiLocale.current,
   };
 
   Future<Map<String, String>> get _authHeaders async {
