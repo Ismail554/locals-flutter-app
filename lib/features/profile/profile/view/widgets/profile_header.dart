@@ -6,6 +6,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 class ProfileHeader extends StatelessWidget {
   final String name;
   final String location;
+  final String? avatarUrl;
   final bool hasStory;
   final bool isStoryViewed;
   final VoidCallback? onAvatarTap;
@@ -14,6 +15,7 @@ class ProfileHeader extends StatelessWidget {
     super.key,
     required this.name,
     required this.location,
+    this.avatarUrl,
     this.hasStory = false,
     this.isStoryViewed = false,
     this.onAvatarTap,
@@ -22,11 +24,19 @@ class ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final avatarSize = 96.w;
-    final avatar = StoryAvatarPlaceholder(
-      size: avatarSize,
-      backgroundColor: AppColors.chipUnselected,
-      iconColor: AppColors.textSecondary,
-    );
+    final hasAvatar = avatarUrl != null && avatarUrl!.isNotEmpty;
+    final avatar = hasAvatar
+        ? CircleAvatar(
+            radius: avatarSize / 2,
+            backgroundColor: AppColors.chipUnselected,
+            backgroundImage: NetworkImage(avatarUrl!),
+            onBackgroundImageError: (_, __) {},
+          )
+        : StoryAvatarPlaceholder(
+            size: avatarSize,
+            backgroundColor: AppColors.chipUnselected,
+            iconColor: AppColors.textSecondary,
+          );
 
     return Column(
       children: [
@@ -54,10 +64,7 @@ class ProfileHeader extends StatelessWidget {
         SizedBox(height: 4.h),
         Text(
           location,
-          style: TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 14.sp,
-          ),
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
       ],
     );

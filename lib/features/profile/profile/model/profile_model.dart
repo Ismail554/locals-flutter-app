@@ -84,6 +84,7 @@ class ProfileVisitTile extends CheckInPhoto {
 class ProfileModel {
   final String name;
   final String location;
+  final String? avatarUrl;
   final int level;
   final int points;
   final String levelTitle;
@@ -97,6 +98,7 @@ class ProfileModel {
   const ProfileModel({
     this.name = '',
     this.location = '',
+    this.avatarUrl,
     this.level = 0,
     this.points = 0,
     this.levelTitle = '',
@@ -112,15 +114,21 @@ class ProfileModel {
     required Map<String, dynamic> profileJson,
     required List<dynamic> achievementsJson,
     required List<dynamic> checkinsJson,
+    String? fallbackAvatarUrl,
   }) {
     final level = (profileJson['level'] as int?) ?? 0;
-    final points = (profileJson['total_points'] as int?) ??
+    final points =
+        (profileJson['total_points'] as int?) ??
         (profileJson['points_count'] as int?) ??
         0;
 
     return ProfileModel(
       name: (profileJson['full_name'] as String?) ?? '',
       location: (profileJson['location_city'] as String?) ?? '',
+      avatarUrl:
+          profileJson['avatar'] as String? ??
+          profileJson['avatar_url'] as String? ??
+          fallbackAvatarUrl,
       level: level,
       points: points,
       levelTitle: _levelTitle(level),
@@ -134,8 +142,12 @@ class ProfileModel {
       latestVisits: checkinsJson
           .asMap()
           .entries
-          .map((e) =>
-              ProfileVisitTile.fromApi(e.value as Map<String, dynamic>, e.key))
+          .map(
+            (e) => ProfileVisitTile.fromApi(
+              e.value as Map<String, dynamic>,
+              e.key,
+            ),
+          )
           .toList(),
     );
   }

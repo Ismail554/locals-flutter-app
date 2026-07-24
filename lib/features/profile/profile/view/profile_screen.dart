@@ -47,6 +47,7 @@ class _ProfileView extends StatelessWidget {
               ProfileHeader(
                 name: profile.name,
                 location: profile.location,
+                avatarUrl: profile.avatarUrl,
                 hasStory: controller.hasStory,
                 isStoryViewed: controller.isStoryViewed,
                 onAvatarTap: () => controller.openStory(context),
@@ -79,7 +80,8 @@ class _ProfileView extends StatelessWidget {
               SizedBox(height: 24.h),
               ProfileLatestVisitsSection(
                 visits: profile.latestVisits,
-                onVisitTap: (photo) => controller.openVisitImage(context, photo),
+                onVisitTap: (photo) =>
+                    controller.openVisitImage(context, photo),
               ),
             ],
           ),

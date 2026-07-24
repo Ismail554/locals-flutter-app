@@ -25,8 +25,8 @@ class ViewProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Safe args resolution
-    final resolvedArgs = args ?? 
-        (GoRouterState.of(context).extra as ViewProfileArgs?);
+    final resolvedArgs =
+        args ?? (GoRouterState.of(context).extra as ViewProfileArgs?);
 
     return ChangeNotifierProvider(
       create: (_) => ViewProfileController(
@@ -74,6 +74,7 @@ class _ViewProfileView extends StatelessWidget {
                       name: state.name ?? '',
                       level: state.level ?? 1,
                       location: state.location ?? '',
+                      avatarUrl: state.avatar,
                       hasStory: controller.hasStory,
                       isStoryViewed: controller.isStoryViewed,
                       onAvatarTap: () => controller.openStory(context),

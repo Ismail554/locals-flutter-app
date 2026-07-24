@@ -44,17 +44,17 @@ class ProfileController extends ChangeNotifier {
         repo.fetchAchievements(id),
         repo.fetchCheckins(id),
       ]);
-       print('achievements raw: ${results[1]}');
-  print('checkins raw: ${results[2]}');
-
+      print('achievements raw: ${results[1]}');
+      print('checkins raw: ${results[2]}');
 
       state = ProfileModel.fromApi(
         profileJson: results[0] as Map<String, dynamic>,
         achievementsJson: results[1] as List<dynamic>,
         checkinsJson: results[2] as List<dynamic>,
+        fallbackAvatarUrl: UserSession().currentUser?.avatarUrl,
       );
       print('parsed achievements: ${state.achievements.length}');
-  print('parsed visits: ${state.latestVisits.length}');
+      print('parsed visits: ${state.latestVisits.length}');
     } catch (e) {
       print('PARSE ERROR: $e');
       errorMessage = 'Failed to load profile: $e';
