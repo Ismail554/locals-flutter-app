@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:locals/features/map/map/model/map_mission_args.dart';
+import 'package:locals/features/explore/restaurant_view_details/model/qr_checkin_result.dart';
 
 class PointsArgs {
   final String locationName;
   final int points;
-  final String cityName;
-  final double cityProgress;
-  final int level;
-  final int totalPoints;
-  final int cityPercent;
+
+  // These only come from a fresh QR check-in response. When PointsArgs is
+  // built any other way (e.g. RestaurantViewDetailsModel.toPointsArgs() for
+  // an already-visited place), we genuinely don't have this data — so it's
+  // nullable rather than filled with fake numbers.
+  final String? cityName;
+  final double? cityProgress; // 0.0 - 1.0
+  final int? level;
+  final int? totalPoints;
+  final int? cityPercent; // 0 - 100
+
   final int? completedCount;
   final int? totalCount;
   final String? locationCategory;
@@ -16,63 +23,91 @@ class PointsArgs {
   final Color? locationColor;
   final String? locationId;
   final String? eventId;
+  final bool missionCompleted;
+  final List<String> unlockedAchievements;
+  final double? latitude;
+  final double? longitude;
 
   const PointsArgs({
     required this.locationName,
+    required this.points,
+    this.cityName,
+    this.cityProgress,
+    this.level,
+    this.totalPoints,
+    this.cityPercent,
     this.locationId,
-    this.points = 50,
-    this.cityName = 'Barcelona',
-    this.cityProgress = 0.48,
-    this.level = 12,
-    this.totalPoints = 4380,
-    this.cityPercent = 14,
     this.completedCount,
     this.totalCount,
     this.locationCategory,
     this.locationAddress,
     this.locationColor,
     this.eventId,
+    this.missionCompleted = false,
+    this.unlockedAchievements = const [],
+    this.latitude,
+    this.longitude,
   });
 
-  MapMissionArgs toMapMissionArgs() {
-    final completed = completedCount ?? (cityProgress * 35).round().clamp(1, 35);
-    final total = totalCount ?? 35;
-    final meta = _locationMeta[locationName];
+  /// Builds PointsArgs straight from the `/gamification/qr-checkin/`
+  /// response. Unlike the base constructor, the gamification fields here
+  /// ARE required — this factory should only be called right after a real
+  /// check-in, where the API actually returned them.
+  factory PointsArgs.fromCheckIn({
+    required QRCheckInResult result,
+    required String locationId,
+    required String cityName,
+    String? locationName,
+    String? locationCategory,
+    String? locationAddress,
+    Color? locationColor,
+    double? latitude,
+    double? longitude,
+    int? completedCount,
+    int? totalCount,
+    String? eventId,
+  }) {
+    final cityCompletion = result.cityCompletionPercentage ?? 0.0;
 
+    return PointsArgs(
+      locationName: result.placeName ?? locationName ?? '',
+      points: result.pointsEarned ?? 0,
+      cityName: cityName,
+      cityProgress: cityCompletion / 100,
+      level: result.newLevel ?? 0,
+      totalPoints: result.newTotalPoints ?? 0,
+      cityPercent: cityCompletion.round(),
+      locationId: locationId,
+      locationCategory: locationCategory,
+      locationAddress: locationAddress,
+      locationColor: locationColor,
+      eventId: eventId,
+      missionCompleted: result.missionCompleted,
+      unlockedAchievements: result.unlockedAchievements,
+      latitude: latitude,
+      longitude: longitude,
+      completedCount: completedCount,
+      totalCount: totalCount,
+    );
+  }
+
+  MapMissionArgs toMapMissionArgs() {
     return MapMissionArgs(
-      city: cityName,
-      completedCount: completed,
-      totalCount: total,
+      city: cityName ?? '',
+      completedCount: completedCount ?? 0,
+      totalCount: totalCount ?? 0,
       eventId: eventId,
       activeLocation: MapActiveLocation(
-        locationId: locationId ?? _locationIds[locationName],
-        category: locationCategory ?? meta?.$1 ?? 'LOCAL',
+        locationId: locationId,
+        category: locationCategory ?? '',
         seal: "locals' seal",
         name: locationName,
-        address: locationAddress ?? meta?.$2 ?? '',
+        address: locationAddress ?? '',
         points: points,
-        imageColor: locationColor ?? meta?.$3 ?? const Color(0xFFD4C4B0), 
-        latitude: locationName == 'Café del Born' ? 41.3833 : 0, 
-        longitude: locationName == 'Café del Born' ? 2.1833 : 0,
+        imageColor: locationColor ?? const Color(0xFFD4C4B0),
+        latitude: latitude ?? 0,
+        longitude: longitude ?? 0,
       ),
     );
   }
 }
-
-const _locationIds = <String, String>{
-  'Café del Born': 'cafe_del_born',
-  'Bar Marsella': 'bar_marsella',
-  'Forn Baluard': 'forn_baluard',
-  'Parc Güell': 'parc_guell',
-  'Sagrada Família': 'sagrada_familia',
-  'Casa Batlló': 'cafe_del_born',
-};
-
-const _locationMeta = <String, (String, String, Color)>{
-  'Café del Born': ('CAFE', 'Carrer del Born 12', Color(0xFFD4C4B0)),
-  'Bar Marsella': ('BAR', 'Carrer de Sant Pau 65', Color(0xFFB8C8D8)),
-  'Forn Baluard': ('BAKERY', 'Carrer del Baluard 38', Color(0xFFE8D8C8)),
-  'Sagrada Família': ('MONUMENT', 'Carrer de Mallorca 401', Color(0xFFD0D8E0)),
-  'Parc Güell': ('PARK', 'Carrer d\'Olot', Color(0xFFC8D8B8)),
-  'Casa Batlló': ('MONUMENT', 'Passeig de Gràcia 43', Color(0xFF9A8A7A)),
-};

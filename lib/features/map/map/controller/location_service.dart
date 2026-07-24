@@ -12,7 +12,7 @@ class LocationService {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         debugPrint("❌ Location service disabled → Using fallback");
-        return const LatLng(23.7809, 90.407992); // Dhaka fallback
+        return const LatLng(23.7809, 90.407992);
       }
 
       // Check permission
@@ -39,7 +39,7 @@ class LocationService {
       return LatLng(position.latitude, position.longitude);
     } catch (e) {
       debugPrint("❌ Location failed → Using fallback: $e");
-      return const LatLng(23.7809, 90.407992); // Dhaka fallback
+      return const LatLng(23.7809, 90.407992); 
     }
   }
 
@@ -48,7 +48,7 @@ class LocationService {
     return Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.bestForNavigation,
-        distanceFilter: 8, // Update every ~8 meters
+        distanceFilter: 1, // Update every ~8 meters
       ),
     ).map((position) => LatLng(position.latitude, position.longitude));
   }

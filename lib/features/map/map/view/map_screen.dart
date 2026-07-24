@@ -343,17 +343,17 @@ class _MapViewState extends State<_MapView> {
 
         // Bottom UI
         if (bottomLocation != null) ...[
-          Positioned(
-            right: 16.w,
-            bottom: 108.h,
-            child: SafeArea(
-              top: false,
-              child: _CheckInFab(
-                onTap: () => controller.checkIn(context),
-                enabled: controller.isNearDestination,
-              ),
-            ),
-          ),
+          // Positioned(
+          //   right: 16.w,
+          //   bottom: 108.h,
+          //   child: SafeArea(
+          //     top: false,
+          //     child: _CheckInFab(
+          //       onTap: () => controller.checkIn(context),
+          //       enabled: controller.isNearDestination,
+          //     ),
+          //   ),
+          // ),
           Positioned(
             left: 0,
             right: 0,

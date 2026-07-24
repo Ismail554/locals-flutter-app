@@ -380,7 +380,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authConfirmPasswordHint => 'authConfirmPasswordHint';
 
   @override
-  String get restaurantBeenHere => 'He estado aquí';
+  String get restaurantBeenHere => 'No visitado';
 
   @override
   String get restaurantBeenHereDone => 'He estado aquí ✓';

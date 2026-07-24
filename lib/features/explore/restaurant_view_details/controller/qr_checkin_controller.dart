@@ -34,7 +34,7 @@ class QRCheckInController extends ChangeNotifier {
       debugPrint('QR Check-in error: $e');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.qrScanFailed)),
+          SnackBar(content: Text(context.l10n.qrScanFailed,)),
         );
       }
     } finally {

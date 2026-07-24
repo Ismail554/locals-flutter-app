@@ -136,8 +136,9 @@ class _ShareCardView extends StatelessWidget {
                       hasImage: state.imagePath != null,
                       isSaving: state.isSaving,
                       isSaved: state.isSaved,
+                      isSubmitting: state.isSubmitting,
                       onRetake: () => controller.retake(context),
-                      onConfirm: controller.confirm,
+                      onConfirm: () => controller.confirm(context),
                       onAddToStory: () async =>
                           controller.addToStory(context),
                       onSaveImage: () => controller.saveImage(context),

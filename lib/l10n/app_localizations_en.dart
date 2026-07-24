@@ -378,7 +378,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authConfirmPasswordHint => '********';
 
   @override
-  String get restaurantBeenHere => 'I\'ve been here';
+  String get restaurantBeenHere => 'Not Visited';
 
   @override
   String get restaurantBeenHereDone => 'I\'ve been here ✓';

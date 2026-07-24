@@ -16,10 +16,11 @@ class PointsController extends ChangeNotifier {
     context.push(
       '/share_card',
       extra: ShareCardArgs(
-        level: args.level,
-        points: args.totalPoints,
-        cityPercent: args.cityPercent,
+        level: args.level ?? 1,
+        points: args.totalPoints ?? 0,
+        cityPercent: args.cityPercent ?? 0,
         mapMissionArgs: args.toMapMissionArgs(),
+        placeId: args.locationId,
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:locals/core/network/user_session.dart';
 
 class StoryViewer {
   final String id;
@@ -126,12 +127,32 @@ class ExploreStory {
   }
 
   factory ExploreStory.fromApi(Map<String, dynamic> json) {
-    final slides = (json['stories'] as List)
+    final slides = (json['stories'] as List? ?? [])
         .map((s) => StorySlide.fromApi(s as Map<String, dynamic>))
         .toList();
+
+    final currentUserId = UserSession().currentUser?.id.toString();
+    final rawStoryOwnerId = [
+      json['id'],
+      json['user_id'],
+      json['owner_id'],
+      json['author_id'],
+      json['uploader_id'],
+      (json['user'] as Map<String, dynamic>?)?['id'],
+      (json['author'] as Map<String, dynamic>?)?['id'],
+    ].firstWhere(
+      (value) => value != null,
+      orElse: () => null,
+    );
+    final storyOwnerId = rawStoryOwnerId?.toString();
+    final isYourStory = currentUserId != null && storyOwnerId == currentUserId;
+
     return ExploreStory(
-      id: json['id'].toString(),
-      name: json['full_name'] as String,
+      id: storyOwnerId ?? json['id'].toString(),
+      name: isYourStory
+          ? 'Your story'
+          : ((json['full_name'] as String?) ?? (json['name'] as String?) ?? ''),
+      isYourStory: isYourStory,
       slides: slides,
       isViewed: json['all_viewed'] as bool? ?? false,
       serverId: json['id'] as int?,

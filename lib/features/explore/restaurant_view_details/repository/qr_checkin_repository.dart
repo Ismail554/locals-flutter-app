@@ -18,15 +18,15 @@ class QRCheckInRepositoryImpl implements QRCheckInRepository {
     required double latitude,
     required double longitude,
   }) async {
+    final lat = double.parse(latitude.toStringAsFixed(6));
+    final lng = double.parse(longitude.toStringAsFixed(6));
+
     try {
-      final response = await _client.post(
-        '/gamification/qr-checkin/',
-        {
-          "qr_token": qrToken,
-          "latitude": latitude,
-          "longitude": longitude,
-        },
-      );
+      final response = await _client.post('/gamification/qr-checkin/', {
+        "qr_token": qrToken,
+        "latitude": lat,
+        "longitude": lng,
+      });
 
       return QRCheckInResult.fromApi(response);
     } catch (e) {

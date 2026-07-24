@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/features/explore/explore/model/explore_map_args.dart';
+import 'package:locals/features/explore/restaurant_view_details/model/qr_checkin_result.dart';
 import 'package:locals/features/map/map/model/map_screen_args.dart';
+import 'package:locals/features/explore/points/model/points_args.dart';
 import 'package:locals/shared/components/image_view/check_in_image_view.dart';
 import 'package:locals/shared/components/image_view/image_view_dialog.dart';
 import '../model/restaurant_view_details_args.dart';
@@ -22,7 +24,7 @@ class RestaurantViewDetailsController extends ChangeNotifier {
     _load();
   }
 
-Future<void> _load() async {
+  Future<void> _load() async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
@@ -68,20 +70,56 @@ Future<void> _load() async {
     }
   }
 
-  void checkIn(BuildContext context) {
+  /// Handles the "Been here" / check-in flow.
+  ///
+  /// If the user already visited, go straight to the points screen.
+  /// Otherwise, open the QR scanner and WAIT for it to pop a result back.
+  /// Depending on that result, either navigate to the status screen (success)
+  /// or show a snackbar (failure).
+  Future<void> checkIn(BuildContext context) async {
     if (restaurant == null) return;
 
     if (restaurant!.hasVisited) {
       context.push('/points', extra: restaurant!.toPointsArgs());
-    } else {
+      return;
+    }
+
+    // Wait for QRScanScreen to Navigator.pop(context, result)
+    final result = await context.push<QRCheckInResult>(
+      '/qr-scan',
+      extra: restaurant!.id,
+    );
+
+    // User backed out of the scanner without a result, or this screen
+    // is no longer in the tree (e.g. user navigated away meanwhile).
+    if (result == null || !context.mounted) return;
+
+    if (result.isSuccess) {
       context.push(
-        '/qr-scan',
-        extra: restaurant!.id,
+        '/points',
+        extra: PointsArgs.fromCheckIn(
+          result: result,
+          locationId: restaurant!.id,
+          cityName: 'Barcelona', // TODO: pull from restaurant/city data if/when available
+          locationName: restaurant!.name,
+          locationCategory: restaurant!.category,
+          locationAddress: restaurant!.address,
+          locationColor: restaurant!.heroColor,
+        ),
+      );
+
+      // Optional: reflect the successful check-in locally so the UI
+      // (e.g. "Been here" button state) updates without a full reload.
+      // restaurant = restaurant!.copyWith(hasVisited: true);
+      // notifyListeners();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.displayMessage)),
       );
     }
   }
 
-void openDirections(BuildContext context) {
+  void openDirections(BuildContext context) {
     if (restaurant == null) return;
 
     context.go(

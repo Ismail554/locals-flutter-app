@@ -797,7 +797,7 @@ abstract class AppLocalizations {
   /// No description provided for @restaurantBeenHere.
   ///
   /// In en, this message translates to:
-  /// **'I\'ve been here'**
+  /// **'Not Visited'**
   String get restaurantBeenHere;
 
   /// No description provided for @restaurantBeenHereDone.

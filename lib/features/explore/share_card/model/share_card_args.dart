@@ -10,19 +10,25 @@ class ShareCardArgs {
   final Color previewColor;
   final MapMissionArgs? mapMissionArgs;
 
+  /// The backend place ID to submit the check-in against. Multipart form
+  /// values are strings, and the rest of the check-in flow uses String IDs.
+  final String? placeId;
+
   const ShareCardArgs({
-    this.cityLabel = 'LOCAL · BARCELONA',
+    this.cityLabel = '',
     this.level = 1,
     this.points = 0,
     this.cityPercent = 0,
     this.previewColor = const Color(0xFFEA4D70),
     this.mapMissionArgs,
+    this.placeId,
   });
 
   factory ShareCardArgs.fromCurrentUser({
-    String cityLabel = 'LOCAL · BARCELONA',
+    String cityLabel = '',
     Color previewColor = const Color(0xFFEA4D70),
     MapMissionArgs? mapMissionArgs,
+    String? placeId,
   }) {
     final user = UserSession().currentUser;
     return ShareCardArgs(
@@ -32,6 +38,7 @@ class ShareCardArgs {
       cityPercent: 0,
       previewColor: previewColor,
       mapMissionArgs: mapMissionArgs,
+      placeId: placeId,
     );
   }
 }

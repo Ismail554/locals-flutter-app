@@ -158,7 +158,7 @@
   "authConfirmPasswordLabel" : "Confirm Password",
   "restaurantLocalSpot": "Local spot",
   "authConfirmPasswordHint" : "********",
-  "restaurantBeenHere": "I've been here",
+  "restaurantBeenHere": "Not Visited",
   "restaurantBeenHereDone": "I've been here ✓",
   "restaurantDirections": "Directions",
   "restaurantPhotos": "Photos",

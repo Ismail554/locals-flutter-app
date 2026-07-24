@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/core/localization/l10n_extensions.dart';
+import 'package:locals/features/explore/restaurant_view_details/model/qr_checkin_result.dart';
 import 'package:locals/features/map/map/controller/location_service.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import 'package:provider/provider.dart';
@@ -44,6 +45,7 @@ class _QRScanViewState extends State<_QRScanView> {
     if (value == null || value.isEmpty) return;
 
     isProcessing = true;
+
     final controller = context.read<QRCheckInController>();
 
     try {
@@ -51,35 +53,29 @@ class _QRScanViewState extends State<_QRScanView> {
 
       final result = await controller.repo.qrCheckIn(
         qrToken: value,
-        latitude: currentLoc.latitude,
-        longitude: currentLoc.longitude,
+        latitude: double.parse(currentLoc.latitude.toStringAsFixed(6)),
+        longitude: double.parse(currentLoc.longitude.toStringAsFixed(6)),
         // latitude: 41.387100,
-        // longitude: 2.175400
+        // longitude: 2.175400,
       );
 
-      // Go back and show message
-      if (mounted) {
-        Navigator.pop(context); // Go back to previous screen
+      if (!mounted) return;
 
-        // Show result message as Snackbar
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result.message),
-            backgroundColor: result.isSuccess ? Colors.green : Colors.orange,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
+      // Close the scanner and return the result (success or failure)
+      Navigator.pop(context, result);
     } catch (e) {
       debugPrint("QR Scan error: $e");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.qrScanFailed),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+
+      if (!mounted) return;
+
+      Navigator.pop(
+        context,
+        QRCheckInResult(
+          success: false,
+          status: "error",
+          message: context.l10n.qrScanFailed,
+        ),
+      );
     } finally {
       isProcessing = false;
     }
