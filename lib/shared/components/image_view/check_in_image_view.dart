@@ -4,8 +4,8 @@ import 'package:locals/shared/model/check_in_photo_model.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
 enum ImageViewType {
-  localShare,   // User avatar + name
-  checkIn,      // Location icon + place name
+  localShare, // User avatar + name
+  checkIn, // Location icon + place name
 }
 
 class CheckInImageView extends StatelessWidget {
@@ -37,15 +37,16 @@ class CheckInImageView extends StatelessWidget {
                   children: [
                     AspectRatio(
                       aspectRatio: 1,
-                      child: ColoredBox(
+                      child: Container(
                         color: photo.previewColor,
-                        child: const Center(
-                          child: Icon(
-                            Icons.image_outlined,
-                            color: Colors.white54,
-                            size: 48,
-                          ),
-                        ),
+                        child: photo.imageUrl == null || photo.imageUrl!.isEmpty
+                            ? _imagePlaceholder()
+                            : Image.network(
+                                photo.imageUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    _imagePlaceholder(),
+                              ),
                       ),
                     ),
                     // Close Button
@@ -134,6 +135,12 @@ class CheckInImageView extends StatelessWidget {
     );
   }
 
+  Widget _imagePlaceholder() {
+    return const Center(
+      child: Icon(Icons.image_outlined, color: Colors.white54, size: 48),
+    );
+  }
+
   Widget _buildLocalShareHeader() {
     return Row(
       children: [
@@ -155,17 +162,11 @@ class CheckInImageView extends StatelessWidget {
           children: [
             Text(
               photo.locationName,
-              style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
             ),
             Text(
               photo.timeAgo,
-              style: TextStyle(
-                fontSize: 13.sp,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 13.sp, color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -193,10 +194,7 @@ class CheckInImageView extends StatelessWidget {
         const Spacer(),
         Text(
           photo.timeAgo,
-          style: TextStyle(
-            fontSize: 13.sp,
-            color: AppColors.textSecondary,
-          ),
+          style: TextStyle(fontSize: 13.sp, color: AppColors.textSecondary),
         ),
       ],
     );

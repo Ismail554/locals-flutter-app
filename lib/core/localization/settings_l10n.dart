@@ -57,11 +57,11 @@ class SettingsL10n {
             icon: Icons.description_outlined,
             label: l10n.settingsPrivacyPolicy,
           ),
-          SettingsItem(
-            id: 'rate',
-            icon: Icons.star_outline,
-            label: l10n.settingsRateLocal,
-          ),
+          // SettingsItem(
+          //   id: 'rate',
+          //   icon: Icons.star_outline,
+          //   label: l10n.settingsRateLocal,
+          // ),
         ],
       ),
       SettingsSection(

@@ -38,10 +38,10 @@ class SettingsController extends ChangeNotifier {
         context.push('/help_support');
       case 'policy':
         context.push('/privacy_data');
-      case 'rate':
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.snackbarThanksFeedback)),
-        );
+      // case 'rate':
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(content: Text(context.l10n.snackbarThanksFeedback)),
+      //   );
       case 'logout':
         confirmLogout(context);
       default:

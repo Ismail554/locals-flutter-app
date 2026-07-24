@@ -76,19 +76,19 @@ class _PrivacyView extends StatelessWidget {
                     onChanged: controller.updatePhotoVisibility,
                   ),
                   SizedBox(height: 24.h),
-                  PrivacySettingRow(
-                    label: PrivacyL10n.sectionLabel(l10n, state.locationPermission),
-                    options: state.locationPermission.options
-                        .map((o) => ProfileSegmentOption(
-                              label: PrivacyL10n.optionLabel(l10n, o.id),
-                              value: o.id,
-                            ))
-                        .toList(),
-                    selectedValue:
-                        controller.selectedId(state.locationPermission),
-                    onChanged: controller.updateLocationPermission,
-                  ),
-                  SizedBox(height: 24.h),
+                  // PrivacySettingRow(
+                  //   label: PrivacyL10n.sectionLabel(l10n, state.locationPermission),
+                  //   options: state.locationPermission.options
+                  //       .map((o) => ProfileSegmentOption(
+                  //             label: PrivacyL10n.optionLabel(l10n, o.id),
+                  //             value: o.id,
+                  //           ))
+                  //       .toList(),
+                  //   selectedValue:
+                  //       controller.selectedId(state.locationPermission),
+                  //   onChanged: controller.updateLocationPermission,
+                  // ),
+                  // SizedBox(height: 24.h),
                   PrivacySettingRow(
                     label:
                         PrivacyL10n.sectionLabel(l10n, state.leaderboardVisibility),

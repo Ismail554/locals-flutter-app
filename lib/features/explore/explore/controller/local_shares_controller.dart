@@ -67,6 +67,7 @@ class LocalSharesController extends ChangeNotifier {
 
   void openLocalShareDetail(BuildContext context, ExploreLocalShare share) {
     final photo = CheckInPhoto(
+      imageUrl: share.imageUrl,
       previewColor: share.imageColor,
       locationName: share.userName,
       timeAgo: share.timeAgo,
