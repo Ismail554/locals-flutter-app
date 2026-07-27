@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "411052851930",
+    "project_id": "locals-4d187",
+    "storage_bucket": "locals-4d187.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:411052851930:android:272bc49a3d5aa443641be3",
+        "android_client_info": {
+          "package_name": "com.hugo.locals"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZ3LK-dFygkHeMbthPYLWFZXcaQYgJIS8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
