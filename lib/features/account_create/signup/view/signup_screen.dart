@@ -87,6 +87,7 @@ class _SignupView extends StatelessWidget {
                   SizedBox(height: 24.h),
                   PrimaryButton(
                     label: context.l10n.signupButton,
+                    isLoading: controller.state.isLoading,
                     onPressed: () {
                       if (!controller.state.isLoading) {
                         controller.createAccount(context);
@@ -94,12 +95,12 @@ class _SignupView extends StatelessWidget {
                     },
                   ),
                   SizedBox(height: 24.h),
-                  const AuthDivider(),
-                  SizedBox(height: 24.h),
-                  GoogleSignInButton(
-                    onPressed: () => controller.signInWithGoogle(context),
-                  ),
-                  SizedBox(height: 32.h),
+                  // const AuthDivider(),
+                  // SizedBox(height: 24.h),
+                  // GoogleSignInButton(
+                  //   onPressed: () => controller.signInWithGoogle(context),
+                  // ),
+                  // SizedBox(height: 32.h),
                   SignupLoginFooter(
                     onLogin: () => controller.goToLogin(context),
                   ),

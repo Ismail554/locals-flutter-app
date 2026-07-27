@@ -113,6 +113,7 @@ class _SetNewPasswordView extends StatelessWidget {
                   SizedBox(height: 32.h),
                   PrimaryButton(
                     label: context.l10n.setPasswordButton,
+                    isLoading: controller.state.isLoading,
                     onPressed: () {
                       if (!controller.state.isLoading) {
                         controller.resetPassword(context);

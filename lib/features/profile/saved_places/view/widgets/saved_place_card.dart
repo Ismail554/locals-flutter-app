@@ -43,13 +43,29 @@ class SavedPlaceCard extends StatelessWidget {
                   height: 160.h,
                   width: double.infinity,
                   color: place.imageColor,
-                  child: Center(
-                    child: Icon(
-                      Icons.image_outlined,
-                      color: AppColors.white.withValues(alpha: 0.6),
-                      size: 40.sp,
-                    ),
-                  ),
+                  child: place.imageUrl != null && place.imageUrl!.isNotEmpty
+                      ? Image.network(
+                          place.imageUrl!,
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
+                              child: Icon(
+                                Icons.image_outlined,
+                                color: AppColors.white.withValues(alpha: 0.6),
+                                size: 40.sp,
+                              ),
+                            );
+                          },
+                        )
+                      : Center(
+                          child: Icon(
+                            Icons.image_outlined,
+                            color: AppColors.white.withValues(alpha: 0.6),
+                            size: 40.sp,
+                          ),
+                        ),
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(16.w, 12.h, 12.w, 16.h),
@@ -92,7 +108,9 @@ class SavedPlaceCard extends StatelessWidget {
                             width: 36.w,
                             height: 36.w,
                             decoration: BoxDecoration(
-                              color: AppColors.actionPink.withValues(alpha: 0.12),
+                              color: AppColors.actionPink.withValues(
+                                alpha: 0.12,
+                              ),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(

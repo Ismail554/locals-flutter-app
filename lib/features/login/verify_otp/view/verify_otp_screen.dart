@@ -86,6 +86,7 @@ class _VerifyOtpView extends StatelessWidget {
                   const Spacer(),
                   PrimaryButton(
                     label: context.l10n.otpVerifyButton,
+                    isLoading: controller.state.isLoading,
                     onPressed: () {
                       if (!controller.state.isLoading) {
                         controller.verifyOtp(context);

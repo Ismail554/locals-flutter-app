@@ -64,6 +64,7 @@ class _RequestOtpView extends StatelessWidget {
                   const Spacer(),
                   PrimaryButton(
                     label: context.l10n.requestOtpButton,
+                    isLoading: controller.state.isLoading,
                     onPressed: () {
                       if (!controller.state.isLoading) {
                         controller.requestOtp(context);

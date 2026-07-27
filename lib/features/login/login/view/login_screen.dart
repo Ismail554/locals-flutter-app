@@ -89,17 +89,18 @@ class _LoginView extends StatelessWidget {
                   SizedBox(height: 24.h),
                   PrimaryButton(
                     label: context.l10n.loginButton,
+                    isLoading: controller.state.isLoading,
                     onPressed: controller.state.isLoading
                         ? () {}
                         : () => controller.login(context),
                   ),
                   SizedBox(height: 24.h),
-                  const AuthDivider(),
-                  SizedBox(height: 24.h),
-                  GoogleSignInButton(
-                    onPressed: () => controller.login(context),
-                  ),
-                  SizedBox(height: 32.h),
+                  // const AuthDivider(),
+                  // SizedBox(height: 24.h),
+                  // GoogleSignInButton(
+                  //   onPressed: () => controller.login(context),
+                  // ),
+                  // SizedBox(height: 32.h),
                   LoginSignupFooter(
                     onCreateAccount: () => controller.goToSignup(context),
                   ),
