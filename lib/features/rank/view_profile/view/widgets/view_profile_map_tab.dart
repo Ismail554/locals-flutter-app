@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locals/features/map/map/controller/location_service.dart';
@@ -20,8 +21,18 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
 
   final Set<Marker> _markers = {};
   LatLng? _currentUserLocation;
+  String? _mapStyle;
 
   // ─── Current Location ─────────────────────────────────────────────────────
+
+  Future<void> _loadMapStyle() async {
+    final style = await rootBundle.loadString(
+      'assets/map_styles/locals_map_style.json',
+    );
+    if (mounted) {
+      setState(() => _mapStyle = style);
+    }
+  }
 
   Future<void> _updateCurrentLocation() async {
     try {
@@ -41,10 +52,7 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
 
     // Add user pins
     for (final pin in widget.pins) {
-      final icon = await iconCache.iconFor(
-        tag: pin.tag,
-        visited: pin.visited,
-      );
+      final icon = await iconCache.iconFor(tag: pin.tag, visited: pin.visited);
 
       _markers.add(
         Marker(
@@ -89,10 +97,7 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
     if (widget.pins.length == 1) {
       final pin = widget.pins.first;
       await mapController!.animateCamera(
-        CameraUpdate.newLatLngZoom(
-          LatLng(pin.lat, pin.lng),
-          16.5,
-        ),
+        CameraUpdate.newLatLngZoom(LatLng(pin.lat, pin.lng), 16.5),
       );
     } else {
       double minLat = widget.pins.first.lat;
@@ -121,8 +126,9 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
   @override
   void initState() {
     super.initState();
+    _loadMapStyle();
     _buildMarkers();
-    _updateCurrentLocation();        // ← Added
+    _updateCurrentLocation(); // ← Added
   }
 
   @override
@@ -134,13 +140,15 @@ class _ViewProfileMapTabState extends State<ViewProfileMapTab> {
         width: double.infinity,
         child: GoogleMap(
           mapType: MapType.normal,
+          style: _mapStyle,
           initialCameraPosition: const CameraPosition(
             target: LatLng(23.7809, 90.407992), // Dhaka default
             zoom: 13,
           ),
           markers: _markers,
           myLocationEnabled: true,
-          myLocationButtonEnabled: false,   // Hide default button (we have custom)
+          myLocationButtonEnabled:
+              false, // Hide default button (we have custom)
           zoomControlsEnabled: false,
           mapToolbarEnabled: false,
           compassEnabled: true,

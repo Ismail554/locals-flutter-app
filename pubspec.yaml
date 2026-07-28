@@ -48,6 +48,7 @@ flutter:
     - assets/onboard/
     - assets/visited/
     - assets/unvisited/
+    - assets/map_styles/locals_map_style.json
     - .env
 
   uses-material-design: true

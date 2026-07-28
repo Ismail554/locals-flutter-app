@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -35,9 +36,20 @@ class _MyMapView extends StatefulWidget {
 
 class _MyMapViewState extends State<_MyMapView> {
   GoogleMapController? mapController;
-  final Set<Marker> _markers = {};
-
+  Set<Marker> _markers = {};
   LatLng? _currentUserLocation;
+  String? _mapStyle;
+
+  // ─── Map Style ────────────────────────────────────────────────────────────
+
+  Future<void> _loadMapStyle() async {
+    final style = await rootBundle.loadString(
+      'assets/map_styles/locals_map_style.json',
+    );
+    if (mounted) {
+      setState(() => _mapStyle = style);
+    }
+  }
 
   // ─── Current Location ─────────────────────────────────────────────────────
 
@@ -53,31 +65,49 @@ class _MyMapViewState extends State<_MyMapView> {
     }
   }
 
+  // ─── Build Markers ────────────────────────────────────────────────────────
+
   Future<void> _buildMarkers(MyMapModel state) async {
-    _markers.clear();
     final iconCache = MapMarkerIconCache.instance;
+    final Set<Marker> newMarkers = {};
 
-    // Add place pins
+    // Place pins
     for (final pin in state.filteredPins) {
-      final icon = await iconCache.iconFor(
-        tag: pin.tag,
-        visited: pin.visited,
-      );
+      try {
+        final icon = await iconCache.iconFor(
+          tag: pin.tag,
+          visited: pin.visited,
+        );
 
-      _markers.add(
-        Marker(
-          markerId: MarkerId(pin.id),
-          position: LatLng(pin.lat, pin.lng),
-          icon: icon,
-          infoWindow: InfoWindow(title: pin.name),
-          onTap: () => context.read<MyMapController>().onPinTap(pin.id),
-        ),
-      );
+        newMarkers.add(
+          Marker(
+            markerId: MarkerId(pin.id),
+            position: LatLng(pin.lat, pin.lng),
+            icon: icon,
+            infoWindow: InfoWindow(title: pin.name),
+            onTap: () => context.read<MyMapController>().onPinTap(pin.id),
+          ),
+        );
+      } catch (e) {
+        debugPrint('Failed to create marker for ${pin.id}: $e');
+        // Fallback so you can at least see the pin
+        newMarkers.add(
+          Marker(
+            markerId: MarkerId(pin.id),
+            position: LatLng(pin.lat, pin.lng),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              pin.visited ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueRed,
+            ),
+            infoWindow: InfoWindow(title: pin.name),
+            onTap: () => context.read<MyMapController>().onPinTap(pin.id),
+          ),
+        );
+      }
     }
 
-    // Add Current Location Pin
+    // Current location pin
     if (_currentUserLocation != null) {
-      _markers.add(
+      newMarkers.add(
         Marker(
           markerId: const MarkerId('current_location'),
           position: _currentUserLocation!,
@@ -88,14 +118,22 @@ class _MyMapViewState extends State<_MyMapView> {
       );
     }
 
-    if (mounted) setState(() {});
+    if (!mounted) return;
+
+    setState(() {
+      _markers = newMarkers;
+    });
+
+    // Re-center the camera after markers are ready
+    _centerOnPins();
   }
+
+  // ─── Camera ───────────────────────────────────────────────────────────────
 
   Future<void> _centerOnPins() async {
     if (mapController == null) return;
 
     if (_markers.isEmpty) {
-      // Center on current location if available
       if (_currentUserLocation != null) {
         await mapController!.animateCamera(
           CameraUpdate.newLatLngZoom(_currentUserLocation!, 15.0),
@@ -134,10 +172,26 @@ class _MyMapViewState extends State<_MyMapView> {
     }
   }
 
+  // ─── Lifecycle ────────────────────────────────────────────────────────────
+
   @override
   void initState() {
     super.initState();
+    _loadMapStyle();
     _updateCurrentLocation();
+
+    // Listen to controller changes (filter / data loaded)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = context.read<MyMapController>();
+
+      // Initial build
+      _buildMarkers(controller.state);
+
+      // Rebuild whenever state changes
+      controller.addListener(() {
+        _buildMarkers(controller.state);
+      });
+    });
   }
 
   @override
@@ -145,7 +199,7 @@ class _MyMapViewState extends State<_MyMapView> {
     final controller = context.watch<MyMapController>();
     final state = controller.state;
 
-    _buildMarkers(state);   // Safe to call here (optimized inside)
+    // ⚠️ Do NOT call _buildMarkers here anymore
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -192,6 +246,7 @@ class _MyMapViewState extends State<_MyMapView> {
                   borderRadius: BorderRadius.circular(20.r),
                   child: GoogleMap(
                     mapType: MapType.normal,
+                    style: _mapStyle,
                     initialCameraPosition: const CameraPosition(
                       target: LatLng(23.7809, 90.407992), // Dhaka default
                       zoom: 12,

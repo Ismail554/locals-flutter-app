@@ -90,8 +90,6 @@ class RestaurantViewDetailsController extends ChangeNotifier {
       extra: restaurant!.id,
     );
 
-    // User backed out of the scanner without a result, or this screen
-    // is no longer in the tree (e.g. user navigated away meanwhile).
     if (result == null || !context.mounted) return;
 
     if (result.isSuccess) {
@@ -100,7 +98,7 @@ class RestaurantViewDetailsController extends ChangeNotifier {
         extra: PointsArgs.fromCheckIn(
           result: result,
           locationId: restaurant!.id,
-          cityName: 'Barcelona', // TODO: pull from restaurant/city data if/when available
+          cityName: '', 
           locationName: restaurant!.name,
           locationCategory: restaurant!.category,
           locationAddress: restaurant!.address,

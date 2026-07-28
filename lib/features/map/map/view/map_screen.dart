@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -53,8 +54,18 @@ class _MapViewState extends State<_MapView> {
   LatLng? _currentUserLocation;
 
   bool _isBuildingMarkers = false;
+  String? _mapStyle;
 
   // ─── Current Location ─────────────────────────────────────────────────────
+
+  Future<void> _loadMapStyle() async {
+    final style = await rootBundle.loadString(
+      'assets/map_styles/locals_map_style.json',
+    );
+    if (mounted) {
+      setState(() => _mapStyle = style);
+    }
+  }
 
   Future<void> _updateCurrentLocation() async {
     try {
@@ -190,6 +201,7 @@ class _MapViewState extends State<_MapView> {
   @override
   void initState() {
     super.initState();
+    _loadMapStyle();
     _updateCurrentLocation();
   }
 
@@ -233,6 +245,7 @@ class _MapViewState extends State<_MapView> {
       children: [
         GoogleMap(
           mapType: MapType.normal,
+          style: _mapStyle,
           initialCameraPosition: const CameraPosition(
             target: LatLng(23.7809, 90.407992),
             zoom: 13,
@@ -336,7 +349,8 @@ class _MapViewState extends State<_MapView> {
           right: 16.w,
           child: BusinessBanner(
             type: BannerType.businessOfTheMonth,
-            onTap: (placeId) => controller.openRestaurantDetails(context, placeId),
+            onTap: (placeId) =>
+                controller.openRestaurantDetails(context, placeId),
             onClose: () {},
           ),
         ),
