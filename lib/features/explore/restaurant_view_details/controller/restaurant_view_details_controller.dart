@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/features/explore/explore/model/explore_map_args.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/qr_checkin_result.dart';
+import 'package:locals/features/map/map/controller/location_service.dart';
 import 'package:locals/features/map/map/model/map_screen_args.dart';
 import 'package:locals/features/explore/points/model/points_args.dart';
 import 'package:locals/shared/components/image_view/check_in_image_view.dart';
@@ -17,6 +18,7 @@ class RestaurantViewDetailsController extends ChangeNotifier {
 
   RestaurantViewDetailsModel? restaurant;
   bool isLoading = true;
+  bool isCheckingIn = false;
   String? errorMessage;
   bool descriptionExpanded = false;
 
@@ -69,28 +71,39 @@ class RestaurantViewDetailsController extends ChangeNotifier {
       debugPrint('Save/unsave error: $e');
     }
   }
-
-  /// Handles the "Been here" / check-in flow.
-  ///
-  /// If the user already visited, go straight to the points screen.
-  /// Otherwise, open the QR scanner and WAIT for it to pop a result back.
-  /// Depending on that result, either navigate to the status screen (success)
-  /// or show a snackbar (failure).
   Future<void> checkIn(BuildContext context) async {
-    if (restaurant == null) return;
+    if (restaurant == null || isCheckingIn) return;
 
     if (restaurant!.hasVisited) {
       context.push('/points', extra: restaurant!.toPointsArgs());
       return;
     }
 
-    // Wait for QRScanScreen to Navigator.pop(context, result)
-    final result = await context.push<QRCheckInResult>(
-      '/qr-scan',
-      extra: restaurant!.id,
-    );
+    isCheckingIn = true;
+    notifyListeners();
 
-    if (result == null || !context.mounted) return;
+    QRCheckInResult result;
+    try {
+      final currentLoc = await LocationService.currentLocation();
+
+      result = await repo.checkIn(
+        placeId: restaurant!.id,
+        latitude: currentLoc.latitude,
+        longitude: currentLoc.longitude,
+      );
+    } catch (e) {
+      debugPrint('Check-in error: $e');
+      result = const QRCheckInResult(
+        success: false,
+        message: 'Failed to check in. Please try again.',
+        status: 'error',
+      );
+    }
+
+    isCheckingIn = false;
+    notifyListeners();
+
+    if (!context.mounted) return;
 
     if (result.isSuccess) {
       context.push(
@@ -98,7 +111,7 @@ class RestaurantViewDetailsController extends ChangeNotifier {
         extra: PointsArgs.fromCheckIn(
           result: result,
           locationId: restaurant!.id,
-          cityName: '', 
+          cityName: '',
           locationName: restaurant!.name,
           locationCategory: restaurant!.category,
           locationAddress: restaurant!.address,
@@ -106,10 +119,10 @@ class RestaurantViewDetailsController extends ChangeNotifier {
         ),
       );
 
-      // Optional: reflect the successful check-in locally so the UI
-      // (e.g. "Been here" button state) updates without a full reload.
-      // restaurant = restaurant!.copyWith(hasVisited: true);
-      // notifyListeners();
+      // Reflect the successful check-in locally so the "Been here"
+      // button state updates without a full reload.
+      restaurant = restaurant!.copyWith(hasVisited: true);
+      notifyListeners();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result.displayMessage)),

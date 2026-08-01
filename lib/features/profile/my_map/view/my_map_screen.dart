@@ -248,7 +248,7 @@ class _MyMapViewState extends State<_MyMapView> {
                     mapType: MapType.normal,
                     style: _mapStyle,
                     initialCameraPosition: const CameraPosition(
-                      target: LatLng(23.7809, 90.407992), // Dhaka default
+                      target: LatLng(23.7809, 90.407992), 
                       zoom: 12,
                     ),
                     markers: _markers,

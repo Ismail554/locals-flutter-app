@@ -1,26 +1,23 @@
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:locals/core/localization/l10n_extensions.dart';
-import 'package:locals/features/explore/restaurant_view_details/model/qr_checkin_result.dart';
-import 'package:locals/features/map/map/controller/location_service.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
-import '../controller/qr_checkin_controller.dart';
-import '../repository/qr_checkin_repository.dart';
+import '../controller/qr_discount_controller.dart';
+import '../model/qr_discount_result.dart';
+import '../repository/qr_discount_repository.dart';
 
+/// QR scanner reached from the Settings page, used to claim place
+/// discounts. Unlike the old check-in flow, this needs only the QR
+/// token — no device location and no place id.
 class QRScanScreen extends StatelessWidget {
-  final String? placeId;
-
-  const QRScanScreen({super.key, this.placeId});
+  const QRScanScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) =>
-          QRCheckInController(QRCheckInRepositoryImpl(), placeId: placeId),
+      create: (_) => QRDiscountController(QRDiscountRepositoryImpl()),
       child: const _QRScanView(),
     );
   }
@@ -46,34 +43,26 @@ class _QRScanViewState extends State<_QRScanView> {
 
     isProcessing = true;
 
-    final controller = context.read<QRCheckInController>();
+    final controller = context.read<QRDiscountController>();
 
     try {
-      final currentLoc = await LocationService.currentLocation();
-
-      final result = await controller.repo.qrCheckIn(
-        qrToken: value,
-        latitude: double.parse(currentLoc.latitude.toStringAsFixed(6)),
-        longitude: double.parse(currentLoc.longitude.toStringAsFixed(6)),
-        // latitude: 41.387100,
-        // longitude: 2.175400,
-      );
+      final result = await controller.repo.claimDiscount(qrToken: value);
 
       if (!mounted) return;
 
-      // Close the scanner and return the result (success or failure)
+      // Close the scanner and return the discount claim result to
+      // whoever pushed this screen (Settings).
       Navigator.pop(context, result);
     } catch (e) {
-      debugPrint("QR Scan error: $e");
+      debugPrint("QR discount scan error: $e");
 
       if (!mounted) return;
 
       Navigator.pop(
         context,
-        QRCheckInResult(
+        const QRDiscountResult(
           success: false,
-          status: "error",
-          message: context.l10n.qrScanFailed,
+          message: 'Failed to scan QR code. Please try again.',
         ),
       );
     } finally {
@@ -83,12 +72,12 @@ class _QRScanViewState extends State<_QRScanView> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<QRCheckInController>();
+    final controller = context.watch<QRDiscountController>();
 
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(context.l10n.qrCodeScanTitle),
+        title: const Text('Scan for Discount'),
         backgroundColor: Colors.black,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -97,17 +86,7 @@ class _QRScanViewState extends State<_QRScanView> {
       ),
       body: Stack(
         children: [
-          AiBarcodeScanner(
-            onDetect: _handleScan,
-            // hideGalleryButton: false,
-            // hideSheetTitle: true,
-            // sheetTitle: context.l10n.positionQrCodeHere,
-            // successColor: AppColors.actionPink,
-            // borderColor: AppColors.actionPink,
-            // borderWidth: 4,
-            // cutOutSize: 280,
-            // scanLineColor: AppColors.actionPink,
-          ),
+          AiBarcodeScanner(onDetect: _handleScan),
 
           if (controller.isLoading)
             Container(

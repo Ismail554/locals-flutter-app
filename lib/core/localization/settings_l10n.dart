@@ -30,6 +30,11 @@ class SettingsL10n {
             icon: Icons.lock_outline,
             label: l10n.settingsPrivacy,
           ),
+          SettingsItem(
+            id: 'discount',
+            icon: Icons.local_offer,
+            label: 'Discounts',
+          ),
         ],
       ),
       SettingsSection(

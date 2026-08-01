@@ -4,6 +4,7 @@ import 'package:locals/core/localization/app_locales.dart';
 import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/core/localization/locale_controller.dart';
 import 'package:locals/core/localization/settings_l10n.dart';
+import 'package:locals/features/explore/restaurant_view_details/model/qr_discount_result.dart';
 import 'package:locals/shared/components/premium_confirm_dialog.dart';
 import 'package:provider/provider.dart';
 import '../model/settings_model.dart';
@@ -38,6 +39,8 @@ class SettingsController extends ChangeNotifier {
         context.push('/help_support');
       case 'policy':
         context.push('/privacy_data');
+      case 'discount':
+        scanForDiscount(context);
       // case 'rate':
       //   ScaffoldMessenger.of(context).showSnackBar(
       //     SnackBar(content: Text(context.l10n.snackbarThanksFeedback)),
@@ -59,6 +62,15 @@ class SettingsController extends ChangeNotifier {
 
     await localeController.setLocale(selected);
     notifyListeners();
+  }
+
+  /// Opens the QR scanner to claim a place discount, then forwards the
+  /// result on to the discount result screen.
+  Future<void> scanForDiscount(BuildContext context) async {
+    final result = await context.push<QRDiscountResult>('/qr-scan');
+    if (result == null || !context.mounted) return;
+
+    context.push('/qr-discount-result', extra: result);
   }
 
   Future<void> confirmLogout(BuildContext context) async {

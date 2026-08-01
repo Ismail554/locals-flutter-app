@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/features/explore/explore/view/local_shares_screen.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/qr_checkin_result.dart';
+import 'package:locals/features/explore/restaurant_view_details/model/qr_discount_result.dart';
+import 'package:locals/features/explore/restaurant_view_details/view/qr_discount_status_screen.dart';
 import 'package:locals/features/explore/restaurant_view_details/view/qr_scan_screen.dart';
 import 'package:locals/features/explore/restaurant_view_details/view/qr_scan_status_screen.dart';
 import 'app_scaffold.dart';
@@ -323,7 +325,12 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/qr-scan',
-      builder: (context, state) => QRScanScreen(placeId: state.extra as String),
+      builder: (context, state) => const QRScanScreen(),
+    ),
+    GoRoute(
+      path: '/qr-discount-result',
+      builder: (context, state) =>
+          QRDiscountStatusScreen(result: state.extra as QRDiscountResult),
     ),
     GoRoute(
       path: '/qr-scan-status',
