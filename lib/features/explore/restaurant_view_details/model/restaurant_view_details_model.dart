@@ -128,6 +128,7 @@ class RestaurantViewDetailsModel {
       address: address,
       points: points,
       imageColor: heroColor,
+      imageUrl: heroImageUrl,
       latitude: latitude,
       longitude: longitude,
     );
@@ -178,6 +179,11 @@ class RestaurantViewDetailsModel {
     final avatarColors = visitors.isNotEmpty
         ? visitors.take(6).map((_) => const Color(0xFFD4A574)).toList()
         : <Color>[];
+    final description = json['description'] as String? ?? '';
+    final shortDescription =
+        json['short_description'] as String? ??
+        json['summary'] as String? ??
+        description;
 
     return RestaurantViewDetailsModel(
       id: json['id'].toString(),
@@ -185,9 +191,9 @@ class RestaurantViewDetailsModel {
       name: json['name'] as String? ?? '',
       hasLocalsSeal: json['has_locals_seal'] as bool? ?? false,
       heroColor: const Color(0xFFD4C4B0),
-      heroImageUrl: json['cover_photo'] as String?,
-      shortDescription: json['description'] as String? ?? '',
-      fullDescription: json['description'] as String? ?? '',
+      heroImageUrl: _extractImageUrl(json),
+      shortDescription: shortDescription,
+      fullDescription: json['long_description'] as String? ?? description,
       address: json['address'] as String? ?? '',
       hours: json['opening_hours'] as String? ?? '',
       instagramHandle:
@@ -209,4 +215,22 @@ class RestaurantViewDetailsModel {
       businessOfTheMonth: json['is_business_of_the_month'] as bool? ?? false,
     );
   }
+}
+
+String? _extractImageUrl(Map<String, dynamic> json) {
+  final image = json['image'];
+  final imageMap = image is Map<String, dynamic> ? image : null;
+  final candidates = <String?>[
+    json['cover_photo'] as String?,
+    json['full_image_url'] as String?,
+    json['image_url'] as String?,
+    image is String ? image : null,
+    imageMap?['url'] as String?,
+    imageMap?['full_image_url'] as String?,
+  ];
+
+  for (final candidate in candidates) {
+    if (candidate != null && candidate.trim().isNotEmpty) return candidate;
+  }
+  return null;
 }

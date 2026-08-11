@@ -42,8 +42,7 @@ class MapActiveMission {
   });
 
   /// Guarded against totalCount == 0 (would otherwise be 0/0 = NaN).
-  double get progress =>
-      totalCount <= 0 ? 0.0 : completedCount / totalCount;
+  double get progress => totalCount <= 0 ? 0.0 : completedCount / totalCount;
 
   /// Guarded against NaN/Infinity (e.g. from totalCount == 0) — `.round()`
   /// throws an UnsupportedError on those values. Also clamps to a sane
@@ -63,6 +62,7 @@ class MapActiveLocation {
   final String address;
   final int points;
   final Color imageColor;
+  final String? imageUrl;
   final double latitude;
   final double longitude;
 
@@ -74,14 +74,15 @@ class MapActiveLocation {
     required this.address,
     required this.points,
     required this.imageColor,
+    this.imageUrl,
     required this.latitude,
     required this.longitude,
   });
 
-  String get resolvedLocationId =>
-      locationId ?? locationIdForName(name) ?? '';
+  String get resolvedLocationId => locationId ?? locationIdForName(name) ?? '';
 
-  String get mapPinId => mapPinIdForLocationId(locationId ?? locationIdForName(name));
+  String get mapPinId =>
+      mapPinIdForLocationId(locationId ?? locationIdForName(name));
 }
 
 const _locationIdsByName = <String, String>{
@@ -98,6 +99,4 @@ String mapPinIdForLocationId(String? locationId) {
   return _locationIdsById[locationId] ?? locationId;
 }
 
-const _locationIdsById = <String, String>{
-  'sagrada_familia': 'sagrada',
-};
+const _locationIdsById = <String, String>{'sagrada_familia': 'sagrada'};

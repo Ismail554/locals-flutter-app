@@ -23,25 +23,15 @@ class RestaurantDescriptionSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          shortDescription,
+          isExpanded ? fullDescription : shortDescription,
+          maxLines: isExpanded ? null : 2,
+          overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
           style: TextStyle(
             color: AppColors.black,
-            fontSize: 15.sp,
-            fontWeight: FontWeight.w700,
-            height: 1.4,
+            fontSize: 14.sp,
+            height: 1.5,
           ),
         ),
-        if (isExpanded) ...[
-          SizedBox(height: 8.h),
-          Text(
-            fullDescription,
-            style: TextStyle(
-              color: AppColors.textSub2,
-              fontSize: 14.sp,
-              height: 1.5,
-            ),
-          ),
-        ],
         SizedBox(height: 8.h),
         GestureDetector(
           onTap: onToggle,
@@ -49,7 +39,9 @@ class RestaurantDescriptionSection extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                isExpanded ? context.l10n.commonShowLess : context.l10n.commonShowMore,
+                isExpanded
+                    ? context.l10n.commonShowLess
+                    : context.l10n.commonShowMore,
                 style: TextStyle(
                   color: AppColors.actionPink,
                   fontSize: 14.sp,

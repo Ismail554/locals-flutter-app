@@ -2,44 +2,61 @@ import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+class LocationServiceException implements Exception {
+  final String message;
+  final bool shouldOpenSettings;
+
+  const LocationServiceException(
+    this.message, {
+    this.shouldOpenSettings = false,
+  });
+
+  @override
+  String toString() => message;
+}
+
 class LocationService {
   LocationService._();
 
-  /// Get single current location (Real device location with fallback)
+  /// Gets the device location without hiding permission or service failures.
   static Future<LatLng> currentLocation() async {
-    try {
-      // Check if location service is enabled
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        debugPrint("❌ Location service disabled → Using fallback");
-        return const LatLng(23.7809, 90.407992);
-      }
-
-      // Check permission
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-
-      // Handle denied or permanently denied
-      if (permission == LocationPermission.denied || 
-          permission == LocationPermission.deniedForever) {
-        debugPrint("❌ Location permission denied → Using fallback");
-        return const LatLng(23.7809, 90.407992);
-      }
-
-      // Get current position
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.bestForNavigation,
-        timeLimit: const Duration(seconds: 10),
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      throw const LocationServiceException(
+        'Location services are disabled. Please enable them and try again.',
       );
+    }
 
-      debugPrint("✅ Real Location: ${position.latitude}, ${position.longitude}");
-      
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
+      throw const LocationServiceException(
+        'Location permission is permanently denied. Enable it in App Settings.',
+        shouldOpenSettings: true,
+      );
+    }
+
+    if (permission == LocationPermission.denied) {
+      throw const LocationServiceException(
+        'Location permission is required to show your position and directions.',
+      );
+    }
+
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+        ),
+      ).timeout(const Duration(seconds: 10));
       return LatLng(position.latitude, position.longitude);
-    } catch (e) {
-      debugPrint("❌ Location failed → Using fallback: $e");
-      return const LatLng(23.7809, 90.407992); 
+    } catch (error) {
+      debugPrint('Location fetch failed: $error');
+      throw const LocationServiceException(
+        'Unable to get your location. Check GPS and try again.',
+      );
     }
   }
 
@@ -71,15 +88,6 @@ class LocationService {
   }
 }
 
-
-
-
-
-
-
-
-
-
 // import 'package:flutter/foundation.dart';
 // import 'package:geolocator/geolocator.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -87,14 +95,12 @@ class LocationService {
 // class LocationService {
 //   LocationService._();
 
-
 //     static Future<LatLng> currentLocation() async {
 //     // FORCE BARCELONA FOR TESTING - Remove this after testing on real device
 //     const LatLng Dhaka = LatLng(23.7809, 90.407992);
 //     debugPrint("🧪 FORCED Dhaka Location for testing");
 //     return Dhaka;
 //   }
-
 
 //   /// Get single current location (with fallback)
 //   // static Future<LatLng> currentLocation() async {
@@ -110,7 +116,7 @@ class LocationService {
 //   //       permission = await Geolocator.requestPermission();
 //   //     }
 
-//   //     if (permission == LocationPermission.denied || 
+//   //     if (permission == LocationPermission.denied ||
 //   //         permission == LocationPermission.deniedForever) {
 //   //       debugPrint("❌ Permission denied → Barcelona fallback");
 //   //       return const LatLng(41.3851, 2.1734);
@@ -155,6 +161,3 @@ class LocationService {
 //     }
 //   }
 // }
-
-
-

@@ -5,6 +5,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:locals/core/config/app_config.dart';
+import 'package:locals/core/network/api_client.dart';
 
 class RouteService {
   RouteService._();
@@ -21,7 +22,7 @@ class RouteService {
       "https://maps.googleapis.com/maps/api/directions/json"
       "?origin=${origin.latitude},${origin.longitude}"
       "&destination=${destination.latitude},${destination.longitude}"
-      "&mode=driving"
+      "&mode=walking"
       "&alternatives=true"
       "&language=en"
       "&key=$_apiKey",
@@ -45,7 +46,10 @@ class RouteService {
 
       if (response.statusCode != 200) {
         debugPrint("Directions API HTTP Error: ${response.statusCode}");
-        return [];
+        throw ApiException(
+          'Directions request failed (${response.statusCode}).',
+          statusCode: response.statusCode,
+        );
       }
 
       final json = jsonDecode(response.body);
@@ -54,10 +58,19 @@ class RouteService {
         debugPrint("Directions Status: ${json["status"]}");
       }
 
+      if (json["status"] == "ZERO_RESULTS") {
+        if (kDebugMode) {
+          debugPrint(
+            "No walking route exists between the current location and destination.",
+          );
+        }
+        return [];
+      }
+
       if (json["status"] != "OK") {
         final errorMsg = json["error_message"] ?? 'Unknown error';
         if (kDebugMode) debugPrint("Directions Error: $errorMsg");
-        return [];
+        throw ApiException('Directions unavailable: $errorMsg');
       }
 
       final routes = json["routes"] as List<dynamic>;
@@ -108,12 +121,16 @@ class RouteService {
       }
 
       return points;
+    } on ApiException {
+      rethrow;
     } catch (e, stackTrace) {
       if (kDebugMode) {
         debugPrint("RouteService Error: $e");
         debugPrintStack(stackTrace: stackTrace);
       }
-      return [];
+      throw const ApiException(
+        'Unable to load directions. Check your connection and try again.',
+      );
     }
   }
 
@@ -152,7 +169,7 @@ class RouteService {
         "https://maps.googleapis.com/maps/api/directions/json"
         "?origin=${origin.latitude},${origin.longitude}"
         "&destination=${destination.latitude},${destination.longitude}"
-        "&mode=driving"
+        "&mode=walking"
         "&key=$_apiKey",
       );
 
@@ -180,7 +197,7 @@ class RouteService {
         "https://maps.googleapis.com/maps/api/directions/json"
         "?origin=${origin.latitude},${origin.longitude}"
         "&destination=${destination.latitude},${destination.longitude}"
-        "&mode=driving"
+        "&mode=walking"
         "&key=$_apiKey",
       );
 

@@ -64,7 +64,7 @@ class MapPinInfo {
       address: json['address'] as String?,
       points: json['base_points'] as int?,
       accentColor: const Color(0xFFD4C4B0),
-      imageUrl: json['cover_photo'] as String?,
+      imageUrl: _extractImageUrl(json),
       placeType: placeType,
       visitStatus: visitStatus,
     );
@@ -77,5 +77,23 @@ class MapPinInfo {
     if (isFeatured) return MapPinTag.sponsoredOrEvent;
     if (placeType == 'BUSINESS') return MapPinTag.business;
     return MapPinTag.pointOfInterest;
+  }
+
+  static String? _extractImageUrl(Map<String, dynamic> json) {
+    final image = json['image'];
+    final imageMap = image is Map<String, dynamic> ? image : null;
+    final candidates = <String?>[
+      json['cover_photo'] as String?,
+      json['full_image_url'] as String?,
+      json['image_url'] as String?,
+      image is String ? image : null,
+      imageMap?['url'] as String?,
+      imageMap?['full_image_url'] as String?,
+    ];
+
+    for (final candidate in candidates) {
+      if (candidate != null && candidate.trim().isNotEmpty) return candidate;
+    }
+    return null;
   }
 }

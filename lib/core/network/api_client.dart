@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:locals/core/localization/api_locale.dart';
 import 'token_manager.dart';
@@ -69,6 +70,9 @@ class ApiClient {
     } on FormatException {
       _logError('POST', url, 'Unexpected response format');
       throw const ApiException('Unexpected response format.');
+    } on TimeoutException {
+      _logError('POST', url, 'Request timed out');
+      throw const ApiException('No internet connection. Please try again.');
     }
   }
 
@@ -99,6 +103,9 @@ class ApiClient {
     } on FormatException {
       _logError('GET', url, 'Unexpected response format');
       throw const ApiException('Unexpected response format.');
+    } on TimeoutException {
+      _logError('GET', url, 'Request timed out');
+      throw const ApiException('No internet connection. Please try again.');
     }
   }
 
@@ -130,6 +137,9 @@ class ApiClient {
     } on FormatException {
       _logError('PATCH', url, 'Unexpected response format');
       throw const ApiException('Unexpected response format.');
+    } on TimeoutException {
+      _logError('PATCH', url, 'Request timed out');
+      throw const ApiException('No internet connection. Please try again.');
     }
   }
 
@@ -175,40 +185,44 @@ class ApiClient {
     } on FormatException {
       _logError('POST', url, 'Unexpected response format');
       throw const ApiException('Unexpected response format.');
+    } on TimeoutException {
+      _logError('POST', url, 'Request timed out');
+      throw const ApiException('No internet connection. Please try again.');
     }
   }
 
+  Future<Map<String, dynamic>> delete(
+    String path, {
+    bool requiresAuth = true,
+  }) async {
+    final url = '$baseUrl$path';
 
-  
-Future<Map<String, dynamic>> delete(
-  String path, {
-  bool requiresAuth = true,
-}) async {
-  final url = '$baseUrl$path';
- 
-  try {
-    final headers = requiresAuth ? await _authHeaders : _baseHeaders;
- 
-    _logRequest('DELETE', url, null);
- 
-    final response = await http
-        .delete(Uri.parse(url), headers: headers)
-        .timeout(_timeout);
- 
-    _logResponse(response);
- 
-    return _handleResponse(response);
-  } on SocketException {
-    _logError('DELETE', url, 'No internet connection');
-    throw const ApiException('No internet connection.');
-  } on HttpException {
-    _logError('DELETE', url, 'Network error');
-    throw const ApiException('Network error. Please try again.');
-  } on FormatException {
-    _logError('DELETE', url, 'Unexpected response format');
-    throw const ApiException('Unexpected response format.');
+    try {
+      final headers = requiresAuth ? await _authHeaders : _baseHeaders;
+
+      _logRequest('DELETE', url, null);
+
+      final response = await http
+          .delete(Uri.parse(url), headers: headers)
+          .timeout(_timeout);
+
+      _logResponse(response);
+
+      return _handleResponse(response);
+    } on SocketException {
+      _logError('DELETE', url, 'No internet connection');
+      throw const ApiException('No internet connection.');
+    } on HttpException {
+      _logError('DELETE', url, 'Network error');
+      throw const ApiException('Network error. Please try again.');
+    } on FormatException {
+      _logError('DELETE', url, 'Unexpected response format');
+      throw const ApiException('Unexpected response format.');
+    } on TimeoutException {
+      _logError('DELETE', url, 'Request timed out');
+      throw const ApiException('No internet connection. Please try again.');
+    }
   }
-}
 
   // ─── Logging ────────────────────────────────────────────────────────────────
 

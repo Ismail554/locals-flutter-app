@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/filters_l10n.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import '../../model/saved_places_model.dart';
 
 class SavedPlaceCard extends StatelessWidget {
@@ -79,7 +81,10 @@ class SavedPlaceCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              place.category,
+                              FiltersL10n.categoryLabel(
+                                context.l10n,
+                                place.category,
+                              ),
                               style: TextStyle(
                                 color: AppColors.actionPink,
                                 fontSize: 11.sp,

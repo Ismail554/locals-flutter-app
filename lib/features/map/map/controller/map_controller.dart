@@ -10,8 +10,8 @@ import 'package:locals/features/map/map/controller/location_service.dart';
 import 'package:locals/features/map/map/controller/route_service.dart';
 import 'package:locals/features/map/map/model/map_mission_args.dart';
 import 'package:locals/features/missions/check_in/view/checkin_bottom_sheet.dart';
+import 'package:locals/core/network/api_client.dart';
 import 'package:locals/shared/components/pin_details_sheet.dart';
-import 'package:locals/shared/model/map_pin_details.dart';
 import 'package:locals/shared/model/map_pin_info.dart';
 import 'package:locals/shared/model/map_pin_tag.dart';
 import 'package:locals/shared/theme/app_colors.dart';
@@ -26,6 +26,8 @@ class MapController extends ChangeNotifier {
   MapModel state;
 
   Timer? _searchDebounce;
+  Timer? _visibleRegionDebounce;
+  String? _lastVisibleBoundsKey;
   StreamSubscription<LatLng>? _locationSubscription;
   bool isNearDestination = false;
   bool isTrackingLive = false;
@@ -55,30 +57,58 @@ class MapController extends ChangeNotifier {
     }
   }
 
-void startLiveTracking() {
+  Future<void> retry() => _loadPlaces();
+
+  void loadVisibleRegion(LatLngBounds bounds) {
+    if (_isFocusedMode) return;
+    final boundsKey = [
+      bounds.southwest.latitude,
+      bounds.southwest.longitude,
+      bounds.northeast.latitude,
+      bounds.northeast.longitude,
+    ].map((value) => value.toStringAsFixed(5)).join(',');
+    if (boundsKey == _lastVisibleBoundsKey) return;
+    _lastVisibleBoundsKey = boundsKey;
+    _visibleRegionDebounce?.cancel();
+    _visibleRegionDebounce = Timer(const Duration(milliseconds: 350), () {
+      _loadPlaces(bounds: bounds);
+    });
+  }
+
+  void startLiveTracking() {
     if (isTrackingLive) return;
     isTrackingLive = true;
 
     _locationSubscription?.cancel();
-    _locationSubscription = LocationService.locationStream().listen((currentLoc) {
-      final destination = state.highlightedLocation;
-      if (destination == null) return;
+    _locationSubscription = LocationService.locationStream().listen(
+      (currentLoc) {
+        final destination = state.highlightedLocation;
+        if (destination == null) return;
 
-      final destLatLng = LatLng(destination.latitude, destination.longitude);
-      final distance = Geolocator.distanceBetween(
-        currentLoc.latitude,
-        currentLoc.longitude,
-        destLatLng.latitude,
-        destLatLng.longitude,
-      );
+        final destLatLng = LatLng(destination.latitude, destination.longitude);
+        final distance = Geolocator.distanceBetween(
+          currentLoc.latitude,
+          currentLoc.longitude,
+          destLatLng.latitude,
+          destLatLng.longitude,
+        );
 
-      final nearNow = distance < 50;
+        final nearNow = distance < 50;
 
-      if (nearNow != isNearDestination) {
-        isNearDestination = nearNow;
+        if (nearNow != isNearDestination) {
+          isNearDestination = nearNow;
+          notifyListeners();
+        }
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        debugPrint('Live location error: $error');
+        stopLiveTracking();
+        state = state.copyWith(
+          errorMessage: 'Live location is unavailable. Please try again.',
+        );
         notifyListeners();
-      }
-    });
+      },
+    );
     notifyListeners();
   }
 
@@ -111,7 +141,6 @@ void startLiveTracking() {
         origin: current,
         destination: destination,
       );
-
       if (points.isNotEmpty) {
         state = state.copyWith(
           polylines: {
@@ -119,7 +148,7 @@ void startLiveTracking() {
               polylineId: const PolylineId('route'),
               points: points,
               width: 8,
-              color: AppColors.actionPink,
+              color: AppColors.borderGray,
               geodesic: false,
               startCap: Cap.roundCap,
               endCap: Cap.roundCap,
@@ -143,11 +172,17 @@ void startLiveTracking() {
       notifyListeners();
     } catch (e) {
       debugPrint("Route Error: $e");
+      state = state.copyWith(
+        errorMessage: e is ApiException
+            ? e.message
+            : 'Unable to load directions. Please try again.',
+      );
+      notifyListeners();
     }
   }
 
-  Future<void> _loadPlaces() async {
-    state = state.copyWith(isLoadingPins: true);
+  Future<void> _loadPlaces({LatLngBounds? bounds}) async {
+    state = state.copyWith(isLoadingPins: true, clearError: true);
     notifyListeners();
 
     try {
@@ -156,6 +191,7 @@ void startLiveTracking() {
         categorySlug: _resolveCategorySlug(),
         placeType: _resolvePlaceType(),
         visitStatus: _resolveVisitStatus(),
+        bounds: bounds,
       );
 
       // === Focused Mode (Mission, Featured Route, Single Place) ===
@@ -194,63 +230,68 @@ void startLiveTracking() {
       }
     } catch (e) {
       debugPrint('Places fetch error: $e');
-      state = state.copyWith(isLoadingPins: false);
+      state = state.copyWith(
+        isLoadingPins: false,
+        errorMessage: e is ApiException
+            ? e.message
+            : 'Unable to load places. Please check your connection and try again.',
+      );
       notifyListeners();
     }
   }
 
-void showRouteToPin(String pinId) {
-  final pin = state.getPinById(pinId);
-  if (pin == null) {
-    debugPrint("❌ Pin not found: $pinId");
-    return;
+  void showRouteToPin(String pinId) {
+    final pin = state.getPinById(pinId);
+    if (pin == null) {
+      debugPrint("❌ Pin not found: $pinId");
+      return;
+    }
+
+    debugPrint("📍 Showing route to pin: ${pin.name}");
+
+    state = state.copyWith(
+      highlightedLocation: MapActiveLocation(
+        locationId: pin.id,
+        category: pin.category ?? 'PLACE',
+        seal: 'Local spot',
+        name: pin.name,
+        address: pin.address ?? '',
+        points: pin.points ?? 30,
+        imageColor: pin.accentColor ?? const Color(0xFFD4C4B0),
+        latitude: pin.lat,
+        longitude: pin.lng,
+      ),
+      showRoute: true,
+      selectedPinId: null,
+    );
+
+    notifyListeners();
+    loadRoute();
   }
 
-  debugPrint("📍 Showing route to pin: ${pin.name}");
+  void openDirectionsFromPin(String pinId) {
+    final pin = state.getPinById(pinId);
+    if (pin == null) return;
 
-  state = state.copyWith(
-    highlightedLocation: MapActiveLocation(
-      locationId: pin.id,
-      category: pin.category ?? 'PLACE',
-      seal: 'Local spot',
-      name: pin.name,
-      address: pin.address ?? '',
-      points: pin.points ?? 30,
-      imageColor: pin.accentColor ?? const Color(0xFFD4C4B0),
-      latitude: pin.lat,
-      longitude: pin.lng,
-    ),
-    showRoute: true,
-    selectedPinId: null,
-  );
+    state = state.copyWith(
+      highlightedLocation: MapActiveLocation(
+        locationId: pin.id,
+        category: pin.category ?? 'PLACE',
+        seal: 'Local spot',
+        name: pin.name,
+        address: pin.address ?? '',
+        points: pin.points ?? 30,
+        imageColor: pin.accentColor ?? const Color(0xFFD4C4B0),
+        latitude: pin.lat,
+        longitude: pin.lng,
+      ),
+      showRoute: true,
+      selectedPinId: null,
+    );
 
-  notifyListeners();
-  loadRoute();
-}
-
-void openDirectionsFromPin(String pinId) {
-  final pin = state.getPinById(pinId);
-  if (pin == null) return;
-
-  state = state.copyWith(
-    highlightedLocation: MapActiveLocation(
-      locationId: pin.id,
-      category: pin.category ?? 'PLACE',
-      seal: 'Local spot',
-      name: pin.name,
-      address: pin.address ?? '',
-      points: pin.points ?? 30,
-      imageColor: pin.accentColor ?? const Color(0xFFD4C4B0),
-      latitude: pin.lat,
-      longitude: pin.lng,
-    ),
-    showRoute: true,
-    selectedPinId: null, 
-  );
-
-  notifyListeners();
-  loadRoute();
-}
+    notifyListeners();
+    loadRoute();
+  }
 
   MapPinTag _getPinTag(String category) {
     final cat = category.toLowerCase();
@@ -310,18 +351,6 @@ void openDirectionsFromPin(String pinId) {
   }
 
   void _showPinDetailsBottomSheet(BuildContext context, MapPinInfo pin) {
-    final details = MapPinDetails(
-      id: pin.id,
-      category: pin.category ?? 'PLACE',
-      name: pin.name,
-      address: pin.address ?? 'Unknown Address',
-      points: pin.points ?? 30,
-      accentColor: pin.accentColor ?? const Color(0xFFD4C4B0),
-      imageUrl: pin.imageUrl,
-      latitude: pin.lat,
-      longitude: pin.lng,
-    );
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -425,15 +454,17 @@ void openDirectionsFromPin(String pinId) {
     });
   }
 
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _visibleRegionDebounce?.cancel();
+    _locationSubscription?.cancel();
+    super.dispose();
+  }
+
   void applyFilters(MapFiltersState filters) {
     state = state.copyWith(filters: filters);
     notifyListeners();
     _loadPlaces();
-  }
-
-  @override
-  void dispose() {
-    _searchDebounce?.cancel();
-    super.dispose();
   }
 }

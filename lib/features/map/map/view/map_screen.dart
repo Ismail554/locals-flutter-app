@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,6 +12,8 @@ import 'package:provider/provider.dart';
 
 import '../controller/map_controller.dart';
 import '../model/map_screen_args.dart';
+import 'package:locals/shared/model/map_pin_info.dart';
+import '../model/map_mission_args.dart';
 import '../repository/map_repository.dart';
 import 'widgets/map_circle_action_button.dart';
 import 'widgets/map_location_detail_card.dart';
@@ -49,12 +49,14 @@ class _MapViewState extends State<_MapView> {
 
   Set<Marker> _markers = {};
   String? _lastMarkersKey;
+  String? _markerSignature;
 
   String? _lastRouteLocationKey;
   LatLng? _currentUserLocation;
 
   bool _isBuildingMarkers = false;
   String? _mapStyle;
+  String? _locationError;
 
   // ─── Current Location ─────────────────────────────────────────────────────
 
@@ -72,10 +74,18 @@ class _MapViewState extends State<_MapView> {
       final loc = await LocationService.currentLocation();
       if (!mounted) return;
 
-      setState(() => _currentUserLocation = loc);
+      if (_currentUserLocation != loc) {
+        setState(() {
+          _currentUserLocation = loc;
+          _locationError = null;
+        });
+      }
       _rebuildMarkers(); // Only rebuild once location is ready
     } catch (e) {
       debugPrint("Could not get current location: $e");
+      if (mounted && _locationError != e.toString()) {
+        setState(() => _locationError = e.toString());
+      }
     }
   }
 
@@ -97,6 +107,13 @@ class _MapViewState extends State<_MapView> {
 
     _lastMarkersKey = currentKey;
 
+    if (pins.length > 200) {
+      final clusteredMarkers = await _buildClusteredMarkers(pins, controller);
+      _updateMarkersIfChanged(clusteredMarkers);
+      _isBuildingMarkers = false;
+      return;
+    }
+
     final iconCache = MapMarkerIconCache.instance;
     final markers = <Marker>{};
 
@@ -117,23 +134,105 @@ class _MapViewState extends State<_MapView> {
 
     // Add Current Location Pin
     if (_currentUserLocation != null) {
+      markers.add(_currentLocationMarker(_currentUserLocation!));
+    }
+    final destination = controller.state.highlightedLocation;
+    if (destination != null) markers.add(_destinationMarker(destination));
+
+    _updateMarkersIfChanged(markers);
+
+    _isBuildingMarkers = false;
+  }
+
+  void _updateMarkersIfChanged(Set<Marker> markers) {
+    final signature =
+        markers
+            .map(
+              (marker) =>
+                  '${marker.markerId.value}:${marker.position.latitude},${marker.position.longitude}',
+            )
+            .toList()
+          ..sort();
+    final nextSignature = signature.join('|');
+    if (!mounted || nextSignature == _markerSignature) return;
+    _markerSignature = nextSignature;
+    setState(() => _markers = markers);
+  }
+
+  Future<Set<Marker>> _buildClusteredMarkers(
+    List<MapPinInfo> pins,
+    MapController controller,
+  ) async {
+    const cellSize = 0.002;
+    final groups = <String, List<MapPinInfo>>{};
+
+    for (final pin in pins) {
+      final latCell = (pin.lat / cellSize).floor();
+      final lngCell = (pin.lng / cellSize).floor();
+      groups.putIfAbsent('$latCell:$lngCell', () => []).add(pin);
+    }
+
+    final markers = <Marker>{};
+    for (final group in groups.values) {
+      if (group.length == 1) {
+        final pin = group.first;
+        final icon = await MapMarkerIconCache.instance.iconFor(
+          tag: pin.tag,
+          visited: pin.visited,
+        );
+        markers.add(
+          Marker(
+            markerId: MarkerId(pin.id),
+            position: LatLng(pin.lat, pin.lng),
+            icon: icon,
+            infoWindow: InfoWindow(title: pin.name),
+            onTap: () => controller.onPinTap(context, pin.id),
+          ),
+        );
+        continue;
+      }
+
+      final center = LatLng(
+        group.map((pin) => pin.lat).reduce((a, b) => a + b) / group.length,
+        group.map((pin) => pin.lng).reduce((a, b) => a + b) / group.length,
+      );
       markers.add(
         Marker(
-          markerId: const MarkerId('current_location'),
-          position: _currentUserLocation!,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          infoWindow: const InfoWindow(title: "You are here"),
-          anchor: const Offset(0.5, 0.5),
+          markerId: MarkerId('cluster_${group.first.id}'),
+          position: center,
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueAzure,
+          ),
+          infoWindow: InfoWindow(title: '${group.length} places'),
+          onTap: () => mapController?.animateCamera(
+            CameraUpdate.newLatLngZoom(center, 16),
+          ),
         ),
       );
     }
 
-    if (mounted) {
-      setState(() => _markers = markers);
+    if (_currentUserLocation != null) {
+      markers.add(_currentLocationMarker(_currentUserLocation!));
     }
-
-    _isBuildingMarkers = false;
+    final destination = controller.state.highlightedLocation;
+    if (destination != null) markers.add(_destinationMarker(destination));
+    return markers;
   }
+
+  Marker _currentLocationMarker(LatLng location) => Marker(
+    markerId: const MarkerId('current_location'),
+    position: location,
+    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+    infoWindow: const InfoWindow(title: 'You are here'),
+    anchor: const Offset(0.5, 0.5),
+  );
+
+  Marker _destinationMarker(MapActiveLocation location) => Marker(
+    markerId: const MarkerId('route_destination'),
+    position: LatLng(location.latitude, location.longitude),
+    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+    infoWindow: InfoWindow(title: location.name),
+  );
 
   // ─── Helper Methods ───────────────────────────────────────────────────────
 
@@ -246,9 +345,9 @@ class _MapViewState extends State<_MapView> {
         GoogleMap(
           mapType: MapType.normal,
           style: _mapStyle,
-          initialCameraPosition: const CameraPosition(
-            target: LatLng(23.7809, 90.407992),
-            zoom: 13,
+          initialCameraPosition: CameraPosition(
+            target: state.initialCenter ?? const LatLng(23.7809, 90.407992),
+            zoom: state.initialZoom ?? 13,
           ),
           markers: _markers,
           polylines: state.polylines,
@@ -262,6 +361,14 @@ class _MapViewState extends State<_MapView> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               _updateCurrentLocation();
             });
+          },
+          onCameraIdle: () async {
+            if (mapController == null || !mounted) return;
+            final controller = context.read<MapController>();
+            final bounds = await mapController!.getVisibleRegion();
+            if (mounted) {
+              controller.loadVisibleRegion(bounds);
+            }
           },
         ),
         Positioned(
@@ -295,6 +402,28 @@ class _MapViewState extends State<_MapView> {
             left: 0,
             right: 0,
             child: Center(child: CircularProgressIndicator()),
+          ),
+
+        if (state.errorMessage != null)
+          Positioned(
+            left: 16.w,
+            right: 16.w,
+            bottom: bottomLocation == null ? 24.h : 150.h,
+            child: _MapErrorBanner(
+              message: state.errorMessage!,
+              onRetry: controller.retry,
+            ),
+          ),
+
+        if (_locationError != null)
+          Positioned(
+            left: 16.w,
+            right: 16.w,
+            top: 100.h,
+            child: _MapErrorBanner(
+              message: _locationError!,
+              onRetry: _updateCurrentLocation,
+            ),
           ),
 
         // Top UI (Search, Filters, Notifications)
@@ -426,6 +555,38 @@ class _CheckInFab extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MapErrorBanner extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _MapErrorBanner({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      elevation: 4,
+      borderRadius: BorderRadius.circular(12.r),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(14.w, 10.h, 8.w, 10.h),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                message,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: AppColors.black, fontSize: 13.sp),
+              ),
+            ),
+            TextButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
         ),
       ),
     );

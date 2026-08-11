@@ -5,11 +5,13 @@ import 'package:locals/features/explore/restaurant_view_details/model/restaurant
 import 'package:locals/features/map/map/controller/map_controller.dart';
 import 'package:locals/features/map/map/model/map_mission_args.dart';
 import 'package:locals/features/map/map/model/map_screen_args.dart';
-import 'package:locals/shared/model/map_pin_info.dart';   // ← Use this
+import 'package:locals/core/localization/filters_l10n.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
+import 'package:locals/shared/model/map_pin_info.dart'; // ← Use this
 import 'package:locals/shared/theme/app_colors.dart';
 
 class PinDetailsSheet extends StatelessWidget {
-  final MapPinInfo pin;           // ← Changed to MapPinInfo
+  final MapPinInfo pin; // ← Changed to MapPinInfo
   final MapController controller;
 
   const PinDetailsSheet({
@@ -104,7 +106,10 @@ class PinDetailsSheet extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                pin.category?.toUpperCase() ?? 'PLACE',
+                                FiltersL10n.categoryLabel(
+                                  context.l10n,
+                                  pin.category ?? 'other',
+                                ),
                                 style: TextStyle(
                                   color: AppColors.primaryPink,
                                   fontSize: 13.sp,

@@ -789,6 +789,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsPrivacy => 'Privacidad';
 
   @override
+  String get settingsDiscounts => 'Descuentos';
+
+  @override
   String get settingsEditProfile => 'Editar perfil';
 
   @override
@@ -986,6 +989,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get filterCategoryOther => 'Otro';
+
+  @override
+  String get filterCategoryParksGardens => 'Parques y jardines';
+
+  @override
+  String get validationFailed => 'Error de validación';
 
   @override
   String get snackbarLinkCopied => 'Enlace copiado';

@@ -1562,6 +1562,12 @@ abstract class AppLocalizations {
   /// **'Privacy'**
   String get settingsPrivacy;
 
+  /// No description provided for @settingsDiscounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Discounts'**
+  String get settingsDiscounts;
+
   /// No description provided for @settingsEditProfile.
   ///
   /// In en, this message translates to:
@@ -1945,6 +1951,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Other'**
   String get filterCategoryOther;
+
+  /// No description provided for @filterCategoryParksGardens.
+  ///
+  /// In en, this message translates to:
+  /// **'Parks and gardens'**
+  String get filterCategoryParksGardens;
+
+  /// No description provided for @validationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Validation failed'**
+  String get validationFailed;
 
   /// No description provided for @snackbarLinkCopied.
   ///

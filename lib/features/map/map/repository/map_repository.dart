@@ -1,4 +1,5 @@
 import 'package:locals/core/network/api_client.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locals/shared/model/map_pin_info.dart';
 
 abstract class MapRepository {
@@ -7,6 +8,7 @@ abstract class MapRepository {
     String? categorySlug,
     String? placeType,
     String? visitStatus,
+    LatLngBounds? bounds,
   });
 }
 
@@ -19,12 +21,19 @@ class MapRepositoryImpl implements MapRepository {
     String? categorySlug,
     String? placeType,
     String? visitStatus,
+    LatLngBounds? bounds,
   }) async {
     final params = <String, String>{
       if (search != null && search.trim().isNotEmpty) 'search': search.trim(),
       if (categorySlug != null) 'category_slug': categorySlug,
       if (placeType != null) 'place_type': placeType,
       if (visitStatus != null) 'visit_status': visitStatus,
+      if (bounds != null) ...{
+        'min_lat': bounds.southwest.latitude.toString(),
+        'min_lng': bounds.southwest.longitude.toString(),
+        'max_lat': bounds.northeast.latitude.toString(),
+        'max_lng': bounds.northeast.longitude.toString(),
+      },
     };
 
     final query = params.isEmpty

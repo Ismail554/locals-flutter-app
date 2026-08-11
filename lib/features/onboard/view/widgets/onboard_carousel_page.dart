@@ -15,14 +15,12 @@ class OnboardCarouselPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        NeumorphicIllustrationCard(
-          child: SizedBox(
-            width: 90.w,
-            height: 90.w,
-            child: Image.asset(
-              page.imageAsset,
-              fit: BoxFit.contain,
-            ),
+        SizedBox(
+          width: 190.w,
+          height: 190.w,
+          child: Image.asset(
+            page.imageAsset,
+            fit: BoxFit.contain,
           ),
         ),
         SizedBox(height: 20.h),

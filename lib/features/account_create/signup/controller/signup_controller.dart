@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/core/network/api_client.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import '../model/signup_model.dart';
 import '../repository/signup_repository.dart';
 
@@ -59,7 +60,12 @@ class SignupController extends ChangeNotifier {
       if (!context.mounted) return;
       context.push('/verify_account_otp', extra: state.email.trim());
     } on ApiException catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.message);
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.message == 'Validation failed'
+            ? context.l10n.validationFailed
+            : e.message,
+      );
       notifyListeners();
     } catch (_) {
       state = state.copyWith(

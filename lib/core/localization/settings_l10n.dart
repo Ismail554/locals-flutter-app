@@ -33,7 +33,7 @@ class SettingsL10n {
           SettingsItem(
             id: 'discount',
             icon: Icons.local_offer,
-            label: 'Discounts',
+            label: l10n.settingsDiscounts,
           ),
         ],
       ),

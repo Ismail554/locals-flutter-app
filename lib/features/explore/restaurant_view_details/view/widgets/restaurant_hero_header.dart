@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/core/localization/l10n_extensions.dart';
+import 'package:locals/core/localization/filters_l10n.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_model.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 
@@ -84,7 +85,12 @@ class RestaurantHeroHeader extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    _Tag(label: restaurant.category),
+                    _Tag(
+                      label: FiltersL10n.categoryLabel(
+                        context.l10n,
+                        restaurant.category,
+                      ),
+                    ),
                     if (restaurant.hasLocalsSeal) ...[
                       SizedBox(width: 8.w),
                       _SealTag(),

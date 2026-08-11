@@ -15,13 +15,13 @@ class NeumorphicIllustrationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardSize = size ?? 170.w;
+    final cardSize = size ?? 100.w;
     final radius = circular ? cardSize / 2 : 22.67.r;
 
     return Container(
       width: cardSize,
       height: cardSize,
-      padding: EdgeInsets.symmetric(horizontal: 28.33.w, vertical: 28.33.w),
+      // padding: EdgeInsets.symmetric(horizontal: 28.33.w, vertical: 28.33.w),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment(-0.47, -0.43),
