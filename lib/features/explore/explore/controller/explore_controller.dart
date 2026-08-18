@@ -60,9 +60,17 @@ class ExploreController extends ChangeNotifier {
 
     try {
       final feedStories = await repo.fetchStoryFeed();
-      final yourStory = repo.loadStories().first;
+
+      // The feed can include the current user's own story. Merge it into the
+      // single "Your story" slot so the upload option never shows up twice and
+      // the user sees their own uploaded story (with its real viewer count).
+      final ownFromFeed = feedStories.where((s) => s.isYourStory).toList();
+      final otherStories = feedStories.where((s) => !s.isYourStory).toList();
+
+      final yourStory = _mergeYourStory(repo.loadStories().first, ownFromFeed);
+
       state = state.copyWith(
-        stories: [yourStory, ...feedStories],
+        stories: [yourStory, ...otherStories],
         isLoadingStories: false,
       );
     } catch (e) {
@@ -71,6 +79,30 @@ class ExploreController extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  /// Combines the local "Your story" placeholder with the current user's own
+  /// story returned by the feed (if any), producing a single entry that
+  /// reflects the real uploaded slides and viewer count.
+  ExploreStory _mergeYourStory(
+    ExploreStory placeholder,
+    List<ExploreStory> ownFromFeed,
+  ) {
+    if (ownFromFeed.isEmpty) return placeholder;
+
+    final serverSlides = ownFromFeed.expand((s) => s.slides).toList();
+    final serverViewers = ownFromFeed.expand((s) => s.viewers).toList();
+    final serverViewerCount = ownFromFeed.fold<int>(
+      0,
+      (sum, s) => sum + s.displayViewerCount,
+    );
+
+    return placeholder.copyWith(
+      slides: serverSlides.isNotEmpty ? serverSlides : placeholder.slides,
+      viewers: serverViewers.isNotEmpty ? serverViewers : placeholder.viewers,
+      viewerCount: serverViewerCount,
+      serverId: ownFromFeed.first.serverId,
+    );
   }
 
   // ─── Story Tap ──────────────────────────────────────────────────────────────

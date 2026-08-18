@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:locals/core/network/api_client.dart';
 import 'package:locals/core/network/token_manager.dart';
@@ -102,7 +101,9 @@ class ExploreRepositoryImpl implements ExploreRepository {
   @override
   void addSlideToYourStory(StorySlide slide) {
     _yourSlides = [..._yourSlides.where((s) => !s.isExpired), slide];
-    if (_yourViewers.isEmpty) _yourViewers = _seedViewers();
+    // Viewer data is owned by the backend — a freshly uploaded story starts
+    // with zero viewers and the real count arrives with the next feed load.
+    // (No fake/seeded viewers.)
   }
 
   @override
@@ -202,25 +203,5 @@ class ExploreRepositoryImpl implements ExploreRepository {
   @override
   Future<void> toggleFollow(String userId) async {
     await _client.post('/social/profiles/$userId/follow/', {});
-  }
-
-  // ─── Helpers ────────────────────────────────────────────────────────────────
-
-  static List<StoryViewer> _seedViewers() {
-    final now = DateTime.now();
-    return [
-      StoryViewer(
-        id: 'marta',
-        name: 'Marta Roig',
-        viewedAt: now.subtract(const Duration(minutes: 8)),
-        avatarColor: const Color(0xFFD4A574),
-      ),
-      StoryViewer(
-        id: 'aina',
-        name: 'Aina V.',
-        viewedAt: now.subtract(const Duration(minutes: 22)),
-        avatarColor: const Color(0xFFE8A0A0),
-      ),
-    ];
   }
 }

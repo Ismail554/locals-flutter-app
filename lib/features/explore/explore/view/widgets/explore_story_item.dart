@@ -37,7 +37,7 @@ class ExploreStoryItem extends StatelessWidget {
                     Positioned(
                       right: 0,
                       bottom: 0,
-                      child: _StoryViewerBadge(count: story.viewers.length),
+                      child: _StoryViewerBadge(count: story.displayViewerCount),
                     ),
                 ],
               ),

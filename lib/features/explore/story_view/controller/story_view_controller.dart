@@ -40,7 +40,7 @@ class StoryViewController extends ChangeNotifier {
   ExploreStory get currentStory => stories[storyIndex];
   StorySlide get currentSlide => _currentSlides[slideIndex];
   bool get isYourStory => currentStory.isYourStory;
-  int get viewerCount => currentStory.viewers.length;
+  int get viewerCount => currentStory.displayViewerCount;
 
   static const _currentUserViewerId = 'you';
   static const _currentUserViewerName = 'You';

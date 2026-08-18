@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:locals/core/network/user_session.dart';
 
+/// Coerces a dynamic JSON value into an int, tolerating num, numeric strings
+/// and unexpected types (e.g. a list) — returning 0 when it can't.
+int _asInt(dynamic value) {
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value) ?? 0;
+  return 0;
+}
+
 class StoryViewer {
   final String id;
   final String name;
@@ -13,6 +21,18 @@ class StoryViewer {
     required this.viewedAt,
     this.avatarColor = const Color(0xFFD4A574),
   });
+
+  factory StoryViewer.fromApi(Map<String, dynamic> json) {
+    final user = json['user'] as Map<String, dynamic>? ?? json;
+    final rawViewedAt = json['viewed_at'] ?? json['created_at'];
+    return StoryViewer(
+      id: (user['id'] ?? json['id'] ?? '').toString(),
+      name: (user['full_name'] as String?) ?? (user['name'] as String?) ?? '',
+      viewedAt: rawViewedAt != null
+          ? (DateTime.tryParse(rawViewedAt.toString()) ?? DateTime.now())
+          : DateTime.now(),
+    );
+  }
 }
 
 class StorySlide {
@@ -26,6 +46,7 @@ class StorySlide {
 
   final bool isLikedByMe;
   final int likeCount;
+  final int viewCount;
 
   const StorySlide({
     required this.id,
@@ -35,6 +56,7 @@ class StorySlide {
     required this.createdAt,
     this.isLikedByMe = false,
     this.likeCount = 0,
+    this.viewCount = 0,
   });
 
   DateTime get expiresAt => createdAt.add(storyLifetime);
@@ -61,6 +83,7 @@ class StorySlide {
     Color? placeholderColor,
     bool? isLikedByMe,
     int? likeCount,
+    int? viewCount,
   }) {
     return StorySlide(
       id: id,
@@ -70,6 +93,7 @@ class StorySlide {
       createdAt: createdAt,
       isLikedByMe: isLikedByMe ?? this.isLikedByMe,
       likeCount: likeCount ?? this.likeCount,
+      viewCount: viewCount ?? this.viewCount,
     );
   }
 
@@ -80,6 +104,12 @@ class StorySlide {
       createdAt: DateTime.parse(json['created_at'] as String),
       isLikedByMe: json['liked_by_me'] as bool? ?? false,
       likeCount: json['like_count'] as int? ?? 0,
+      viewCount: _asInt(
+        json['view_count'] ??
+            json['views_count'] ??
+            json['viewers_count'] ??
+            json['views'],
+      ),
     );
   }
 }
@@ -91,6 +121,7 @@ class ExploreStory {
   final List<StorySlide> slides;
   final bool isViewed;
   final List<StoryViewer> viewers;
+  final int viewerCount;
   final int? serverId;
 
   const ExploreStory({
@@ -100,6 +131,7 @@ class ExploreStory {
     this.slides = const [],
     this.isViewed = false,
     this.viewers = const [],
+    this.viewerCount = 0,
     this.serverId,
   });
 
@@ -108,12 +140,22 @@ class ExploreStory {
 
   bool get hasStory => activeSlides.isNotEmpty;
 
+  /// Total number of people who viewed this story. Prefers the count the API
+  /// reports, then a returned viewers list, then the sum of per-slide views.
+  int get displayViewerCount {
+    if (viewerCount > 0) return viewerCount;
+    if (viewers.isNotEmpty) return viewers.length;
+    return slides.fold<int>(0, (sum, slide) => sum + slide.viewCount);
+  }
+
   ExploreStory copyWith({
     List<StorySlide>? slides,
     bool? isViewed,
     bool? isLikedByMe,
     int? likeCount,
     List<StoryViewer>? viewers,
+    int? viewerCount,
+    int? serverId,
   }) {
     return ExploreStory(
       id: id,
@@ -122,7 +164,8 @@ class ExploreStory {
       slides: slides ?? this.slides,
       isViewed: isViewed ?? this.isViewed,
       viewers: viewers ?? this.viewers,
-      serverId: serverId,
+      viewerCount: viewerCount ?? this.viewerCount,
+      serverId: serverId ?? this.serverId,
     );
   }
 
@@ -132,20 +175,47 @@ class ExploreStory {
         .toList();
 
     final currentUserId = UserSession().currentUser?.id.toString();
+    // Prefer explicit owner fields over the top-level `id` (which may be the
+    // story/group id, not the user id) so the current user's own story is
+    // reliably detected and doesn't appear as a separate feed entry.
     final rawStoryOwnerId = [
-      json['id'],
       json['user_id'],
       json['owner_id'],
       json['author_id'],
       json['uploader_id'],
       (json['user'] as Map<String, dynamic>?)?['id'],
       (json['author'] as Map<String, dynamic>?)?['id'],
+      json['id'],
     ].firstWhere(
       (value) => value != null,
       orElse: () => null,
     );
     final storyOwnerId = rawStoryOwnerId?.toString();
     final isYourStory = currentUserId != null && storyOwnerId == currentUserId;
+
+    // Viewers list, if the API includes one.
+    final rawViewers =
+        json['viewers'] ?? json['viewed_by'] ?? json['story_views'];
+    final viewers = rawViewers is List
+        ? rawViewers
+              .whereType<Map<String, dynamic>>()
+              .map(StoryViewer.fromApi)
+              .toList()
+        : <StoryViewer>[];
+
+    // Total viewer count: an explicit story-level field wins, then the
+    // viewers list length, then the sum of per-slide view counts.
+    final storyLevelViewers = _asInt(
+      json['viewers_count'] ??
+          json['viewer_count'] ??
+          json['views_count'] ??
+          json['view_count'] ??
+          json['total_views'],
+    );
+    final slideViews = slides.fold<int>(0, (sum, s) => sum + s.viewCount);
+    final viewerCount = storyLevelViewers > 0
+        ? storyLevelViewers
+        : (viewers.isNotEmpty ? viewers.length : slideViews);
 
     return ExploreStory(
       id: storyOwnerId ?? json['id'].toString(),
@@ -155,6 +225,8 @@ class ExploreStory {
       isYourStory: isYourStory,
       slides: slides,
       isViewed: json['all_viewed'] as bool? ?? false,
+      viewers: viewers,
+      viewerCount: viewerCount,
       serverId: json['id'] as int?,
     );
   }
