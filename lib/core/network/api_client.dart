@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:locals/core/localization/api_locale.dart';
 import 'token_manager.dart';
@@ -20,8 +21,7 @@ class ApiClient {
 
   factory ApiClient() => _instance;
 
-  // static final baseUrl = dotenv.env['base_url'] ?? '';
-  static const baseUrl = 'https://clubby-andy-irksomely.ngrok-free.dev/api/v1';
+  static final baseUrl = dotenv.env['base_url'] ?? '';
   // static const _apiPrefix = '/api/v1';
 
   ApiClient._internal();
@@ -283,6 +283,12 @@ class ApiClient {
   }
 
   String _extractErrorMessage(Map<String, dynamic> body) {
+    // Prefer specific field-level validation errors over a generic message.
+    // e.g. {"message": "Validation failed.",
+    //       "errors": {"non_field_errors": ["This password must ..."]}}
+    final nested = _firstMessageFromValue(body['errors']);
+    if (nested != null) return nested;
+
     if (body['detail'] is String) return body['detail'] as String;
     if (body['message'] is String) return body['message'] as String;
 
@@ -295,5 +301,26 @@ class ApiClient {
     }
 
     return 'Something went wrong. Please try again.';
+  }
+
+  /// Recursively pulls the first human-readable message out of a DRF-style
+  /// error payload, which may be a String, a List, or a nested Map of them.
+  String? _firstMessageFromValue(dynamic value) {
+    if (value is String) {
+      return value.trim().isEmpty ? null : value;
+    }
+    if (value is List) {
+      for (final item in value) {
+        final msg = _firstMessageFromValue(item);
+        if (msg != null) return msg;
+      }
+    }
+    if (value is Map) {
+      for (final item in value.values) {
+        final msg = _firstMessageFromValue(item);
+        if (msg != null) return msg;
+      }
+    }
+    return null;
   }
 }

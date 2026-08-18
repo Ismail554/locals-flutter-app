@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:locals/shared/model/check_in_photo_model.dart';
 import 'package:locals/features/explore/points/model/points_args.dart';
 import 'package:locals/features/map/map/model/map_mission_args.dart';
@@ -101,7 +102,9 @@ class RestaurantViewDetailsModel {
     this.businessOfTheMonth = false,
   });
 
-  String get shareUrl => 'https://clubby-andy-irksomely.ngrok-free.dev/l/$id';
+
+static final baseUrl = dotenv.env['base_url'] ?? '';
+  String get shareUrl => '$baseUrl/$id';
 
   String get mapPinId => switch (id) {
     'sagrada_familia' => 'sagrada',

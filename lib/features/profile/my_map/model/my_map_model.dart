@@ -1,7 +1,10 @@
 import 'package:locals/shared/model/map_pin_info.dart';
-import 'package:locals/shared/model/map_pin_tag.dart';
 
-enum MyMapFilter { all, visited, unvisited }
+enum MyMapFilter {
+  all,
+  visited,
+  unvisited,
+}
 
 class MyMapModel {
   final MyMapFilter selectedFilter;
@@ -15,15 +18,23 @@ class MyMapModel {
   });
 
   int get visitedCount => pins.where((p) => p.visited).length;
+
   int get unvisitedCount => pins.where((p) => !p.visited).length;
 
   List<MapPinInfo> get filteredPins {
-    return switch (selectedFilter) {
-      MyMapFilter.all => pins,
-      MyMapFilter.visited => pins.where((p) => p.visited).toList(),
-      MyMapFilter.unvisited => pins.where((p) => !p.visited).toList(),
-    };
+    switch (selectedFilter) {
+      case MyMapFilter.all:
+        return pins;
+
+      case MyMapFilter.visited:
+        return pins.where((p) => p.visited).toList();
+
+      case MyMapFilter.unvisited:
+        return pins.where((p) => !p.visited).toList();
+    }
   }
+
+  bool get hasFilteredPins => filteredPins.isNotEmpty;
 
   MyMapModel copyWith({
     MyMapFilter? selectedFilter,
@@ -33,7 +44,8 @@ class MyMapModel {
   }) {
     return MyMapModel(
       selectedFilter: selectedFilter ?? this.selectedFilter,
-      selectedPinId: clearSelectedPin ? null : (selectedPinId ?? this.selectedPinId),
+      selectedPinId:
+          clearSelectedPin ? null : (selectedPinId ?? this.selectedPinId),
       pins: pins ?? this.pins,
     );
   }

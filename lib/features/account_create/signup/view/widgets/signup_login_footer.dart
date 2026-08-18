@@ -14,7 +14,7 @@ class SignupLoginFooter extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          '${context.l10n.signupAlreadyLocal} ',
+          '${context.l10n.signupAlreadyLocal}  ',
           style: TextStyle(color: AppColors.textSecondary, fontSize: 14.sp),
         ),
         GestureDetector(
