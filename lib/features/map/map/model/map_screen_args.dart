@@ -1,6 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'map_mission_args.dart';
+import 'travel_mode.dart';
 
 class MapScreenArgs {
   final String? focusedPinId;
@@ -9,9 +10,11 @@ class MapScreenArgs {
 
   final bool showRoute;
 
-  final List<MapActiveLocation>? routeStops; 
-  final LatLng? initialCenter;              
+  final List<MapActiveLocation>? routeStops;
+  final LatLng? initialCenter;
   final double? initialZoom;
+
+  final TravelMode travelMode;
 
   const MapScreenArgs({
     this.focusedPinId,
@@ -21,6 +24,7 @@ class MapScreenArgs {
     this.routeStops,
     this.initialCenter,
     this.initialZoom,
+    this.travelMode = TravelMode.walk,
   });
 
   factory MapScreenArgs.fromExtra(Object? extra) {

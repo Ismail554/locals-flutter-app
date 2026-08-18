@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/core/navigation/navigation_session.dart';
+import 'package:locals/core/network/token_manager.dart';
+import 'package:locals/core/network/user_session.dart';
 import 'package:locals/shared/components/premium_confirm_dialog.dart';
 import '../model/privacy_data_model.dart';
 import '../repository/privacy_data_repository.dart';
@@ -33,6 +36,12 @@ class PrivacyDataController extends ChangeNotifier {
 
     try {
       await repo.deleteAccount();
+
+      // Drop the local session so the app doesn't try to auto-login with a
+      // now-invalid token after the account is gone.
+      await TokenManager().clearTokens();
+      await NavigationSession().clear();
+      UserSession().clear();
 
       if (context.mounted) {
         context.go('/login'); // Logout after delete

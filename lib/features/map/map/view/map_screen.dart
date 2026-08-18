@@ -19,6 +19,7 @@ import 'widgets/map_circle_action_button.dart';
 import 'widgets/map_location_detail_card.dart';
 import 'widgets/map_mission_progress_card.dart';
 import 'widgets/map_search_bar.dart';
+import 'widgets/travel_mode_selector.dart';
 
 class MapScreen extends StatelessWidget {
   final MapScreenArgs? screenArgs;
@@ -513,6 +514,21 @@ class _MapViewState extends State<_MapView> {
             ),
           ),
         ],
+
+        // Travel-mode selector (walk / car / bus) — shown only while a
+        // direction is active, floating just above the location card.
+        if (state.showRoute && state.highlightedLocation != null)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 130.h,
+            child: Center(
+              child: TravelModeSelector(
+                selected: controller.travelMode,
+                onSelected: controller.setTravelMode,
+              ),
+            ),
+          ),
       ],
     );
   }

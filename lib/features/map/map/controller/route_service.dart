@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart'
+    hide TravelMode;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:locals/core/config/app_config.dart';
 import 'package:locals/core/network/api_client.dart';
+import 'package:locals/features/map/map/model/travel_mode.dart';
 
 class RouteService {
   RouteService._();
@@ -17,16 +19,24 @@ class RouteService {
   Future<List<LatLng>> getRoute({
     required LatLng origin,
     required LatLng destination,
+    TravelMode mode = TravelMode.walk,
   }) async {
-    final url = Uri.parse(
+    final buffer = StringBuffer(
       "https://maps.googleapis.com/maps/api/directions/json"
       "?origin=${origin.latitude},${origin.longitude}"
       "&destination=${destination.latitude},${destination.longitude}"
-      "&mode=walking"
+      "&mode=${mode.apiMode}"
       "&alternatives=true"
       "&language=en"
       "&key=$_apiKey",
     );
+
+    // Transit (bus) needs a time reference to plan against; default to now.
+    if (mode == TravelMode.bus) {
+      buffer.write("&departure_time=now");
+    }
+
+    final url = Uri.parse(buffer.toString());
 
     if (kDebugMode) {
       debugPrint("========== DIRECTIONS REQUEST ==========");
@@ -61,7 +71,7 @@ class RouteService {
       if (json["status"] == "ZERO_RESULTS") {
         if (kDebugMode) {
           debugPrint(
-            "No walking route exists between the current location and destination.",
+            "No ${mode.apiMode} route exists between the current location and destination.",
           );
         }
         return [];

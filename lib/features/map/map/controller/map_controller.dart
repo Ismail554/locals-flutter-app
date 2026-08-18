@@ -11,6 +11,7 @@ import 'package:locals/features/map/map/controller/route_service.dart';
 import 'package:locals/features/map/map/model/map_mission_args.dart';
 import 'package:locals/features/missions/check_in/view/checkin_bottom_sheet.dart';
 import 'package:locals/core/network/api_client.dart';
+import 'package:locals/core/navigation/navigation_session.dart';
 import 'package:locals/shared/components/pin_details_sheet.dart';
 import 'package:locals/shared/model/map_pin_info.dart';
 import 'package:locals/shared/model/map_pin_tag.dart';
@@ -18,6 +19,7 @@ import 'package:locals/shared/theme/app_colors.dart';
 import '../../filters/model/filters_model.dart';
 import '../../search/repository/map_search_repository.dart';
 import '../model/map_screen_args.dart';
+import '../model/travel_mode.dart';
 import '../model/map_model.dart';
 import '../repository/map_repository.dart';
 
@@ -31,6 +33,7 @@ class MapController extends ChangeNotifier {
   StreamSubscription<LatLng>? _locationSubscription;
   bool isNearDestination = false;
   bool isTrackingLive = false;
+  TravelMode travelMode;
   bool get isFocusedMode => _isFocusedMode;
 
   bool get _isFocusedMode =>
@@ -44,7 +47,8 @@ class MapController extends ChangeNotifier {
         showRoute: screenArgs?.showRoute ?? false,
         initialCenter: screenArgs?.initialCenter,
         initialZoom: screenArgs?.initialZoom,
-      ) {
+      ),
+      travelMode = screenArgs?.travelMode ?? TravelMode.walk {
     _initContext();
   }
 
@@ -58,6 +62,16 @@ class MapController extends ChangeNotifier {
   }
 
   Future<void> retry() => _loadPlaces();
+
+  /// Switches the active route's travel mode (walk / car / bus) and redraws
+  /// the polyline accordingly. The choice is persisted via [loadRoute] so it
+  /// survives an app restart.
+  void setTravelMode(TravelMode mode) {
+    if (travelMode == mode) return;
+    travelMode = mode;
+    notifyListeners();
+    loadRoute();
+  }
 
   void loadVisibleRegion(LatLngBounds bounds) {
     if (_isFocusedMode) return;
@@ -140,6 +154,7 @@ class MapController extends ChangeNotifier {
       final points = await RouteService.instance.getRoute(
         origin: current,
         destination: destination,
+        mode: travelMode,
       );
       if (points.isNotEmpty) {
         state = state.copyWith(
@@ -169,6 +184,15 @@ class MapController extends ChangeNotifier {
           },
         );
       }
+
+      // Remember this direction so it can be resumed after an app restart.
+      unawaited(
+        NavigationSession().save(
+          destination: location,
+          travelMode: travelMode,
+        ),
+      );
+
       notifyListeners();
     } catch (e) {
       debugPrint("Route Error: $e");

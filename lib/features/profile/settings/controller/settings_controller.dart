@@ -4,6 +4,9 @@ import 'package:locals/core/localization/app_locales.dart';
 import 'package:locals/core/localization/l10n_extensions.dart';
 import 'package:locals/core/localization/locale_controller.dart';
 import 'package:locals/core/localization/settings_l10n.dart';
+import 'package:locals/core/navigation/navigation_session.dart';
+import 'package:locals/core/network/token_manager.dart';
+import 'package:locals/core/network/user_session.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/qr_discount_result.dart';
 import 'package:locals/shared/components/premium_confirm_dialog.dart';
 import 'package:provider/provider.dart';
@@ -76,6 +79,14 @@ class SettingsController extends ChangeNotifier {
   Future<void> confirmLogout(BuildContext context) async {
     final shouldLogout = await PremiumConfirmDialog.showLogout(context);
     if (!shouldLogout || !context.mounted) return;
+
+    // Clear the persisted session so reopening the app requires logging in
+    // again, and drop any in-progress direction from the previous account.
+    await TokenManager().clearTokens();
+    await NavigationSession().clear();
+    UserSession().clear();
+
+    if (!context.mounted) return;
     context.go('/login');
   }
 }
