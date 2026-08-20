@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class EditProfileModel {
   final String name;
+  final String email;
   final String location;
   final Color avatarColor;
   final String? avatarImagePath;
@@ -12,6 +13,7 @@ class EditProfileModel {
 
   const EditProfileModel({
     this.name = '',
+    this.email = '',
     this.location = '',
     this.avatarColor = _defaultAvatarColor,
     this.avatarImagePath,
@@ -21,6 +23,7 @@ class EditProfileModel {
 
   EditProfileModel copyWith({
     String? name,
+    String? email,
     String? location,
     Color? avatarColor,
     String? avatarImagePath,
@@ -30,6 +33,7 @@ class EditProfileModel {
   }) {
     return EditProfileModel(
       name: name ?? this.name,
+      email: email ?? this.email,
       location: location ?? this.location,
       avatarColor: avatarColor ?? this.avatarColor,
       avatarImagePath: clearAvatarImagePath

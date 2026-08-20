@@ -65,6 +65,7 @@
   "otpVerifyButton": "Verify OTP",
   "otpDidntReceiveCode": "Didn't receive code?",
   "otpResend": "Resend",
+  "otpResendSuccess": "A new code has been sent to your email.",
   "otpEmailVerifiedTitle": "Email Verified",
   "otpEmailVerifiedMessage": "Your email has been verified successfully.",
   "requestOtpButton": "Request OTP",

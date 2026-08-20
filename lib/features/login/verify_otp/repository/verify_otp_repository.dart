@@ -2,6 +2,7 @@ import 'package:locals/core/network/api_client.dart';
 
 abstract class VerifyOtpRepository {
   Future<String> verifyOtp({required String email, required String code});
+  Future<void> resendOtp({required String email});
 }
 
 class VerifyOtpRepositoryImpl implements VerifyOtpRepository {
@@ -23,5 +24,10 @@ class VerifyOtpRepositoryImpl implements VerifyOtpRepository {
     }
 
     return resetToken;
+  }
+
+  @override
+  Future<void> resendOtp({required String email}) async {
+    await _client.post('/auth/password-reset/request/', {'email': email});
   }
 }

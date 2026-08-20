@@ -61,7 +61,8 @@ class _RequestOtpView extends StatelessWidget {
                       ),
                     ),
                   ],
-                  const Spacer(),
+                  // const Spacer(),
+                  SizedBox(height: 24.h),
                   PrimaryButton(
                     label: context.l10n.requestOtpButton,
                     isLoading: controller.state.isLoading,

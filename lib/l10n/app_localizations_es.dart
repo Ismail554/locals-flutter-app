@@ -169,6 +169,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get otpResend => 'Reenviar';
 
   @override
+  String get otpResendSuccess => 'Se ha enviado un nuevo código a tu correo.';
+
+  @override
   String get otpEmailVerifiedTitle => 'Correo verificado';
 
   @override

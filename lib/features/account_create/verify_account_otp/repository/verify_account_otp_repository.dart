@@ -3,6 +3,7 @@ import 'package:locals/core/network/token_manager.dart';
 
 abstract class VerifyAccountOtpRepository {
   Future<void> verifyOtp({required String email, required String code});
+  Future<void> resendOtp({required String email});
 }
 
 class VerifyAccountOtpRepositoryImpl implements VerifyAccountOtpRepository {
@@ -26,5 +27,10 @@ class VerifyAccountOtpRepositoryImpl implements VerifyAccountOtpRepository {
     }
 
     await TokenManager().setTokens(access, refresh);
+  }
+
+  @override
+  Future<void> resendOtp({required String email}) async {
+    await _client.post('/auth/register/resend-otp/', {'email': email});
   }
 }

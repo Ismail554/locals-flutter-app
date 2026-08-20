@@ -83,7 +83,8 @@ class _VerifyOtpView extends StatelessWidget {
                       ),
                     ),
                   ],
-                  const Spacer(),
+                  // const Spacer(),
+                  SizedBox(height: 24.h),
                   PrimaryButton(
                     label: context.l10n.otpVerifyButton,
                     isLoading: controller.state.isLoading,
@@ -94,7 +95,9 @@ class _VerifyOtpView extends StatelessWidget {
                     },
                   ),
                   SizedBox(height: 20.h),
-                  VerifyOtpResendRow(onResend: controller.resendCode),
+                  VerifyOtpResendRow(
+                    onResend: () => controller.resendCode(context),
+                  ),
                   SizedBox(height: 24.h),
                 ],
               ),

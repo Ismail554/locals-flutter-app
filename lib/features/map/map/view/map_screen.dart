@@ -348,12 +348,12 @@ class _MapViewState extends State<_MapView> {
           style: _mapStyle,
           initialCameraPosition: CameraPosition(
             target: state.initialCenter ?? const LatLng(23.7809, 90.407992),
-            zoom: state.initialZoom ?? 13,
+            zoom: state.initialZoom ?? 14,
           ),
           markers: _markers,
           polylines: state.polylines,
           myLocationEnabled: true,
-          myLocationButtonEnabled: true,
+          myLocationButtonEnabled: false,
           zoomControlsEnabled: false,
           compassEnabled: true,
 
@@ -533,50 +533,6 @@ class _MapViewState extends State<_MapView> {
     );
   }
 }
-
-class _CheckInFab extends StatelessWidget {
-  final VoidCallback onTap;
-  final bool enabled;
-
-  const _CheckInFab({super.key, required this.onTap, this.enabled = true});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: enabled ? AppColors.actionPink : Colors.grey.shade400,
-      borderRadius: BorderRadius.circular(24.r),
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.2),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(24.r),
-        onTap: enabled ? onTap : null,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 12.h),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.camera_alt_outlined,
-                color: AppColors.white,
-                size: 18.sp,
-              ),
-              SizedBox(width: 8.w),
-              Text(
-                context.l10n.checkInButtonLabel,
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _MapErrorBanner extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;

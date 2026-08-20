@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:locals/core/network/api_client.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import '../model/verify_otp_model.dart';
 import '../repository/verify_otp_repository.dart';
 
@@ -9,6 +10,8 @@ class VerifyOtpController extends ChangeNotifier {
   final String email;
 
   VerifyOtpModel state = const VerifyOtpModel();
+
+  bool isResending = false;
 
   final List<TextEditingController> digitControllers = List.generate(
     4,
@@ -60,8 +63,32 @@ class VerifyOtpController extends ChangeNotifier {
     }
   }
 
-  void resendCode() {
-    // Wire up resend OTP when endpoint is available
+  Future<void> resendCode(BuildContext context) async {
+    if (isResending) return;
+
+    isResending = true;
+    state = state.copyWith(clearError: true);
+    notifyListeners();
+
+    try {
+      await repo.resendOtp(email: email);
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.otpResendSuccess)),
+      );
+    } on ApiException catch (e) {
+      state = state.copyWith(errorMessage: e.message);
+      notifyListeners();
+    } catch (_) {
+      state = state.copyWith(
+        errorMessage: 'Something went wrong. Please try again.',
+      );
+      notifyListeners();
+    } finally {
+      isResending = false;
+      notifyListeners();
+    }
   }
 
   void goBack(BuildContext context) {

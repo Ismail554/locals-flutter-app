@@ -163,7 +163,7 @@ class MapController extends ChangeNotifier {
               polylineId: const PolylineId('route'),
               points: points,
               width: 8,
-              color: AppColors.borderGray,
+              color: AppColors.primaryPink,
               geodesic: false,
               startCap: Cap.roundCap,
               endCap: Cap.roundCap,

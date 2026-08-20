@@ -33,6 +33,7 @@ class EditProfileRepositoryImpl implements EditProfileRepository {
 
     return EditProfileModel(
       name: user.fullName,
+      email: user.email,
       location: user.locationCity,
       avatarUrl: user.avatarUrl,
     );

@@ -10,6 +10,7 @@ class EditProfileController extends ChangeNotifier {
   EditProfileModel state = const EditProfileModel();
 
   final nameController = TextEditingController();
+  final emailController = TextEditingController();
   final locationController = TextEditingController();
   final currentPasswordController = TextEditingController();
   final newPasswordController = TextEditingController();
@@ -35,6 +36,7 @@ class EditProfileController extends ChangeNotifier {
     state = loaded.copyWith(isLoading: false);
 
     nameController.text = state.name;
+    emailController.text = state.email;
     locationController.text = state.location;
     notifyListeners();
   }
@@ -152,6 +154,7 @@ class EditProfileController extends ChangeNotifier {
   @override
   void dispose() {
     nameController.dispose();
+    emailController.dispose();
     locationController.dispose();
     currentPasswordController.dispose();
     newPasswordController.dispose();

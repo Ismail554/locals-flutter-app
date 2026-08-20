@@ -34,8 +34,8 @@ class AuthTextField extends StatelessWidget {
           label,
           style: TextStyle(
             color: AppColors.black,
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w700,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w500,
           ),
         ),
         SizedBox(height: 8.h),

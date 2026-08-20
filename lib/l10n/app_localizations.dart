@@ -404,6 +404,12 @@ abstract class AppLocalizations {
   /// **'Resend'**
   String get otpResend;
 
+  /// No description provided for @otpResendSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'A new code has been sent to your email.'**
+  String get otpResendSuccess;
+
   /// No description provided for @otpEmailVerifiedTitle.
   ///
   /// In en, this message translates to:

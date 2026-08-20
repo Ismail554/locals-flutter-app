@@ -104,7 +104,9 @@ class _VerifyAccountOtpView extends StatelessWidget {
                     },
                   ),
                   SizedBox(height: 20.h),
-                  VerifyOtpResendRow(onResend: controller.resendCode),
+                  VerifyOtpResendRow(
+                    onResend: () => controller.resendCode(context),
+                  ),
                   SizedBox(height: 24.h),
                 ],
               ),

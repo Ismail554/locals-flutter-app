@@ -66,6 +66,13 @@ class _EditProfileView extends StatelessWidget {
                         ),
                         SizedBox(height: 16.h),
                         EditProfileFormField(
+                          label: context.l10n.authEmailLabel,
+                          controller: controller.emailController,
+                          readOnly: true,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        SizedBox(height: 16.h),
+                        EditProfileFormField(
                           label: context.l10n.editProfileLocation,
                           controller: controller.locationController,
                         ),
