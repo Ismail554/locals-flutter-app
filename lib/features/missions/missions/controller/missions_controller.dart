@@ -38,6 +38,8 @@ class MissionsController extends ChangeNotifier {
     }
   }
 
+  Future<void> refresh() => _fetch();
+
   Future<void> selectFilter(MissionFilter filter) async {
     state = state.copyWith(selectedFilter: filter);
     notifyListeners();

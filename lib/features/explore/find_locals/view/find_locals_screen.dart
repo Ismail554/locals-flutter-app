@@ -52,43 +52,47 @@ class _FindLocalsView extends StatelessWidget {
               child: state.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : state.errorMessage != null && users.isEmpty
-                      ? Center(
-                          child: Text(
-                            state.errorMessage!,
-                            style: TextStyle(
-                              color: AppColors.levelGrey,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                        )
-                      : GridView.builder(
-                          padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 12.h,
-                            crossAxisSpacing: 12.w,
-                            childAspectRatio: 0.86,
-                          ),
-                          itemCount: users.length,
-                          itemBuilder: (context, index) {
-                            final user = users[index];
-                            final story = controller.storyForUser(user.id);
-
-                            return Align(
-                              alignment: Alignment.topCenter,
-                              child: FindLocalCard(
-                                user: user,
-                                story: story,
-                                onCardTap: () => controller.openProfile(context, user.id),
-                                onAvatarTap: () =>
-                                    controller.openUserStory(context, user.id),
-                                onFollowTap: () =>
-                                    controller.toggleFollow(user.id),
-                              ),
-                            );
-                          },
+                  ? Center(
+                      child: Text(
+                        state.errorMessage!,
+                        style: TextStyle(
+                          color: AppColors.levelGrey,
+                          fontSize: 14.sp,
                         ),
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: controller.refresh,
+                      child: GridView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12.h,
+                          crossAxisSpacing: 12.w,
+                          childAspectRatio: 0.86,
+                        ),
+                        itemCount: users.length,
+                        itemBuilder: (context, index) {
+                          final user = users[index];
+                          final story = controller.storyForUser(user.id);
+
+                          return Align(
+                            alignment: Alignment.topCenter,
+                            child: FindLocalCard(
+                              user: user,
+                              story: story,
+                              onCardTap: () =>
+                                  controller.openProfile(context, user.id),
+                              onAvatarTap: () =>
+                                  controller.openUserStory(context, user.id),
+                              onFollowTap: () =>
+                                  controller.toggleFollow(user.id),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
             ),
           ],
         ),

@@ -50,6 +50,8 @@ class FindLocalsController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> refresh() => _loadSuggestions();
+
   Future<void> toggleFollow(String id) async {
     final target = state.users.firstWhere((u) => u.id == id);
     final wasFollowing = target.isFollowing;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:locals/features/profile/edit_profile/model/user_model.dart';
 import 'package:locals/shared/model/check_in_photo_model.dart';
 
 class ProfileAchievement {
@@ -89,6 +90,7 @@ class ProfileModel {
   final int points;
   final String levelTitle;
   final int pointsToNextLevel;
+  final int nextLevelThreshold;
   final int visitCount;
   final int cities;
   final int followers;
@@ -103,6 +105,7 @@ class ProfileModel {
     this.points = 0,
     this.levelTitle = '',
     this.pointsToNextLevel = 0,
+    this.nextLevelThreshold = 0,
     this.visitCount = 0,
     this.cities = 0,
     this.followers = 0,
@@ -114,12 +117,26 @@ class ProfileModel {
     required Map<String, dynamic> profileJson,
     required List<dynamic> achievementsJson,
     required List<dynamic> checkinsJson,
-    String? fallbackAvatarUrl,
+    UserModel? sessionUser,
   }) {
-    final level = (profileJson['level'] as int?) ?? 0;
+    final level = (profileJson['level'] as int?) ?? sessionUser?.level ?? 0;
     final points =
         (profileJson['total_points'] as int?) ??
         (profileJson['points_count'] as int?) ??
+        sessionUser?.totalPoints ??
+        0;
+
+    // Level progression is owned by the backend (`/auth/me/`). The
+    // `/social/profiles/` endpoint doesn't expose these fields yet, so fall
+    // back to the cached current-user values instead of deriving them from a
+    // hardcoded points-per-level constant.
+    final pointsToNextLevel =
+        (profileJson['points_to_next_level'] as int?) ??
+        sessionUser?.pointsToNextLevel ??
+        0;
+    final nextLevelThreshold =
+        (profileJson['next_level_threshold'] as int?) ??
+        sessionUser?.nextLevelThreshold ??
         0;
 
     return ProfileModel(
@@ -128,11 +145,12 @@ class ProfileModel {
       avatarUrl:
           profileJson['avatar'] as String? ??
           profileJson['avatar_url'] as String? ??
-          fallbackAvatarUrl,
+          sessionUser?.avatarUrl,
       level: level,
       points: points,
       levelTitle: _levelTitle(level),
-      pointsToNextLevel: _pointsToNextLevel(level, points),
+      pointsToNextLevel: pointsToNextLevel,
+      nextLevelThreshold: nextLevelThreshold,
       visitCount: (profileJson['visits_count'] as int?) ?? 0,
       cities: (profileJson['cities_count'] as int?) ?? 0,
       followers: (profileJson['followers_count'] as int?) ?? 0,
@@ -152,8 +170,8 @@ class ProfileModel {
     );
   }
 
-  // The API doesn't currently return a level title or "points to next
-  // level" — derived locally until the backend exposes real values.
+  // The API doesn't currently return a level title — derived locally until
+  // the backend exposes a real value.
   static String _levelTitle(int level) {
     const titles = [
       'Newcomer',
@@ -166,10 +184,13 @@ class ProfileModel {
     return titles[(level - 1).clamp(0, titles.length - 1)];
   }
 
-  static int _pointsToNextLevel(int level, int points) {
-    const perLevel = 500;
-    final remaining = (level * perLevel) - points;
-    return remaining > 0 ? remaining : 0;
+  /// Progress through the current level as a 0.0–1.0 fraction, driven entirely
+  /// by the backend: `nextLevelThreshold` is the points needed for this level
+  /// and `pointsToNextLevel` is how many of those still remain.
+  double get levelProgress {
+    if (nextLevelThreshold <= 0) return 0;
+    final earned = nextLevelThreshold - pointsToNextLevel;
+    return (earned / nextLevelThreshold).clamp(0.0, 1.0);
   }
 
   String get shareUrl =>

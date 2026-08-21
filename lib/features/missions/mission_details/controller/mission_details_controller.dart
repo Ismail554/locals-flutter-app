@@ -31,6 +31,11 @@ class MissionDetailsController extends ChangeNotifier {
     }
   }
 
+  Future<void> refresh() async {
+    final id = missionId;
+    if (id != null) await _fetch(id);
+  }
+
   void openStop(BuildContext context, MissionStop stop) {
     if (stop.latitude == null || stop.longitude == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -72,9 +77,9 @@ class MissionDetailsController extends ChangeNotifier {
       isStarting = false;
       notifyListeners();
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not start mission: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Could not start mission: $e')));
       }
       return;
     }
@@ -85,14 +90,23 @@ class MissionDetailsController extends ChangeNotifier {
     // Get next pending stop
     final nextStop = state.stops.firstWhere(
       (s) => s.status == MissionStopStatus.pending,
-      orElse: () => state.stops.firstOrNull ?? const MissionStop(
-        number: 0, name: '', category: '', address: '',
-        status: MissionStopStatus.pending, placeId: '',
-        city: '', seal: '',
-      ),
+      orElse: () =>
+          state.stops.firstOrNull ??
+          const MissionStop(
+            number: 0,
+            name: '',
+            category: '',
+            address: '',
+            status: MissionStopStatus.pending,
+            placeId: '',
+            city: '',
+            seal: '',
+          ),
     );
 
-    if (!context.mounted || nextStop.latitude == null || nextStop.longitude == null) {
+    if (!context.mounted ||
+        nextStop.latitude == null ||
+        nextStop.longitude == null) {
       return;
     }
 

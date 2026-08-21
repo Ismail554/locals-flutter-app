@@ -35,55 +35,60 @@ class _ProfileView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 24.h),
-          child: Column(
-            children: [
-              ProfileTopActions(
-                onShare: () => controller.shareProfile(context),
-                onSettings: () => controller.openSettings(context),
-              ),
-              SizedBox(height: 16.h),
-              ProfileHeader(
-                name: profile.name,
-                location: profile.location,
-                avatarUrl: profile.avatarUrl,
-                hasStory: controller.hasStory,
-                isStoryViewed: controller.isStoryViewed,
-                onAvatarTap: () => controller.openStory(context),
-              ),
-              SizedBox(height: 20.h),
-              ProfileLevelCard(
-                level: profile.level,
-                points: profile.points,
-                levelTitle: profile.levelTitle,
-                pointsToNextLevel: profile.pointsToNextLevel,
-              ),
-              SizedBox(height: 16.h),
-              ProfileStatsRow(
-                visits: profile.visitCount,
-                cities: profile.cities,
-                followers: profile.followers,
-              ),
-              SizedBox(height: 16.h),
-              ProfileActionGrid(
-                onMyMap: () => controller.openMyMap(context),
-                onFollowers: () => controller.openFollowersList(context),
-                onSavedPlace: () => controller.openSavedPlaces(context),
-                onBlocked: () => controller.openBlockedList(context),
-              ),
-              SizedBox(height: 24.h),
-              ProfileAchievementsSection(
-                achievements: profile.achievements,
-                onViewAll: () => controller.openAchievements(context),
-              ),
-              SizedBox(height: 24.h),
-              ProfileLatestVisitsSection(
-                visits: profile.latestVisits,
-                onVisitTap: (photo) =>
-                    controller.openVisitImage(context, photo),
-              ),
-            ],
+        child: RefreshIndicator(
+          onRefresh: () => controller.load(),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 24.h),
+            child: Column(
+              children: [
+                ProfileTopActions(
+                  onShare: () => controller.shareProfile(context),
+                  onSettings: () => controller.openSettings(context),
+                ),
+                SizedBox(height: 16.h),
+                ProfileHeader(
+                  name: profile.name,
+                  location: profile.location,
+                  avatarUrl: profile.avatarUrl,
+                  hasStory: controller.hasStory,
+                  isStoryViewed: controller.isStoryViewed,
+                  onAvatarTap: () => controller.openStory(context),
+                ),
+                SizedBox(height: 20.h),
+                ProfileLevelCard(
+                  level: profile.level,
+                  points: profile.points,
+                  levelTitle: profile.levelTitle,
+                  pointsToNextLevel: profile.pointsToNextLevel,
+                  progress: profile.levelProgress,
+                ),
+                SizedBox(height: 16.h),
+                ProfileStatsRow(
+                  visits: profile.visitCount,
+                  cities: profile.cities,
+                  followers: profile.followers,
+                ),
+                SizedBox(height: 16.h),
+                ProfileActionGrid(
+                  onMyMap: () => controller.openMyMap(context),
+                  onFollowers: () => controller.openFollowersList(context),
+                  onSavedPlace: () => controller.openSavedPlaces(context),
+                  onBlocked: () => controller.openBlockedList(context),
+                ),
+                SizedBox(height: 24.h),
+                ProfileAchievementsSection(
+                  achievements: profile.achievements,
+                  onViewAll: () => controller.openAchievements(context),
+                ),
+                SizedBox(height: 24.h),
+                ProfileLatestVisitsSection(
+                  visits: profile.latestVisits,
+                  onVisitTap: (photo) =>
+                      controller.openVisitImage(context, photo),
+                ),
+              ],
+            ),
           ),
         ),
       ),

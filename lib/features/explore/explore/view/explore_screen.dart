@@ -37,70 +37,76 @@ class _ExploreView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ExploreHeader(
-                onNotificationTap: () => controller.openNotifications(context),
-              ),
-              SizedBox(height: 20.h),
-
-              ExploreRecentActivitySection(
-                stories: state.stories,
-                onStoryTap: (index) => controller.onStoryTap(context, index),
-              ),
-
-              SizedBox(height: 24.h),
-
-              LocalSharesSection(
-                shares: state.localShares,
-                onPhotoTap: (share) =>
-                    controller.openLocalShareDetails(context, share),
-                onSeeAll: () => controller.openLocalShares(context),
-              ),
-
-              SizedBox(height: 24.h),
-
-              ExploreFollowLocalsSection(
-                users: state.followLocals,
-                stories: state.stories,
-                onFollowTap: controller.toggleFollow,
-                onCardTap: () => controller.openProfile(context),
-                onAvatarTap: (id) => controller.openUserStory(context, id),
-                onSeeAll: () => controller.openFindLocals(context),
-              ),
-
-              SizedBox(height: 24.h),
-
-              ExploreFeaturedLocationsSection(
-                locations: state.featuredLocations,
-                onSeeAll: () => controller.openFeaturedLocations(context),
-                onLocationTap: (id) =>
-                    controller.openLocationDetails(context, id),
-              ),
-
-              SizedBox(height: 24.h),
-
-              ExploreNewLocalsSection(
-                locals: state.newLocals,
-                onLocalTap: (id) => controller.openLocationDetails(context, id),
-              ),
-
-              // Safe Featured Route Section
-              if (state.featuredRoute != null) ...[
-                SizedBox(height: 24.h),
-                ExploreFeaturedRoutesSection(
-                  route: state.featuredRoute!,
-                  onAllEvents: () => controller.openEventsRoutes(context),
-                  onRouteTap: () => controller.openJoinEvent(
-                    context,
-                    state.featuredRoute!.id,   // Still safe because of if check
-                  ),
+        child: RefreshIndicator(
+          onRefresh: controller.refreshDashboard,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ExploreHeader(
+                  onNotificationTap: () =>
+                      controller.openNotifications(context),
                 ),
+                SizedBox(height: 20.h),
+
+                ExploreRecentActivitySection(
+                  stories: state.stories,
+                  onStoryTap: (index) => controller.onStoryTap(context, index),
+                ),
+
+                SizedBox(height: 24.h),
+
+                LocalSharesSection(
+                  shares: state.localShares,
+                  onPhotoTap: (share) =>
+                      controller.openLocalShareDetails(context, share),
+                  onSeeAll: () => controller.openLocalShares(context),
+                ),
+
+                SizedBox(height: 24.h),
+
+                ExploreFollowLocalsSection(
+                  users: state.followLocals,
+                  stories: state.stories,
+                  onFollowTap: controller.toggleFollow,
+                  onCardTap: () => controller.openProfile(context),
+                  onAvatarTap: (id) => controller.openUserStory(context, id),
+                  onSeeAll: () => controller.openFindLocals(context),
+                ),
+
+                SizedBox(height: 24.h),
+
+                ExploreFeaturedLocationsSection(
+                  locations: state.featuredLocations,
+                  onSeeAll: () => controller.openFeaturedLocations(context),
+                  onLocationTap: (id) =>
+                      controller.openLocationDetails(context, id),
+                ),
+
+                SizedBox(height: 24.h),
+
+                ExploreNewLocalsSection(
+                  locals: state.newLocals,
+                  onLocalTap: (id) =>
+                      controller.openLocationDetails(context, id),
+                ),
+
+                // Safe Featured Route Section
+                if (state.featuredRoute != null) ...[
+                  SizedBox(height: 24.h),
+                  ExploreFeaturedRoutesSection(
+                    route: state.featuredRoute!,
+                    onAllEvents: () => controller.openEventsRoutes(context),
+                    onRouteTap: () => controller.openJoinEvent(
+                      context,
+                      state.featuredRoute!.id, // Still safe because of if check
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

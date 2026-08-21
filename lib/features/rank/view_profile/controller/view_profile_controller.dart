@@ -16,7 +16,7 @@ class ViewProfileController extends ChangeNotifier {
   final ApiClient _client = ApiClient();
 
   ViewProfileController(this.repo, {required this.userId})
-      : state = const ViewProfileModel() {
+    : state = const ViewProfileModel() {
     _fetchProfile();
   }
 
@@ -33,6 +33,8 @@ class ViewProfileController extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> refresh() => _fetchProfile();
 
   bool get hasStory => UserStoryLauncher.hasStory(state.storyUserId);
   bool get isStoryViewed => UserStoryLauncher.isViewed(state.storyUserId);
@@ -52,35 +54,30 @@ class ViewProfileController extends ChangeNotifier {
     }
   }
 
-
   Future<void> blockUser(BuildContext context) async {
-  try {
-    await repo.blockUser(userId);
+    try {
+      await repo.blockUser(userId);
 
-    if (!context.mounted) return;
+      if (!context.mounted) return;
 
-    Navigator.pop(context);
+      Navigator.pop(context);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('User blocked successfully.'),
-      ),
-    );
-    Navigator.pop(context);
-  } catch (e) {
-    debugPrint('Block user error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User blocked successfully.')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      debugPrint('Block user error: $e');
 
-    if (!context.mounted) return;
+      if (!context.mounted) return;
 
-    Navigator.pop(context);
+      Navigator.pop(context);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Failed to block user.'),
-      ),
-    );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to block user.')));
+    }
   }
-}
 
   void showMoreOptions(BuildContext context) {
     showDialog(

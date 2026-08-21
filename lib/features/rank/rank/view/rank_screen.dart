@@ -35,80 +35,89 @@ class _RankView extends StatelessWidget {
       body: SafeArea(
         child: controller.isLoading && state.podium.isEmpty
             ? const Center(child: CircularProgressIndicator())
-            : CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 16.h),
-                      child: Text(
-                        context.l10n.rankLeaderboardTitle,
-                        style: TextStyle(
-                          color: AppColors.black,
-                          fontSize: 26.sp,
-                          fontWeight: FontWeight.w700,
+            : RefreshIndicator(
+                onRefresh: controller.fetchLeaderboard,
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 16.h),
+                        child: Text(
+                          context.l10n.rankLeaderboardTitle,
+                          style: TextStyle(
+                            color: AppColors.black,
+                            fontSize: 26.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      child: RankScopeChips(
-                        selected: state.selectedScope,
-                        onChanged: controller.selectScope,
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: RankScopeChips(
+                          selected: state.selectedScope,
+                          onChanged: controller.selectScope,
+                        ),
                       ),
                     ),
-                  ),
-                  SliverToBoxAdapter(child: SizedBox(height: 12.h)),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      child: RankPeriodTabs(
-                        selected: state.selectedPeriod,
-                        onSelected: controller.selectPeriod,
+                    SliverToBoxAdapter(child: SizedBox(height: 12.h)),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: RankPeriodTabs(
+                          selected: state.selectedPeriod,
+                          onSelected: controller.selectPeriod,
+                        ),
                       ),
                     ),
-                  ),
-                  SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      child: RankPodium(
-                        users: state.podium,
-                        hasStory: (user) => controller.hasStory(user.storyUserId),
-                        isStoryViewed: (user) =>
-                            controller.isStoryViewed(user.storyUserId),
-                        onUserTap: (user) => controller.openViewProfile(context, user.storyUserId ?? user.rank.toString()),
-                        onAvatarTap: (user) =>
-                            controller.onPodiumAvatarTap(context, user),
+                    SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: RankPodium(
+                          users: state.podium,
+                          hasStory: (user) =>
+                              controller.hasStory(user.storyUserId),
+                          isStoryViewed: (user) =>
+                              controller.isStoryViewed(user.storyUserId),
+                          onUserTap: (user) => controller.openViewProfile(
+                            context,
+                            user.storyUserId ?? user.rank.toString(),
+                          ),
+                          onAvatarTap: (user) =>
+                              controller.onPodiumAvatarTap(context, user),
+                        ),
                       ),
                     ),
-                  ),
-                  SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-                  SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
+                    SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
                           final entry = state.entries[index];
                           return RankListItem(
                             entry: entry,
                             hasStory: controller.hasStory(entry.storyUserId),
-                            isStoryViewed:
-                                controller.isStoryViewed(entry.storyUserId),
+                            isStoryViewed: controller.isStoryViewed(
+                              entry.storyUserId,
+                            ),
                             onTap: entry.isCurrentUser
                                 ? null
-                                : () => controller.openViewProfile(context, entry.storyUserId ?? entry.rank.toString()),
+                                : () => controller.openViewProfile(
+                                    context,
+                                    entry.storyUserId ?? entry.rank.toString(),
+                                  ),
                             onAvatarTap: () =>
                                 controller.onListAvatarTap(context, entry),
                           );
-                        },
-                        childCount: state.entries.length,
+                        }, childCount: state.entries.length),
                       ),
                     ),
-                  ),
-                  SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-                ],
+                    SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                  ],
+                ),
               ),
       ),
     );

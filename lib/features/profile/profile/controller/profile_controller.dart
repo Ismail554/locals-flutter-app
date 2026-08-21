@@ -51,7 +51,7 @@ class ProfileController extends ChangeNotifier {
         profileJson: results[0] as Map<String, dynamic>,
         achievementsJson: results[1] as List<dynamic>,
         checkinsJson: results[2] as List<dynamic>,
-        fallbackAvatarUrl: UserSession().currentUser?.avatarUrl,
+        sessionUser: UserSession().currentUser,
       );
       print('parsed achievements: ${state.achievements.length}');
       print('parsed visits: ${state.latestVisits.length}');

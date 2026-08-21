@@ -36,8 +36,7 @@ class _MissionsView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 0),
               child: MissionsHeader(
-                onAchievementsTap: () =>
-                    controller.openAchievements(context),
+                onAchievementsTap: () => controller.openAchievements(context),
               ),
             ),
             SizedBox(height: 16.h),
@@ -52,17 +51,22 @@ class _MissionsView extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: ListView.separated(
-                padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
-                itemCount: controller.state.missions.length,
-                separatorBuilder: (_, __) => SizedBox(height: 16.h),
-                itemBuilder: (context, index) {
-                  final mission = controller.state.missions[index];
-                  return MissionCard(
-                    mission: mission,
-                    onTap: () => controller.openMissionDetails(context, mission.id),
-                  );
-                },
+              child: RefreshIndicator(
+                onRefresh: controller.refresh,
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
+                  itemCount: controller.state.missions.length,
+                  separatorBuilder: (_, __) => SizedBox(height: 16.h),
+                  itemBuilder: (context, index) {
+                    final mission = controller.state.missions[index];
+                    return MissionCard(
+                      mission: mission,
+                      onTap: () =>
+                          controller.openMissionDetails(context, mission.id),
+                    );
+                  },
+                ),
               ),
             ),
           ],

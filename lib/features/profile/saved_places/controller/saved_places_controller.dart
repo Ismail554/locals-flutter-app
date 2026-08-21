@@ -27,6 +27,8 @@ class SavedPlacesController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> refresh() => _loadSavedPlaces();
+
   void openPlaceDetails(BuildContext context, SavedPlace place) {
     context.push(
       '/restaurant_view_details',

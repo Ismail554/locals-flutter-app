@@ -42,11 +42,7 @@ class _JoinEventView extends StatelessWidget {
     if (controller.isLoading) {
       return const Scaffold(
         backgroundColor: AppColors.white,
-        body: SafeArea(
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
+        body: SafeArea(child: Center(child: CircularProgressIndicator())),
       );
     }
 
@@ -74,11 +70,7 @@ class _JoinEventView extends StatelessWidget {
     if (event == null) {
       return const Scaffold(
         backgroundColor: AppColors.white,
-        body: SafeArea(
-          child: Center(
-            child: Text('No event found'),
-          ),
-        ),
+        body: SafeArea(child: Center(child: Text('No event found'))),
       );
     }
 
@@ -90,48 +82,50 @@ class _JoinEventView extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 20.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    JoinEventHeroHeader(
-                      sponsor: event.sponsor,
-                      title: event.title,
-                      dateLabel: event.dateLabel,
-                      heroColor: event.heroColor,
-                      onBack: () => context.pop(),
-                    ),
-                    SizedBox(height: 20.h),
-                    JoinEventStatsRow(
-                      stops: '${event.totalStops}',
-                      reward: '+${event.rewardPoints}',
-                      progress: event.progressLabel,
-                    ),
-                    SizedBox(height: 24.h),
-                    Text(
-                      context.l10n.joinEventRouteStops,
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
+              child: RefreshIndicator(
+                onRefresh: controller.refresh,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 20.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      JoinEventHeroHeader(
+                        sponsor: event.sponsor,
+                        title: event.title,
+                        dateLabel: event.dateLabel,
+                        heroColor: event.heroColor,
+                        onBack: () => context.pop(),
                       ),
-                    ),
-                    SizedBox(height: 12.h),
-                    for (var i = 0; i < event.stops.length; i++) ...[
-                      if (i > 0) SizedBox(height: 10.h),
-                      JoinEventStopTile(
-                        stop: event.stops[i],
-                        onTap: event.stops[i].locationId != null
-                            ? () => controller.openStop(
-                                  context,
-                                  event.stops[i],
-                                )
-                            : null,
+                      SizedBox(height: 20.h),
+                      JoinEventStatsRow(
+                        stops: '${event.totalStops}',
+                        reward: '+${event.rewardPoints}',
+                        progress: event.progressLabel,
                       ),
+                      SizedBox(height: 24.h),
+                      Text(
+                        context.l10n.joinEventRouteStops,
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      for (var i = 0; i < event.stops.length; i++) ...[
+                        if (i > 0) SizedBox(height: 10.h),
+                        JoinEventStopTile(
+                          stop: event.stops[i],
+                          onTap: event.stops[i].locationId != null
+                              ? () =>
+                                    controller.openStop(context, event.stops[i])
+                              : null,
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -145,8 +139,9 @@ class _JoinEventView extends StatelessWidget {
                       : () => controller.joinEvent(context),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.actionPink,
-                    disabledBackgroundColor:
-                        AppColors.actionPink.withValues(alpha: 0.5),
+                    disabledBackgroundColor: AppColors.actionPink.withValues(
+                      alpha: 0.5,
+                    ),
                     foregroundColor: AppColors.white,
                     padding: EdgeInsets.symmetric(vertical: 16.h),
                     shape: RoundedRectangleBorder(

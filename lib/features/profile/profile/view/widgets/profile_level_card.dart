@@ -8,6 +8,7 @@ class ProfileLevelCard extends StatelessWidget {
   final int points;
   final String levelTitle;
   final int pointsToNextLevel;
+  final double progress;
 
   const ProfileLevelCard({
     super.key,
@@ -15,6 +16,7 @@ class ProfileLevelCard extends StatelessWidget {
     required this.points,
     required this.levelTitle,
     required this.pointsToNextLevel,
+    required this.progress,
   });
 
   @override
@@ -72,7 +74,7 @@ class ProfileLevelCard extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(4.r),
             child: LinearProgressIndicator(
-              value: 0.65,
+              value: progress.clamp(0.0, 1.0),
               minHeight: 6.h,
               backgroundColor: AppColors.white.withValues(alpha: 0.15),
               valueColor: const AlwaysStoppedAnimation(AppColors.actionPink),
