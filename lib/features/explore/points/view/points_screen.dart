@@ -20,11 +20,15 @@ class PointsScreen extends StatelessWidget {
     final resolvedArgs =
         args ?? (GoRouterState.of(context).extra as PointsArgs?);
 
+    assert(
+      resolvedArgs != null,
+      'PointsScreen requires PointsArgs to be passed via GoRouter extra.',
+    );
+
     return ChangeNotifierProvider(
       create: (_) => PointsController(
         PointsRepositoryImpl(),
-        resolvedArgs ??
-            const PointsArgs(locationName: 'Café del Born'),
+        resolvedArgs!,
       ),
       child: const _PointsView(),
     );
@@ -38,6 +42,8 @@ class _PointsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = context.watch<PointsController>();
     final state = controller.state;
+
+    final hasLevelInfo = state.level != null && state.totalPoints != null;
 
     return Scaffold(
       backgroundColor: AppColors.profileLevelCard,
@@ -77,17 +83,28 @@ class _PointsView extends StatelessWidget {
                   letterSpacing: 1,
                 ),
               ),
-              SizedBox(height: 32.h),
-              Text(
-                context.l10n.checkInLocationYours(state.locationName),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.w700,
+              if (hasLevelInfo) ...[
+                SizedBox(height: 12.h),
+                Text(
+                  'Level ${state.level} · ${state.totalPoints} total points',
+                  style: TextStyle(
+                    color: AppColors.white.withValues(alpha: 0.7),
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8.h),
+              ],
+              SizedBox(height: 32.h),
+              // Text(
+              //   context.l10n.checkInLocationYours(state.locationName),
+              //   textAlign: TextAlign.center,
+              //   style: TextStyle(
+              //     color: AppColors.white,
+              //     fontSize: 22.sp,
+              //     fontWeight: FontWeight.w700,
+              //   ),
+              // ),
+              // SizedBox(height: 8.h),
               Text(
                 context.l10n.checkInAddedToMap,
                 textAlign: TextAlign.center,
@@ -96,11 +113,46 @@ class _PointsView extends StatelessWidget {
                   fontSize: 15.sp,
                 ),
               ),
-              SizedBox(height: 32.h),
-              PointsCityProgress(
-                label: state.cityProgressLabel,
-                progress: state.cityProgress,
-              ),
+              if (state.hasCityProgress) ...[
+                SizedBox(height: 32.h),
+                PointsCityProgress(
+                  label: state.cityProgressLabel!,
+                  progress: state.cityProgress!,
+                ),
+              ],
+              if (state.unlockedAchievements.isNotEmpty) ...[
+                SizedBox(height: 24.h),
+                Wrap(
+                  spacing: 8.w,
+                  runSpacing: 8.h,
+                  alignment: WrapAlignment.center,
+                  children: state.unlockedAchievements
+                      .map(
+                        (achievement) => Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12.w,
+                            vertical: 6.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.actionPink.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: AppColors.actionPink.withValues(alpha: 0.4),
+                            ),
+                          ),
+                          child: Text(
+                            achievement,
+                            style: TextStyle(
+                              color: AppColors.white,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
               const Spacer(flex: 3),
               SizedBox(
                 width: double.infinity,

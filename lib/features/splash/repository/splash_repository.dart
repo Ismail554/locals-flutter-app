@@ -1,8 +1,10 @@
+import 'package:locals/core/network/token_manager.dart';
+
 abstract class SplashRepository {
-  Future<void> init();
+  Future<bool> isLoggedIn();
 }
 
 class SplashRepositoryImpl implements SplashRepository {
   @override
-  Future<void> init() async {}
+  Future<bool> isLoggedIn() => TokenManager().hasToken;
 }

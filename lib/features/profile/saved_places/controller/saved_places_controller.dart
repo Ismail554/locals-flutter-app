@@ -7,8 +7,27 @@ import '../repository/saved_places_repository.dart';
 class SavedPlacesController extends ChangeNotifier {
   final SavedPlacesRepository repo;
   SavedPlacesModel state = const SavedPlacesModel();
+  bool isLoading = true;
 
-  SavedPlacesController(this.repo);
+  SavedPlacesController(this.repo) {
+    _loadSavedPlaces();
+  }
+
+  Future<void> _loadSavedPlaces() async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      state = await repo.getSavedPlaces();
+    } catch (e) {
+      debugPrint('Saved places load error: $e');
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> refresh() => _loadSavedPlaces();
 
   void openPlaceDetails(BuildContext context, SavedPlace place) {
     context.push(

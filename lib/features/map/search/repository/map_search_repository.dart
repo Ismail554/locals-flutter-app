@@ -1,7 +1,11 @@
+import 'package:locals/core/network/api_client.dart';
+import 'package:locals/shared/model/map_pin_info.dart';
+
 abstract class MapSearchRepository {
   List<String> loadRecentSearches();
   List<String> loadTrendingSearches();
   void addRecentSearch(String query);
+  Future<List<MapPinInfo>> searchPlaces(String query);   // ← New
 }
 
 class MapSearchRepositoryImpl implements MapSearchRepository {
@@ -11,19 +15,16 @@ class MapSearchRepositoryImpl implements MapSearchRepository {
 
   final List<String> _recentSearches = [];
 
-  static const _trendingSearches = [
-    'Sant Antoni',
-    'Modernist',
-    'Sunset spots',
-    'Tapas',
-    'Vermouth bars',
+  static const _trendingSearches = <String>[
   ];
+
+  final ApiClient _client = ApiClient();
 
   @override
   List<String> loadRecentSearches() => List.unmodifiable(_recentSearches);
 
   @override
-  List<String> loadTrendingSearches() => _trendingSearches;
+  List<String> loadTrendingSearches() => List.unmodifiable(_trendingSearches);
 
   @override
   void addRecentSearch(String query) {
@@ -35,5 +36,15 @@ class MapSearchRepositoryImpl implements MapSearchRepository {
     if (_recentSearches.length > 5) {
       _recentSearches.removeLast();
     }
+  }
+
+  @override
+  Future<List<MapPinInfo>> searchPlaces(String query) async {
+    final response = await _client.get('/places/?search=${Uri.encodeQueryComponent(query)}');
+    final results = response['results'] as List? ?? [];
+    
+    return results
+        .map((item) => MapPinInfo.fromApi(item as Map<String, dynamic>))
+        .toList();
   }
 }

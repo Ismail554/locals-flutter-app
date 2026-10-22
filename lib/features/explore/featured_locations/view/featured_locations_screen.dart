@@ -29,7 +29,7 @@ class _FeaturedLocationsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<FeaturedLocationsController>();
-    final locations = controller.state.locations;
+    final state = controller.state;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -47,19 +47,36 @@ class _FeaturedLocationsView extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: ListView.separated(
-                padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                itemCount: locations.length,
-                separatorBuilder: (_, __) => SizedBox(height: 16.h),
-                itemBuilder: (context, index) {
-                  final location = locations[index];
-                  return FeaturedLocationCard(
-                    location: location,
-                    onTap: () =>
-                        controller.openLocation(context, location.id),
-                  );
-                },
-              ),
+              child: state.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : state.errorMessage != null && state.locations.isEmpty
+                      ? Center(
+                          child: Text(
+                            state.errorMessage!,
+                            style: TextStyle(
+                              color: AppColors.levelGrey,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: controller.refresh,
+                          child: ListView.separated(
+                            padding:
+                                EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+                            itemCount: state.locations.length,
+                            separatorBuilder: (_, __) =>
+                                SizedBox(height: 16.h),
+                            itemBuilder: (context, index) {
+                              final location = state.locations[index];
+                              return FeaturedLocationCard(
+                                location: location,
+                                onTap: () => controller.openLocation(
+                                    context, location.id),
+                              );
+                            },
+                          ),
+                        ),
             ),
           ],
         ),

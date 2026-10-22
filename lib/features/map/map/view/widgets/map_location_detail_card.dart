@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:locals/shared/theme/app_colors.dart';
+import 'package:locals/core/localization/filters_l10n.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import '../../model/map_mission_args.dart';
 
 class MapLocationDetailCard extends StatelessWidget {
   final MapActiveLocation location;
   final VoidCallback? onTap;
 
-  const MapLocationDetailCard({
-    super.key,
-    required this.location,
-    this.onTap,
-  });
+  const MapLocationDetailCard({super.key, required this.location, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +41,14 @@ class MapLocationDetailCard extends StatelessWidget {
                   color: location.imageColor,
                   borderRadius: BorderRadius.circular(14.r),
                 ),
-                child: Icon(
-                  Icons.local_cafe_outlined,
-                  color: AppColors.white.withValues(alpha: 0.7),
-                  size: 28.sp,
-                ),
+                child:
+                    location.imageUrl != null && location.imageUrl!.isNotEmpty
+                    ? Image.network(
+                        location.imageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _placeholderIcon(),
+                      )
+                    : _placeholderIcon(),
               ),
               SizedBox(width: 12.w),
               Flexible(
@@ -61,7 +62,10 @@ class MapLocationDetailCard extends StatelessWidget {
                         style: TextStyle(fontSize: 11.sp, height: 1.3),
                         children: [
                           TextSpan(
-                            text: location.category,
+                            text: FiltersL10n.categoryLabel(
+                              context.l10n,
+                              location.category,
+                            ),
                             style: const TextStyle(
                               color: AppColors.actionPink,
                               fontWeight: FontWeight.w700,
@@ -115,6 +119,14 @@ class MapLocationDetailCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _placeholderIcon() {
+    return Icon(
+      Icons.local_cafe_outlined,
+      color: AppColors.white.withValues(alpha: 0.7),
+      size: 28.sp,
     );
   }
 }

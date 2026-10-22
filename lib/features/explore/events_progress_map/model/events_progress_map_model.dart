@@ -79,72 +79,77 @@ class EventsProgressMapModel {
         .toList();
     return copyWith(completedStops: count, stops: updatedStops);
   }
+static const _defaultPins = [
+  MapPinInfo(
+    id: 'cafe_del_born',
+    name: 'Café del Born',
+    level: 12,
+    lat: 23.8103,
+    lng: 90.4125,
+    tag: MapPinTag.business,
+    visited: true,
+  ),
 
-  static const _defaultPins = [
-    MapPinInfo(
-      id: 'cafe_del_born',
-      name: 'Café del Born',
-      level: 12,
-      x: 0.22,
-      y: 0.18,
-      tag: MapPinTag.business,
-      visited: true,
-    ),
-    MapPinInfo(
-      id: 'parc_guell',
-      name: 'Parc Güell',
-      level: 8,
-      x: 0.72,
-      y: 0.14,
-      tag: MapPinTag.pointOfInterest,
-      visited: false,
-    ),
-    MapPinInfo(
-      id: 'forn_baluard',
-      name: 'Forn Baluard',
-      level: 6,
-      x: 0.48,
-      y: 0.28,
-      tag: MapPinTag.business,
-      visited: false,
-    ),
-    MapPinInfo(
-      id: 'casa_batllo',
-      name: 'Casa Batlló',
-      level: 16,
-      x: 0.35,
-      y: 0.42,
-      tag: MapPinTag.sponsoredOrEvent,
-      visited: true,
-    ),
-    MapPinInfo(
-      id: 'bar_marsella',
-      name: 'Bar Marsella',
-      level: 10,
-      x: 0.62,
-      y: 0.38,
-      tag: MapPinTag.business,
-      visited: true,
-    ),
-    MapPinInfo(
-      id: 'sagrada',
-      name: 'Sagrada Família',
-      level: 18,
-      x: 0.18,
-      y: 0.55,
-      tag: MapPinTag.pointOfInterest,
-      visited: false,
-    ),
-    MapPinInfo(
-      id: 'modernist_trail',
-      name: 'Modernist Trail',
-      level: 14,
-      x: 0.78,
-      y: 0.52,
-      tag: MapPinTag.sponsoredOrEvent,
-      visited: false,
-    ),
-  ];
+  MapPinInfo(
+    id: 'parc_guell',
+    name: 'Parc Güell',
+    level: 8,
+    lat: 41.4145,
+    lng: 2.1527,
+    tag: MapPinTag.pointOfInterest,
+    visited: false,
+  ),
+
+  MapPinInfo(
+    id: 'forn_baluard',
+    name: 'Forn Baluard',
+    level: 6,
+    lat: 41.3825,
+    lng: 2.1769,
+    tag: MapPinTag.business,
+    visited: false,
+  ),
+
+  MapPinInfo(
+    id: 'casa_batllo',
+    name: 'Casa Batlló',
+    level: 16,
+    lat: 41.3917,
+    lng: 2.1649,
+    tag: MapPinTag.sponsoredOrEvent,
+    visited: true,
+  ),
+
+  MapPinInfo(
+    id: 'bar_marsella',
+    name: 'Bar Marsella',
+    level: 10,
+    lat: 41.3792,
+    lng: 2.1649,
+    tag: MapPinTag.business,
+    visited: true,
+  ),
+
+  MapPinInfo(
+    id: 'sagrada',
+    name: 'Sagrada Família',
+    level: 18,
+    lat: 41.4036,
+    lng: 2.1744,
+    tag: MapPinTag.pointOfInterest,
+    visited: false,
+  ),
+
+  MapPinInfo(
+    id: 'modernist_trail',
+    name: 'Modernist Trail',
+    level: 14,
+    lat: 41.3954,
+    lng: 2.1619,
+    tag: MapPinTag.sponsoredOrEvent,
+    visited: false,
+  ),
+];
 
   static EventsProgressMapModel byEventId(String eventId) {
     return switch (eventId) {

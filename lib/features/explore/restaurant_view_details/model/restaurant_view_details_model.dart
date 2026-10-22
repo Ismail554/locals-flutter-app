@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:locals/shared/model/check_in_photo_model.dart';
 import 'package:locals/features/explore/points/model/points_args.dart';
 import 'package:locals/features/map/map/model/map_mission_args.dart';
@@ -8,12 +9,14 @@ class RestaurantPhoto {
   final String timeAgo;
   final String caption;
   final int likes;
+  final String? imageUrl;
 
   const RestaurantPhoto({
     required this.color,
     required this.timeAgo,
     required this.caption,
     required this.likes,
+    this.imageUrl,
   });
 
   CheckInPhoto toCheckInPhoto(String locationName) {
@@ -23,6 +26,31 @@ class RestaurantPhoto {
       timeAgo: timeAgo,
       caption: caption,
       likes: likes,
+      imageUrl: imageUrl,
+    );
+  }
+
+  factory RestaurantPhoto.fromApi(Map<String, dynamic> json) {
+    return RestaurantPhoto(
+      color: const Color(0xFFD4C4B0),
+      timeAgo: json['created_at_relative'] as String? ?? '',
+      caption: json['caption'] as String? ?? '',
+      likes: json['likes_count'] as int? ?? 0,
+      imageUrl: json['full_image_url'] as String?,
+    );
+  }
+}
+
+class RestaurantVisitor {
+  final String name;
+  final String? avatarUrl;
+
+  const RestaurantVisitor({required this.name, this.avatarUrl});
+
+  factory RestaurantVisitor.fromApi(Map<String, dynamic> json) {
+    return RestaurantVisitor(
+      name: json['full_name'] as String? ?? '',
+      avatarUrl: json['avatar'] as String?,
     );
   }
 }
@@ -33,6 +61,7 @@ class RestaurantViewDetailsModel {
   final String name;
   final bool hasLocalsSeal;
   final Color heroColor;
+  final String? heroImageUrl;
   final String shortDescription;
   final String fullDescription;
   final String address;
@@ -42,8 +71,12 @@ class RestaurantViewDetailsModel {
   final List<RestaurantPhoto> photos;
   final int visitorCount;
   final List<Color> visitorAvatarColors;
+  final List<RestaurantVisitor> visitors;
   final bool hasVisited;
   final bool isSaved;
+  final bool businessOfTheMonth;
+  final double latitude;
+  final double longitude;
 
   const RestaurantViewDetailsModel({
     required this.id,
@@ -51,25 +84,32 @@ class RestaurantViewDetailsModel {
     required this.name,
     required this.hasLocalsSeal,
     required this.heroColor,
+    this.heroImageUrl,
     required this.shortDescription,
     required this.fullDescription,
     required this.address,
     required this.hours,
     required this.instagramHandle,
+    required this.latitude,
+    required this.longitude,
     required this.points,
     required this.photos,
     required this.visitorCount,
     required this.visitorAvatarColors,
+    this.visitors = const [],
     this.hasVisited = false,
     this.isSaved = false,
+    this.businessOfTheMonth = false,
   });
 
-  String get shareUrl => 'https://local.app/l/$id';
+
+static final baseUrl = dotenv.env['base_url'] ?? '';
+  String get shareUrl => '$baseUrl/$id';
 
   String get mapPinId => switch (id) {
-        'sagrada_familia' => 'sagrada',
-        _ => id,
-      };
+    'sagrada_familia' => 'sagrada',
+    _ => id,
+  };
 
   PointsArgs toPointsArgs() {
     return PointsArgs(
@@ -86,24 +126,25 @@ class RestaurantViewDetailsModel {
     return MapActiveLocation(
       locationId: id,
       category: category,
-      seal: hasLocalsSeal ? "locals' seal" : 'Local spot',
+      seal: hasLocalsSeal ? "locals' seal" : "Local spot",
       name: name,
       address: address,
       points: points,
       imageColor: heroColor,
+      imageUrl: heroImageUrl,
+      latitude: latitude,
+      longitude: longitude,
     );
   }
 
-  RestaurantViewDetailsModel copyWith({
-    bool? hasVisited,
-    bool? isSaved,
-  }) {
+  RestaurantViewDetailsModel copyWith({bool? hasVisited, bool? isSaved}) {
     return RestaurantViewDetailsModel(
       id: id,
       category: category,
       name: name,
       hasLocalsSeal: hasLocalsSeal,
       heroColor: heroColor,
+      heroImageUrl: heroImageUrl,
       shortDescription: shortDescription,
       fullDescription: fullDescription,
       address: address,
@@ -113,245 +154,86 @@ class RestaurantViewDetailsModel {
       photos: photos,
       visitorCount: visitorCount,
       visitorAvatarColors: visitorAvatarColors,
+      latitude: latitude,
+      longitude: longitude,
+      visitors: visitors,
       hasVisited: hasVisited ?? this.hasVisited,
       isSaved: isSaved ?? this.isSaved,
+      businessOfTheMonth: businessOfTheMonth,
     );
   }
 
-  static const _fornBaluard = RestaurantViewDetailsModel(
-    id: 'forn_baluard',
-    category: 'BAKERY',
-    name: 'Forn Baluard',
-    hasLocalsSeal: true,
-    heroColor: Color(0xFFE8D8C8),
-    shortDescription:
-        'A family-run bakery since 1945, famous for its sourdough and pastries.',
-    fullDescription:
-        'A family-run bakery since 1945, famous for its sourdough and pastries. '
-        'Located near the beach in Barceloneta, Forn Baluard is a must-visit for '
-        'anyone who loves traditional Catalan baking. Their croissants and ensaimadas '
-        'are legendary among locals.',
-    address: 'Carrer del Baluard 38',
-    hours: '8:00 – 20:00',
-    instagramHandle: '@p3.bcn',
-    points: 60,
-    photos: [
-      RestaurantPhoto(
-        color: Color(0xFFD4C4A0),
-        timeAgo: '2d ago',
-        caption: 'Fresh sourdough morning batch.',
-        likes: 24,
-      ),
-      RestaurantPhoto(
-        color: Color(0xFFC8B898),
-        timeAgo: '5d ago',
-        caption: 'Weekend pastry lineup.',
-        likes: 18,
-      ),
-      RestaurantPhoto(
-        color: Color(0xFFE0D0B8),
-        timeAgo: '1w ago',
-        caption: 'Behind the counter vibes.',
-        likes: 31,
-      ),
-      RestaurantPhoto(
-        color: Color(0xFFB8A888),
-        timeAgo: '2w ago',
-        caption: 'Best croissant in the neighborhood.',
-        likes: 42,
-      ),
-    ],
-    visitorCount: 248,
-    visitorAvatarColors: [
-      Color(0xFFD4A574),
-      Color(0xFF7EB8DA),
-      Color(0xFFE8A0A0),
-      Color(0xFF9BB5CE),
-      Color(0xFFC4B5A0),
-      Color(0xFF8FA89A),
-    ],
-  );
+  /// Maps a `GET /places/:id/` response to the detail model.
+  factory RestaurantViewDetailsModel.fromApi(Map<String, dynamic> json) {
+    final categoryJson = json['category'] as Map<String, dynamic>?;
+    final visitStatus = json['user_visit_status'] as String? ?? 'UNVISITED';
 
-  static const _cafeDelBorn = RestaurantViewDetailsModel(
-    id: 'cafe_del_born',
-    category: 'CAFE',
-    name: 'Café del Born',
-    hasLocalsSeal: true,
-    heroColor: Color(0xFFD4C4B0),
-    shortDescription:
-        'A cozy café in the heart of El Born, perfect for morning coffee.',
-    fullDescription:
-        'A cozy café in the heart of El Born, perfect for morning coffee. '
-        'Known for its artisan espresso and homemade pastries, Café del Born '
-        'has been a neighborhood favorite for over a decade.',
-    address: 'Carrer del Born 12',
-    hours: '7:30 – 22:00',
-    instagramHandle: '@cafedelborn',
-    points: 50,
-    photos: [
-      RestaurantPhoto(
-        color: Color(0xFFC8B8A8),
-        timeAgo: '3d ago',
-        caption: 'Best cortado in the Born.',
-        likes: 27,
-      ),
-      RestaurantPhoto(
-        color: Color(0xFFB0A090),
-        timeAgo: '1w ago',
-        caption: 'Morning light by the window.',
-        likes: 15,
-      ),
-      RestaurantPhoto(
-        color: Color(0xFFD8C8B8),
-        timeAgo: '2w ago',
-        caption: 'Homemade pastry of the day.',
-        likes: 22,
-      ),
-    ],
-    visitorCount: 186,
-    visitorAvatarColors: [
-      Color(0xFFD4A574),
-      Color(0xFF7EB8DA),
-      Color(0xFFE8A0A0),
-      Color(0xFF9BB5CE),
-      Color(0xFFC4B5A0),
-    ],
-  );
+    final visitorsRaw = json['visitors'] as List? ?? [];
+    final visitors = visitorsRaw
+        .map((v) => RestaurantVisitor.fromApi(v as Map<String, dynamic>))
+        .toList();
 
-  static const _barMarsella = RestaurantViewDetailsModel(
-    id: 'bar_marsella',
-    category: 'BAR',
-    name: 'Bar Marsella',
-    hasLocalsSeal: false,
-    heroColor: Color(0xFFB8C8D8),
-    shortDescription:
-        'Historic absinthe bar in El Raval, open since 1820.',
-    fullDescription:
-        'Historic absinthe bar in El Raval, open since 1820. '
-        'Bar Marsella retains its vintage charm with original décor and '
-        'a bohemian atmosphere that has attracted artists and writers for centuries.',
-    address: 'Carrer de Sant Pau 65',
-    hours: '18:00 – 02:00',
-    instagramHandle: '@barmarsella',
-    points: 40,
-    photos: [
-      RestaurantPhoto(
-        color: Color(0xFFA8B8C8),
-        timeAgo: '4d ago',
-        caption: 'Late night absinthe hour.',
-        likes: 56,
-      ),
-      RestaurantPhoto(
-        color: Color(0xFF98A8B8),
-        timeAgo: '2w ago',
-        caption: 'Vintage interior details.',
-        likes: 38,
-      ),
-    ],
-    visitorCount: 312,
-    visitorAvatarColors: [
-      Color(0xFFD4A574),
-      Color(0xFF7EB8DA),
-      Color(0xFFE8A0A0),
-      Color(0xFF9BB5CE),
-    ],
-  );
+    final photosRaw = json['photos'] as List? ?? [];
+    final photos = photosRaw
+        .map((p) => RestaurantPhoto.fromApi(p as Map<String, dynamic>))
+        .toList();
 
-  static const _parcGuell = RestaurantViewDetailsModel(
-    id: 'parc_guell',
-    category: 'PARK',
-    name: 'Parc Güell',
-    hasLocalsSeal: true,
-    heroColor: Color(0xFFC8D8B8),
-    shortDescription:
-        'Gaudí\'s whimsical park with stunning city views.',
-    fullDescription:
-        'Gaudí\'s whimsical park with stunning city views. '
-        'A UNESCO World Heritage site featuring colorful mosaics, '
-        'unique architecture, and panoramic views of Barcelona.',
-    address: 'Carrer d\'Olot',
-    hours: '9:30 – 19:30',
-    instagramHandle: '@parkguell',
-    points: 60,
-    photos: [
-      RestaurantPhoto(
-        color: Color(0xFFB8D8A8),
-        timeAgo: '1d ago',
-        caption: 'Mosaic terrace views.',
-        likes: 89,
-      ),
-      RestaurantPhoto(
-        color: Color(0xFFA8C898),
-        timeAgo: '1w ago',
-        caption: 'Gaudí colors everywhere.',
-        likes: 64,
-      ),
-      RestaurantPhoto(
-        color: Color(0xFFC8E8B8),
-        timeAgo: '3w ago',
-        caption: 'Sunset from the park.',
-        likes: 47,
-      ),
-    ],
-    visitorCount: 1024,
-    visitorAvatarColors: [
-      Color(0xFFD4A574),
-      Color(0xFF7EB8DA),
-      Color(0xFFE8A0A0),
-      Color(0xFF9BB5CE),
-      Color(0xFFC4B5A0),
-      Color(0xFF8FA89A),
-    ],
-  );
+    // Build avatar color list from visitor data (or fallback palette)
+    final avatarColors = visitors.isNotEmpty
+        ? visitors.take(6).map((_) => const Color(0xFFD4A574)).toList()
+        : <Color>[];
+    final description = json['description'] as String? ?? '';
+    final shortDescription =
+        json['short_description'] as String? ??
+        json['summary'] as String? ??
+        description;
 
-  static const _sagradaFamilia = RestaurantViewDetailsModel(
-    id: 'sagrada_familia',
-    category: 'MONUMENT',
-    name: 'Sagrada Família',
-    hasLocalsSeal: true,
-    heroColor: Color(0xFFD0D8E0),
-    shortDescription:
-        'Gaudí\'s iconic basilica and UNESCO World Heritage site.',
-    fullDescription:
-        'Gaudí\'s iconic basilica and UNESCO World Heritage site. '
-        'One of Barcelona\'s most visited landmarks, renowned for its '
-        'towering spires and intricate facades.',
-    address: 'Carrer de Mallorca 401',
-    hours: '9:00 – 18:00',
-    instagramHandle: '@sagradafamilia',
-    points: 70,
-    photos: [
-      RestaurantPhoto(
-        color: Color(0xFFC8D0D8),
-        timeAgo: '2d ago',
-        caption: 'Nativity facade detail.',
-        likes: 52,
-      ),
-      RestaurantPhoto(
-        color: Color(0xFFB8C0C8),
-        timeAgo: '1w ago',
-        caption: 'Morning light on the towers.',
-        likes: 38,
-      ),
-    ],
-    visitorCount: 2048,
-    visitorAvatarColors: [
-      Color(0xFFD4A574),
-      Color(0xFF7EB8DA),
-      Color(0xFFE8A0A0),
-      Color(0xFF9BB5CE),
-      Color(0xFFC4B5A0),
-    ],
-  );
+    return RestaurantViewDetailsModel(
+      id: json['id'].toString(),
+      category: (categoryJson?['name'] as String? ?? '').toUpperCase(),
+      name: json['name'] as String? ?? '',
+      hasLocalsSeal: json['has_locals_seal'] as bool? ?? false,
+      heroColor: const Color(0xFFD4C4B0),
+      heroImageUrl: _extractImageUrl(json),
+      shortDescription: shortDescription,
+      fullDescription: json['long_description'] as String? ?? description,
+      address: json['address'] as String? ?? '',
+      hours: json['opening_hours'] as String? ?? '',
+      instagramHandle:
+          json['instagram_handle'] != null &&
+              (json['instagram_handle'] as String).isNotEmpty
+          ? '@${json['instagram_handle']}'
+          : '',
+      points: json['base_points'] as int? ?? 0,
+      photos: photos,
+      visitorCount: json['total_visitors_count'] as int? ?? 0,
 
-  static RestaurantViewDetailsModel byId(String id) {
-    return switch (id) {
-      'cafe_del_born' => _cafeDelBorn,
-      'bar_marsella' => _barMarsella,
-      'forn_baluard' => _fornBaluard,
-      'parc_guell' => _parcGuell,
-      'sagrada_familia' => _sagradaFamilia,
-      _ => _fornBaluard,
-    };
+      latitude: double.tryParse(json['latitude']?.toString() ?? '') ?? 0.0,
+      longitude: double.tryParse(json['longitude']?.toString() ?? '') ?? 0.0,
+
+      visitorAvatarColors: avatarColors,
+      visitors: visitors,
+      hasVisited: visitStatus != 'UNVISITED',
+      isSaved: json['is_saved'] as bool? ?? false,
+      businessOfTheMonth: json['is_business_of_the_month'] as bool? ?? false,
+    );
   }
+}
+
+String? _extractImageUrl(Map<String, dynamic> json) {
+  final image = json['image'];
+  final imageMap = image is Map<String, dynamic> ? image : null;
+  final candidates = <String?>[
+    json['cover_photo'] as String?,
+    json['full_image_url'] as String?,
+    json['image_url'] as String?,
+    image is String ? image : null,
+    imageMap?['url'] as String?,
+    imageMap?['full_image_url'] as String?,
+  ];
+
+  for (final candidate in candidates) {
+    if (candidate != null && candidate.trim().isNotEmpty) return candidate;
+  }
+  return null;
 }

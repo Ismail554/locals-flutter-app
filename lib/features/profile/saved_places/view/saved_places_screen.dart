@@ -28,6 +28,13 @@ class _SavedPlacesView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = context.watch<SavedPlacesController>();
 
+    if (controller.isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.white,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -44,18 +51,22 @@ class _SavedPlacesView extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: ListView.separated(
-                padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                itemCount: controller.state.places.length,
-                separatorBuilder: (_, __) => SizedBox(height: 16.h),
-                itemBuilder: (context, index) {
-                  final place = controller.state.places[index];
-                  return SavedPlaceCard(
-                    place: place,
-                    onTap: () => controller.openPlaceDetails(context, place),
-                    onBookmarkTap: () => controller.removePlace(place.id),
-                  );
-                },
+              child: RefreshIndicator(
+                onRefresh: controller.refresh,
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+                  itemCount: controller.state.places.length,
+                  separatorBuilder: (_, __) => SizedBox(height: 16.h),
+                  itemBuilder: (context, index) {
+                    final place = controller.state.places[index];
+                    return SavedPlaceCard(
+                      place: place,
+                      onTap: () => controller.openPlaceDetails(context, place),
+                      onBookmarkTap: () => controller.removePlace(place.id),
+                    );
+                  },
+                ),
               ),
             ),
           ],

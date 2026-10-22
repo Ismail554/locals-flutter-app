@@ -24,10 +24,14 @@ class ViewProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Safe args resolution
+    final resolvedArgs =
+        args ?? (GoRouterState.of(context).extra as ViewProfileArgs?);
+
     return ChangeNotifierProvider(
       create: (_) => ViewProfileController(
         ViewProfileRepositoryImpl(),
-        userId: args?.userId,
+        userId: resolvedArgs?.userId ?? '', // Safe fallback
       ),
       child: const _ViewProfileView(),
     );
@@ -42,6 +46,8 @@ class _ViewProfileView extends StatelessWidget {
     final controller = context.watch<ViewProfileController>();
     final state = controller.state;
 
+    final bool isPhotosActive = state.selectedTab == ViewProfileTab.photos;
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -50,75 +56,95 @@ class _ViewProfileView extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: ProfileScreenHeader(
-                title: context.l10n.viewProfileTitle(state.name),
+                title: context.l10n.viewProfileTitle(state.name ?? ''),
                 onBack: () => context.pop(),
+                onMorePressed: () => controller.showMoreOptions(context),
               ),
             ),
             SizedBox(height: 20.h),
+
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                child: Column(
-                  children: [
-                    ViewProfileHeaderSection(
-                      name: state.name,
-                      level: state.level,
-                      location: state.location,
-                      hasStory: controller.hasStory,
-                      isStoryViewed: controller.isStoryViewed,
-                      onAvatarTap: () => controller.openStory(context),
-                    ),
-                    SizedBox(height: 20.h),
-                    ViewProfileActionButtons(
-                      isFollowing: state.isFollowing,
-                      onFollowTap: controller.toggleFollow,
-                      onBlockTap: () => controller.blockUser(context),
-                    ),
-                    SizedBox(height: 16.h),
-                    ViewProfileStatsRow(
-                      visits: state.visits,
-                      followers: state.followers,
-                      cities: state.cities,
-                    ),
-                    SizedBox(height: 20.h),
-                    ProfileSegmentedControl(
-                      options: [
-                        ProfileSegmentOption(
-                          label: context.l10n.viewProfileTabPhotos,
-                          value: 'photos',
-                        ),
-                        ProfileSegmentOption(
-                          label: context.l10n.viewProfileTabMap,
-                          value: 'map',
-                        ),
-                        ProfileSegmentOption(
-                          label: context.l10n.viewProfileTabAchievements,
-                          value: 'achievements',
-                        ),
-                      ],
-                      selectedValue: state.selectedTab.name,
-                      onChanged: (value) => controller.selectTab(
-                        ViewProfileTab.values.byName(value),
+              child: RefreshIndicator(
+                onRefresh: controller.refresh,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+                  child: Column(
+                    children: [
+                      ViewProfileHeaderSection(
+                        name: state.name ?? '',
+                        level: state.level ?? 1,
+                        location: state.location ?? '',
+                        avatarUrl: state.avatar,
+                        hasStory: controller.hasStory,
+                        isStoryViewed: controller.isStoryViewed,
+                        onAvatarTap: () => controller.openStory(context),
                       ),
-                    ),
-                    SizedBox(height: 20.h),
-                    switch (state.selectedTab) {
-                      ViewProfileTab.photos => ViewProfilePhotosTab(
-                          photos: state.photos,
+
+                      SizedBox(height: 20.h),
+
+                      ViewProfileActionButtons(
+                        isFollowing: state.isFollowing,
+                        onFollowTap: controller.toggleFollow,
+                        isPhotosActive: isPhotosActive,
+                        onSecondaryButtonTap: () {
+                          if (isPhotosActive) {
+                            controller.selectTab(ViewProfileTab.map);
+                          } else {
+                            controller.selectTab(ViewProfileTab.photos);
+                          }
+                        },
+                      ),
+
+                      SizedBox(height: 16.h),
+
+                      ViewProfileStatsRow(
+                        visits: state.visits ?? 0,
+                        followers: state.followers ?? 0,
+                        likes: state.likes ?? 0,
+                      ),
+
+                      SizedBox(height: 20.h),
+
+                      if (!isPhotosActive) ...[
+                        ProfileSegmentedControl(
+                          options: [
+                            ProfileSegmentOption(
+                              label: context.l10n.navMap,
+                              value: 'map',
+                            ),
+                            ProfileSegmentOption(
+                              label: context.l10n.achievementsTitle,
+                              value: 'achievements',
+                            ),
+                          ],
+                          selectedValue: state.selectedTab.name,
+                          onChanged: (value) => controller.selectTab(
+                            ViewProfileTab.values.byName(value),
+                          ),
+                        ),
+                        SizedBox(height: 20.h),
+                      ],
+
+                      // Tab Content
+                      switch (state.selectedTab) {
+                        ViewProfileTab.photos => ViewProfilePhotosTab(
+                          photos: state.photos ?? [],
                           onPhotoTap: (photo) =>
                               controller.openPhoto(context, photo),
                         ),
-                      ViewProfileTab.map => ViewProfileMapTab(
-                          pins: state.mapPins,
+                        ViewProfileTab.map => ViewProfileMapTab(
+                          pins: state.mapPins ?? [],
                         ),
-                      ViewProfileTab.achievements =>
-                        ViewProfileAchievementsTab(
-                          achievements: state.achievements,
-                        ),
-                    },
-                  ],
+                        ViewProfileTab.achievements =>
+                          ViewProfileAchievementsTab(
+                            achievements: state.achievements ?? [],
+                          ),
+                      },
+                    ],
+                  ),
                 ),
               ),
             ),

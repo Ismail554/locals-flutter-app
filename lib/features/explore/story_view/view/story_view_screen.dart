@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:locals/features/explore/explore/repository/explore_repository.dart';
 import 'package:provider/provider.dart';
 import 'package:locals/shared/theme/app_colors.dart';
 import '../controller/story_view_controller.dart';
@@ -17,7 +18,7 @@ class StoryViewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => StoryViewController(args),
+      create: (_) => StoryViewController(args, ExploreRepositoryImpl.instance),
       child: const _StoryViewBody(),
     );
   }
@@ -137,8 +138,8 @@ class _StoryViewBodyState extends State<_StoryViewBody> {
                 child: SafeArea(
                   top: false,
                   child: StoryReactionBar(
-                    isLiked: story.isLikedByMe,
-                    likeCount: story.likeCount,
+                    isLiked: slide.isLikedByMe,
+                    likeCount: slide.likeCount,
                     showHeartBurst: controller.showHeartBurst,
                     onHeartTap: controller.toggleHeart,
                   ),

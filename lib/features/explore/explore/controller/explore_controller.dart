@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/shared/components/image_view/check_in_image_view.dart';
+import 'package:locals/shared/components/image_view/image_view_dialog.dart';
+import 'package:locals/shared/model/check_in_photo_model.dart';
 import '../../explore/service/story_upload_service.dart';
 import '../model/explore_model.dart';
 import '../repository/explore_repository.dart';
@@ -14,19 +17,282 @@ class ExploreController extends ChangeNotifier {
   final StoryUploadService storyUploadService;
   ExploreModel state;
 
-  ExploreController(
-    this.repo, {
-    StoryUploadService? storyUploadService,
-  })  : storyUploadService = storyUploadService ?? StoryUploadService(),
-        state = ExploreModel(stories: repo.loadStories());
-
-  void openFeaturedLocations(BuildContext context) {
-    context.push('/featured_locations');
+  ExploreController(this.repo, {StoryUploadService? storyUploadService})
+    : storyUploadService = storyUploadService ?? StoryUploadService(),
+      state = ExploreModel(stories: repo.loadStories()) {
+    _loadStoryFeed();
+    _loadDashboard();
   }
 
-  void openEventsRoutes(BuildContext context) {
-    context.push('/events_routes');
+  // ─── Dashboard ──────────────────────────────────────────────────────────────
+
+  Future<void> _loadDashboard() async {
+    state = state.copyWith(isLoadingDashboard: true);
+    notifyListeners();
+
+    try {
+      final dashboard = await repo.fetchDashboard();
+      state = state.copyWith(
+        localShares: dashboard.localShares,
+        followLocals: dashboard.suggestedUsers,
+        featuredLocations: dashboard.featuredLocations,
+        newLocals: dashboard.newLocals,
+        featuredRoute: dashboard.featuredRoutes.isNotEmpty
+            ? dashboard.featuredRoutes.first
+            : null,
+        isLoadingDashboard: false,
+      );
+    } catch (e) {
+      print('Dashboard load error: $e');
+      state = state.copyWith(isLoadingDashboard: false);
+    }
+
+    notifyListeners();
   }
+
+  Future<void> refreshDashboard() => _loadDashboard();
+
+  // ─── Story Feed ─────────────────────────────────────────────────────────────
+
+  Future<void> _loadStoryFeed() async {
+    state = state.copyWith(isLoadingStories: true);
+    notifyListeners();
+
+    try {
+      final feedStories = await repo.fetchStoryFeed();
+
+      // The feed can include the current user's own story. Merge it into the
+      // single "Your story" slot so the upload option never shows up twice and
+      // the user sees their own uploaded story (with its real viewer count).
+      final ownFromFeed = feedStories.where((s) => s.isYourStory).toList();
+      final otherStories = feedStories.where((s) => !s.isYourStory).toList();
+
+      final yourStory = _mergeYourStory(repo.loadStories().first, ownFromFeed);
+
+      state = state.copyWith(
+        stories: [yourStory, ...otherStories],
+        isLoadingStories: false,
+      );
+    } catch (e) {
+      print('Story feed error: $e');
+      state = state.copyWith(isLoadingStories: false);
+    }
+
+    notifyListeners();
+  }
+
+  /// Combines the local "Your story" placeholder with the current user's own
+  /// story returned by the feed (if any), producing a single entry that
+  /// reflects the real uploaded slides and viewer count.
+  ExploreStory _mergeYourStory(
+    ExploreStory placeholder,
+    List<ExploreStory> ownFromFeed,
+  ) {
+    if (ownFromFeed.isEmpty) return placeholder;
+
+    final serverSlides = ownFromFeed.expand((s) => s.slides).toList();
+    final serverViewers = ownFromFeed.expand((s) => s.viewers).toList();
+    final serverViewerCount = ownFromFeed.fold<int>(
+      0,
+      (sum, s) => sum + s.displayViewerCount,
+    );
+
+    return placeholder.copyWith(
+      slides: serverSlides.isNotEmpty ? serverSlides : placeholder.slides,
+      viewers: serverViewers.isNotEmpty ? serverViewers : placeholder.viewers,
+      viewerCount: serverViewerCount,
+      serverId: ownFromFeed.first.serverId,
+    );
+  }
+
+  // ─── Story Tap ──────────────────────────────────────────────────────────────
+
+  Future<void> onStoryTap(BuildContext context, int index) async {
+    final story = state.stories[index];
+    if (story.isYourStory) {
+      await _onYourStoryTap(context, story);
+      return;
+    }
+    if (!story.hasStory) return;
+    await openStoryViewer(context, index);
+  }
+
+  Future<void> _onYourStoryTap(BuildContext context, ExploreStory story) async {
+    if (!story.hasStory) {
+      await _pickAndUploadStory(context);
+      return;
+    }
+
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.play_circle_outline),
+              title: Text(ctx.l10n.exploreViewYourStory),
+              onTap: () => Navigator.pop(ctx, 'view'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.add_photo_alternate_outlined),
+              title: Text(ctx.l10n.exploreAddPhoto),
+              onTap: () => Navigator.pop(ctx, 'add'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (!context.mounted) return;
+    switch (action) {
+      case 'view':
+        await openStoryViewer(context, 0);
+      case 'add':
+        await _pickAndUploadStory(context);
+    }
+  }
+
+  Future<void> _pickAndUploadStory(BuildContext context) async {
+    try {
+      final slide = await storyUploadService.pickAndUpload(context, repo);
+      if (slide == null) return;
+
+      repo.addSlideToYourStory(slide);
+      final yourStory = repo.loadStories().first;
+      state = state.copyWith(
+        stories: [yourStory, ...state.stories.where((s) => !s.isYourStory)],
+      );
+      notifyListeners();
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.snackbarStoryAdded)),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to upload story. Please try again.'),
+          ),
+        );
+      }
+    }
+  }
+
+  // ─── Story Viewer ───────────────────────────────────────────────────────────
+
+  Future<void> openStoryViewer(BuildContext context, int initialIndex) async {
+    final storiesWithContent = state.stories.where((s) => s.hasStory).toList();
+    if (storiesWithContent.isEmpty) return;
+
+    final story = state.stories[initialIndex];
+    final viewerIndex = storiesWithContent.indexWhere((s) => s.id == story.id);
+    if (viewerIndex < 0) return;
+
+    if (!story.isYourStory) {
+      _markStoriesViewed(story);
+    }
+
+    await context.push(
+      '/story_view',
+      extra: StoryViewerArgs(
+        stories: List<ExploreStory>.from(state.stories),
+        initialStoryIndex: viewerIndex,
+        onStoriesUpdated: _updateStories,
+      ),
+    );
+
+    final yourStory = repo.loadStories().first;
+    state = state.copyWith(
+      stories: [yourStory, ...state.stories.where((s) => !s.isYourStory)],
+    );
+    notifyListeners();
+  }
+
+  void _markStoriesViewed(ExploreStory story) {
+    for (final slide in story.activeSlides) {
+      repo.markStoryViewed(slide.id).catchError((dynamic e) {
+        print('Mark viewed error (slide ${slide.id}): $e');
+      });
+    }
+
+    state = state.copyWith(
+      stories: state.stories
+          .map((s) => s.id == story.id ? s.copyWith(isViewed: true) : s)
+          .toList(),
+    );
+    notifyListeners();
+  }
+
+  void openUserStory(BuildContext context, String userId) {
+    final index = state.stories.indexWhere((s) => s.id == userId);
+    if (index < 0 || !state.stories[index].hasStory) return;
+    openStoryViewer(context, index);
+  }
+
+  void _updateStories(List<ExploreStory> updated) {
+    repo.saveStories(updated);
+    final yourStory = repo.loadStories().first;
+    state = state.copyWith(
+      stories: [yourStory, ...updated.where((s) => !s.isYourStory)],
+    );
+    notifyListeners();
+  }
+
+  // ─── Local Shares ───────────────────────────────────────────────────────────
+
+  Future<void> toggleLocalShareLike(ExploreLocalShare share) async {
+    // Optimistic update first
+    final wasLiked = share.isLikedByUser;
+    state = state.copyWith(
+      localShares: state.localShares.map((s) {
+        if (s.id != share.id) return s;
+        return s.copyWith(
+          isLikedByUser: !wasLiked,
+          likeCount: wasLiked ? s.likeCount - 1 : s.likeCount + 1,
+        );
+      }).toList(),
+    );
+    notifyListeners();
+
+    try {
+      await repo.likeLocalShare(share.id);
+    } catch (e) {
+      // Revert on failure
+      print('Like local share error: $e');
+      state = state.copyWith(
+        localShares: state.localShares.map((s) {
+          return s.id == share.id ? share : s;
+        }).toList(),
+      );
+      notifyListeners();
+    }
+  }
+
+  // ─── Navigation ─────────────────────────────────────────────────────────────
+
+  void openLocalShareDetails(BuildContext context, ExploreLocalShare share) {
+    final photo = CheckInPhoto(
+      imageUrl: share.imageUrl,
+      previewColor: share.imageColor,
+      locationName: share.userName,
+      timeAgo: share.timeAgo,
+      caption: share.caption,
+      likes: share.likeCount,
+      userInitial: share.userAvatarInitial,
+    );
+    ImageViewDialog.show(context, photo, viewType: ImageViewType.localShare);
+  }
+
+  void openFeaturedLocations(BuildContext context) =>
+      context.push('/featured_locations');
+
+  void openEventsRoutes(BuildContext context) => context.push('/events_routes');
 
   void openLocationDetails(BuildContext context, String locationId) {
     context.push(
@@ -36,15 +302,11 @@ class ExploreController extends ChangeNotifier {
   }
 
   void openJoinEvent(BuildContext context, String eventId) {
-    context.push(
-      '/join_event',
-      extra: JoinEventArgs(eventId: eventId),
-    );
+    if (eventId.isEmpty) return;
+    context.push('/join_event', extra: JoinEventArgs(eventId: eventId));
   }
 
-  void openNotifications(BuildContext context) {
-    context.push('/notification');
-  }
+  void openNotifications(BuildContext context) => context.push('/notification');
 
   void openFindLocals(BuildContext context) {
     context.push(
@@ -61,120 +323,40 @@ class ExploreController extends ChangeNotifier {
     );
   }
 
-  void openProfile(BuildContext context) {
-    context.push('/view_profile');
-  }
+  void openLocalShares(BuildContext context) => context.push('/local_shares');
 
-  void openUserStory(BuildContext context, String userId) {
-    final index = state.stories.indexWhere((story) => story.id == userId);
-    if (index < 0) return;
-    if (!state.stories[index].hasStory) return;
-    openStoryViewer(context, index);
-  }
+  void openProfile(BuildContext context) => context.push('/view_profile');
 
-  void toggleFollow(String id) {
+  Future<void> toggleFollow(String id) async {
+    final user = state.followLocals.firstWhere((u) => u.id == id);
+    final wasFollowing = user.isFollowing;
+
+    // Optimistic UI update
     state = state.copyWith(
-      followLocals: state.followLocals
-          .map(
-            (user) => user.id == id
-                ? user.copyWith(isFollowing: !user.isFollowing)
-                : user,
-          )
-          .toList(),
-    );
-    notifyListeners();
-  }
+      followLocals: state.followLocals.map((u) {
+        if (u.id != id) return u;
 
-  Future<void> onStoryTap(BuildContext context, int index) async {
-    final story = state.stories[index];
-    if (story.isYourStory) {
-      await _onYourStoryTap(context, story);
-      return;
-    }
-    if (!story.hasStory) return;
-    openStoryViewer(context, index);
-  }
-
-  Future<void> _onYourStoryTap(BuildContext context, ExploreStory story) async {
-    if (!story.hasStory) {
-      await _pickAndAddStoryImage(context);
-      return;
-    }
-
-    final action = await showModalBottomSheet<String>(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.play_circle_outline),
-              title: Text(context.l10n.exploreViewYourStory),
-              onTap: () => Navigator.pop(context, 'view'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.add_photo_alternate_outlined),
-              title: Text(context.l10n.exploreAddPhoto),
-              onTap: () => Navigator.pop(context, 'add'),
-            ),
-          ],
-        ),
-      ),
+        return u.copyWith(isFollowing: !wasFollowing);
+      }).toList(),
     );
 
-    if (!context.mounted) return;
-    switch (action) {
-      case 'view':
-        openStoryViewer(context, 0);
-      case 'add':
-        await _pickAndAddStoryImage(context);
-    }
-  }
-
-  Future<void> _pickAndAddStoryImage(BuildContext context) async {
-    final slide = await storyUploadService.pickFromGallery(context);
-    if (slide == null) return;
-
-    repo.addSlideToYourStory(slide);
-    state = state.copyWith(stories: repo.loadStories());
     notifyListeners();
 
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.snackbarStoryAdded)),
+    try {
+      await repo.toggleFollow(id);
+    } catch (e) {
+      debugPrint('Toggle follow failed: $e');
+
+      // Rollback
+      state = state.copyWith(
+        followLocals: state.followLocals.map((u) {
+          if (u.id != id) return u;
+
+          return u.copyWith(isFollowing: wasFollowing);
+        }).toList(),
       );
+
+      notifyListeners();
     }
-  }
-
-  Future<void> openStoryViewer(BuildContext context, int initialIndex) async {
-    final storiesWithContent = state.stories
-        .where((s) => s.hasStory)
-        .toList();
-    if (storiesWithContent.isEmpty) return;
-
-    final story = state.stories[initialIndex];
-    final viewerIndex = storiesWithContent.indexWhere((s) => s.id == story.id);
-    if (viewerIndex < 0) return;
-
-    await context.push(
-      '/story_view',
-      extra: StoryViewerArgs(
-        stories: List<ExploreStory>.from(state.stories),
-        initialStoryIndex: viewerIndex,
-        onStoriesUpdated: _updateStories,
-      ),
-    );
-
-    state = state.copyWith(stories: repo.loadStories());
-    notifyListeners();
-  }
-
-  void _updateStories(List<ExploreStory> updated) {
-    repo.saveStories(updated);
-    state = state.copyWith(stories: updated);
-    notifyListeners();
   }
 }

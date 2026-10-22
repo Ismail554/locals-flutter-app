@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:locals/core/localization/l10n_extensions.dart';
 import '../model/help_support_model.dart';
 import '../repository/help_support_repository.dart';
-import 'package:locals/core/localization/l10n_extensions.dart';
 
 class HelpSupportController extends ChangeNotifier {
   final HelpSupportRepository repo;
@@ -35,48 +34,29 @@ class HelpSupportController extends ChangeNotifier {
     isSending = true;
     notifyListeners();
 
-    final uri = Uri(
-      scheme: 'mailto',
-      path: state.supportEmail,
-      query: _encodeQuery({
-        'subject': subject.isEmpty ? state.defaultSubject : subject,
-        'body': message,
-      }),
+    final success = await repo.sendSupportEmail(
+      subject: subject.isEmpty ? state.defaultSubject : subject,
+      message: message,
     );
-
-    final launched = await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
-    );
-
-    if (launched) {
-      await repo.sendSupportEmail(subject: subject, message: message);
-    }
 
     isSending = false;
     notifyListeners();
 
     if (!context.mounted) return;
 
-    if (launched) {
+    if (success) {
       messageController.clear();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.helpOpeningEmail)),
+        SnackBar(content: Text(
+          // context.l10n.helpMessageSent
+          "Message sent successful!"
+        )),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.helpCouldNotOpenEmail)),
+        const SnackBar(content: Text('Failed to send message. Please try again.')),
       );
     }
-  }
-
-  String? _encodeQuery(Map<String, String> params) {
-    return params.entries
-        .map(
-          (entry) =>
-              '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}',
-        )
-        .join('&');
   }
 
   @override

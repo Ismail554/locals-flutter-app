@@ -6,13 +6,13 @@ import 'package:locals/core/localization/l10n_extensions.dart';
 class ViewProfileStatsRow extends StatelessWidget {
   final int visits;
   final int followers;
-  final int cities;
+  final int likes;
 
   const ViewProfileStatsRow({
     super.key,
     required this.visits,
     required this.followers,
-    required this.cities,
+    required this.likes,
   });
 
   @override
@@ -34,7 +34,7 @@ class ViewProfileStatsRow extends StatelessWidget {
         Flexible(
           flex: 1,
           fit: FlexFit.tight,
-          child: _StatCard(value: '$cities', label: context.l10n.statCities),
+          child: _StatCard(value: '$likes', label: context.l10n.likes),
         ),
       ],
     );

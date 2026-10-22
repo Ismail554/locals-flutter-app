@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:locals/features/explore/explore/repository/explore_repository.dart';
 import '../../explore/model/explore_model.dart';
 import '../model/story_view_args.dart';
 import '../view/widgets/story_viewers_bottom_sheet.dart';
@@ -8,6 +9,7 @@ import 'package:locals/core/localization/l10n_extensions.dart';
 
 class StoryViewController extends ChangeNotifier {
   final StoryViewerArgs args;
+  final ExploreRepository repo;
 
   late final List<ExploreStory> stories;
   late int storyIndex;
@@ -21,7 +23,7 @@ class StoryViewController extends ChangeNotifier {
   static const _slideDuration = Duration(seconds: 5);
   static const _tick = Duration(milliseconds: 50);
 
-  StoryViewController(this.args) {
+  StoryViewController(this.args, this.repo) {
     stories = args.stories
         .where((s) => s.hasStory)
         .map((s) => s.copyWith(slides: s.activeSlides))
@@ -38,7 +40,7 @@ class StoryViewController extends ChangeNotifier {
   ExploreStory get currentStory => stories[storyIndex];
   StorySlide get currentSlide => _currentSlides[slideIndex];
   bool get isYourStory => currentStory.isYourStory;
-  int get viewerCount => currentStory.viewers.length;
+  int get viewerCount => currentStory.displayViewerCount;
 
   static const _currentUserViewerId = 'you';
   static const _currentUserViewerName = 'You';
@@ -105,19 +107,56 @@ class StoryViewController extends ChangeNotifier {
 
   void onTapRight() => _goNext();
 
-  void toggleHeart() {
+  Future<void> toggleHeart() async {
     if (isYourStory) return;
 
-    final story = currentStory;
-    final liked = !story.isLikedByMe;
-    stories[storyIndex] = story.copyWith(
-      isLikedByMe: liked,
-      likeCount: liked ? story.likeCount + 1 : story.likeCount - 1,
+    final slide = currentSlide;
+
+    final newLikeStatus = !slide.isLikedByMe;
+
+    // optimistic update
+    final updatedSlide = slide.copyWith(
+      isLikedByMe: newLikeStatus,
+      likeCount: newLikeStatus ? slide.likeCount + 1 : slide.likeCount - 1,
     );
-    showHeartBurst = liked;
+
+    final updatedSlides = List<StorySlide>.from(currentStory.slides);
+
+    updatedSlides[slideIndex] = updatedSlide;
+
+    stories[storyIndex] = currentStory.copyWith(slides: updatedSlides);
+
+    showHeartBurst = newLikeStatus;
+
     notifyListeners();
 
-    if (liked) {
+    try {
+      final liked = await repo.likeStory(slide.id);
+
+      // update API result
+      final apiUpdatedSlide = updatedSlide.copyWith(isLikedByMe: liked);
+
+      final apiSlides = List<StorySlide>.from(currentStory.slides);
+
+      apiSlides[slideIndex] = apiUpdatedSlide;
+
+      stories[storyIndex] = currentStory.copyWith(slides: apiSlides);
+
+      notifyListeners();
+    } catch (e) {
+      // rollback
+      final rollbackSlides = List<StorySlide>.from(currentStory.slides);
+
+      rollbackSlides[slideIndex] = slide;
+
+      stories[storyIndex] = currentStory.copyWith(slides: rollbackSlides);
+
+      notifyListeners();
+
+      debugPrint("Story like error: $e");
+    }
+
+    if (newLikeStatus) {
       Future.delayed(const Duration(milliseconds: 600), () {
         showHeartBurst = false;
         notifyListeners();

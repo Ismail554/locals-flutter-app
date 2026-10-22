@@ -5,12 +5,14 @@ import 'package:locals/shared/theme/app_colors.dart';
 class ProfileScreenHeader extends StatelessWidget {
   final String title;
   final VoidCallback onBack;
-  final Widget? trailing;
+  final VoidCallback? onMorePressed;   // 3-dot menu
+  final Widget? trailing;              // Kept for future flexibility
 
   const ProfileScreenHeader({
     super.key,
     required this.title,
     required this.onBack,
+    this.onMorePressed,
     this.trailing,
   });
 
@@ -21,6 +23,7 @@ class ProfileScreenHeader extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
+          // Back Button - Left
           Align(
             alignment: Alignment.centerLeft,
             child: Material(
@@ -44,6 +47,8 @@ class ProfileScreenHeader extends StatelessWidget {
               ),
             ),
           ),
+
+          // Title - Center
           Text(
             title,
             style: TextStyle(
@@ -52,8 +57,35 @@ class ProfileScreenHeader extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          if (trailing != null)
-            Align(alignment: Alignment.centerRight, child: trailing!),
+
+          // Right Side (3-dot or custom trailing)
+          Align(
+            alignment: Alignment.centerRight,
+            child: trailing ?? 
+              (onMorePressed != null 
+                ? Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: onMorePressed,
+                      borderRadius: BorderRadius.circular(22.r),
+                      child: Container(
+                        width: 44.w,
+                        height: 44.w,
+                        decoration: const BoxDecoration(
+                          // color: AppColors.chipUnselected,
+                          color: Colors.transparent,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.more_horiz,
+                          color: AppColors.black,
+                          size: 24.sp,
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox(width: 44)),
+          ),
         ],
       ),
     );

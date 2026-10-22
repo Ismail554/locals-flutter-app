@@ -7,31 +7,26 @@ import 'package:locals/core/localization/l10n_extensions.dart';
 
 class MissionDetailsStopsSection extends StatelessWidget {
   final List<MissionStop> stops;
+  final ValueChanged<MissionStop> onStopTap;
 
-  const MissionDetailsStopsSection({super.key, required this.stops});
+  const MissionDetailsStopsSection({
+    super.key,
+    required this.stops,
+    required this.onStopTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.l10n.missionStopsSection,
-          style: TextStyle(
-            color: AppColors.levelGrey,
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
+      children: stops.map((stop) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: MissionDetailsStopTile(
+            stop: stop,
+            onTap: () => onStopTap(stop),
           ),
-        ),
-        SizedBox(height: 12.h),
-        ...stops.map(
-          (stop) => Padding(
-            padding: EdgeInsets.only(bottom: 10.h),
-            child: MissionDetailsStopTile(stop: stop),
-          ),
-        ),
-      ],
+        );
+      }).toList(),
     );
   }
 }

@@ -6,6 +6,7 @@ class ListUser {
   final int level;
   final bool followsYou;
   final bool isFollowing;
+  final String? avatarUrl;
 
   const ListUser({
     required this.id,
@@ -13,6 +14,7 @@ class ListUser {
     required this.level,
     this.followsYou = false,
     this.isFollowing = false,
+    this.avatarUrl,
   });
 
   ListUser copyWith({bool? isFollowing}) {
@@ -22,6 +24,19 @@ class ListUser {
       level: level,
       followsYou: followsYou,
       isFollowing: isFollowing ?? this.isFollowing,
+      avatarUrl: avatarUrl,
+    );
+  }
+
+  /// Maps a `/social/followers/` or `/social/following/` API item.
+  factory ListUser.fromApi(Map<String, dynamic> json) {
+    return ListUser(
+      id: json['id'].toString(),
+      name: json['full_name'] as String? ?? '',
+      level: json['level'] as int? ?? 1,
+      followsYou: json['follows_you'] as bool? ?? false,
+      isFollowing: json['is_following'] as bool? ?? false,
+      avatarUrl: json['avatar'] as String?,
     );
   }
 }
@@ -30,24 +45,21 @@ class ListModel {
   final ListTab selectedTab;
   final List<ListUser> followers;
   final List<ListUser> following;
+  final bool isLoading;
+  final String? errorMessage;
 
   const ListModel({
     this.selectedTab = ListTab.followers,
-    this.followers = const [
-      ListUser(id: 'joan', name: 'Joan', level: 9),
-      ListUser(id: 'pol', name: 'Pol', level: 9),
-      ListUser(id: 'tena', name: 'Tena', level: 9),
-      ListUser(id: 'aina', name: 'Aina', level: 9),
-    ],
-    this.following = const [
-      ListUser(id: 'tena', name: 'Tena', level: 9, followsYou: true, isFollowing: true),
-      ListUser(id: 'aina', name: 'Aina', level: 9, isFollowing: true),
-      ListUser(id: 'anna', name: 'Anna marie', level: 9, isFollowing: true),
-    ],
+    this.followers = const [],
+    this.following = const [],
+    this.isLoading = false,
+    this.errorMessage,
   });
 
-  int get followersCount => 128;
-  int get followingCount => 96;
+  /// Real counts driven by loaded data — accessible anywhere ListModel is
+  /// available (e.g. `controller.state.followersCount`).
+  int get followersCount => followers.length;
+  int get followingCount => following.length;
 
   List<ListUser> get activeUsers =>
       selectedTab == ListTab.followers ? followers : following;
@@ -56,11 +68,16 @@ class ListModel {
     ListTab? selectedTab,
     List<ListUser>? followers,
     List<ListUser>? following,
+    bool? isLoading,
+    String? errorMessage,
+    bool clearError = false,
   }) {
     return ListModel(
       selectedTab: selectedTab ?? this.selectedTab,
       followers: followers ?? this.followers,
       following: following ?? this.following,
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
 }

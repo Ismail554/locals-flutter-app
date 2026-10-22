@@ -404,6 +404,12 @@ abstract class AppLocalizations {
   /// **'Resend'**
   String get otpResend;
 
+  /// No description provided for @otpResendSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'A new code has been sent to your email.'**
+  String get otpResendSuccess;
+
   /// No description provided for @otpEmailVerifiedTitle.
   ///
   /// In en, this message translates to:
@@ -632,6 +638,12 @@ abstract class AppLocalizations {
   /// **'NEW LOCALS'**
   String get exploreNewLocals;
 
+  /// No description provided for @localShares.
+  ///
+  /// In en, this message translates to:
+  /// **'LOCAL SHARES'**
+  String get localShares;
+
   /// No description provided for @exploreFeaturedLocations.
   ///
   /// In en, this message translates to:
@@ -752,11 +764,29 @@ abstract class AppLocalizations {
   /// **'Route complete'**
   String get eventRouteComplete;
 
+  /// No description provided for @sponsored.
+  ///
+  /// In en, this message translates to:
+  /// **'Sponsored'**
+  String get sponsored;
+
+  /// No description provided for @learnMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn More'**
+  String get learnMore;
+
   /// No description provided for @restaurantLocalsSeal.
   ///
   /// In en, this message translates to:
   /// **'locals\' seal'**
   String get restaurantLocalsSeal;
+
+  /// No description provided for @authConfirmPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get authConfirmPasswordLabel;
 
   /// No description provided for @restaurantLocalSpot.
   ///
@@ -764,10 +794,16 @@ abstract class AppLocalizations {
   /// **'Local spot'**
   String get restaurantLocalSpot;
 
+  /// No description provided for @authConfirmPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'********'**
+  String get authConfirmPasswordHint;
+
   /// No description provided for @restaurantBeenHere.
   ///
   /// In en, this message translates to:
-  /// **'I\'ve been here'**
+  /// **'Not Visited'**
   String get restaurantBeenHere;
 
   /// No description provided for @restaurantBeenHereDone.
@@ -787,6 +823,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Photos'**
   String get restaurantPhotos;
+
+  /// No description provided for @profileDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Details'**
+  String get profileDetails;
+
+  /// No description provided for @busniessOfTheMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Business of the month'**
+  String get busniessOfTheMonth;
 
   /// No description provided for @restaurantVisitors.
   ///
@@ -1022,11 +1070,11 @@ abstract class AppLocalizations {
   /// **'Businesses'**
   String get filtersBusinesses;
 
-  /// No description provided for @filtersHerbs.
+  /// No description provided for @filtersPoi.
   ///
   /// In en, this message translates to:
-  /// **'Herbs'**
-  String get filtersHerbs;
+  /// **'POI'**
+  String get filtersPoi;
 
   /// No description provided for @filtersBoth.
   ///
@@ -1051,6 +1099,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Apply filters'**
   String get filtersApply;
+
+  /// No description provided for @shareCardCaptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Caption'**
+  String get shareCardCaptionHint;
 
   /// No description provided for @mapExploring.
   ///
@@ -1159,6 +1213,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Global'**
   String get rankScopeGlobal;
+
+  /// Label for the button that opens the check-in sheet from the map
+  ///
+  /// In en, this message translates to:
+  /// **'Check In'**
+  String get checkInButtonLabel;
+
+  /// Title of the check-in bottom sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Check In'**
+  String get checkInTitle;
+
+  /// Hint text for the check-in caption field
+  ///
+  /// In en, this message translates to:
+  /// **'Say something about this spot...'**
+  String get checkInCaptionHint;
+
+  /// Submit button label on the check-in sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Check-In'**
+  String get checkInSubmit;
+
+  /// Option to take a photo with the camera
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get checkInCamera;
+
+  /// Option to pick a photo from the gallery
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Gallery'**
+  String get checkInGallery;
+
+  /// Placeholder text on the empty photo picker
+  ///
+  /// In en, this message translates to:
+  /// **'Add a photo'**
+  String get checkInAddPhoto;
+
+  /// Title shown on successful check-in
+  ///
+  /// In en, this message translates to:
+  /// **'Checked In!'**
+  String get checkInSuccessTitle;
+
+  /// Points earned message after check-in
+  ///
+  /// In en, this message translates to:
+  /// **'You earned {points} points'**
+  String checkInPointsEarned(int points);
+
+  /// Banner shown when the check-in completes the mission
+  ///
+  /// In en, this message translates to:
+  /// **'Mission Complete!'**
+  String get checkInMissionComplete;
+
+  /// Section header for newly unlocked achievements
+  ///
+  /// In en, this message translates to:
+  /// **'ACHIEVEMENTS UNLOCKED'**
+  String get checkInAchievementsUnlocked;
+
+  /// Button to dismiss the check-in result sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get checkInContinue;
 
   /// No description provided for @rankScopeFollowers.
   ///
@@ -1441,6 +1567,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy'**
   String get settingsPrivacy;
+
+  /// No description provided for @settingsDiscounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Discounts'**
+  String get settingsDiscounts;
 
   /// No description provided for @settingsEditProfile.
   ///
@@ -1826,6 +1958,18 @@ abstract class AppLocalizations {
   /// **'Other'**
   String get filterCategoryOther;
 
+  /// No description provided for @filterCategoryParksGardens.
+  ///
+  /// In en, this message translates to:
+  /// **'Parks and gardens'**
+  String get filterCategoryParksGardens;
+
+  /// No description provided for @validationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Validation failed'**
+  String get validationFailed;
+
   /// No description provided for @snackbarLinkCopied.
   ///
   /// In en, this message translates to:
@@ -1939,6 +2083,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose from gallery'**
   String get shareCardChooseGallery;
+
+  /// No description provided for @likes.
+  ///
+  /// In en, this message translates to:
+  /// **'LIKES'**
+  String get likes;
+
+  /// Title for QR scan screen
+  ///
+  /// In en, this message translates to:
+  /// **'QR Code Scan'**
+  String get qrCodeScanTitle;
+
+  /// No description provided for @qrScanInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Position the QR code in the frame'**
+  String get qrScanInstruction;
+
+  /// No description provided for @positionQrCodeHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Position QR code here'**
+  String get positionQrCodeHere;
+
+  /// No description provided for @tapToScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to scan'**
+  String get tapToScan;
+
+  /// No description provided for @qrVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'QR Verified!'**
+  String get qrVerified;
+
+  /// No description provided for @qrScanFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Failed'**
+  String get qrScanFailed;
+
+  /// No description provided for @qrTooFar.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re too far from the location'**
+  String get qrTooFar;
+
+  /// No description provided for @continueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueButton;
+
+  /// No description provided for @checkInSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re checked in. Thank you for visiting!'**
+  String get checkInSuccess;
+
+  /// No description provided for @checkInTooFar.
+  ///
+  /// In en, this message translates to:
+  /// **'You need to be closer to check in'**
+  String get checkInTooFar;
 }
 
 class _AppLocalizationsDelegate

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/core/network/api_client.dart';
+import 'package:locals/features/rank/view_profile/model/view_profile_args.dart';
 import 'package:locals/shared/story/user_story_launcher.dart';
 import '../model/rank_model.dart';
 import '../repository/rank_repository.dart';
@@ -7,21 +9,43 @@ import '../repository/rank_repository.dart';
 class RankController extends ChangeNotifier {
   final RankRepository repo;
   RankModel state = const RankModel();
+  bool isLoading = false;
 
-  RankController(this.repo);
+  RankController(this.repo) {
+    fetchLeaderboard();
+  }
+
+  Future<void> fetchLeaderboard() async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      state = await repo.fetchLeaderboard(
+        scope: state.selectedScope,
+        period: state.selectedPeriod,
+      );
+    } catch (e) {
+      debugPrint('Leaderboard fetch error: $e');
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 
   void selectScope(RankScope scope) {
     state = state.copyWith(selectedScope: scope);
     notifyListeners();
+    fetchLeaderboard();
   }
 
   void selectPeriod(RankPeriod period) {
     state = state.copyWith(selectedPeriod: period);
     notifyListeners();
+    fetchLeaderboard();
   }
 
-  void openViewProfile(BuildContext context) {
-    context.push('/view_profile');
+  void openViewProfile(BuildContext context, String userId) {
+    context.push('/view_profile', extra: ViewProfileArgs(userId: userId));
   }
 
   bool hasStory(String? storyUserId) => UserStoryLauncher.hasStory(storyUserId);

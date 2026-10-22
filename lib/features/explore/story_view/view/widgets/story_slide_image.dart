@@ -12,6 +12,22 @@ class StorySlideImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Network image from API
+    if (slide.imageUrl != null) {
+      return Image.network(
+        slide.imageUrl!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        loadingBuilder: (_, child, progress) {
+          if (progress == null) return child;
+          return _loading();
+        },
+        errorBuilder: (_, __, ___) => _placeholder(),
+      );
+    }
+
+    // 2. Local file (camera / gallery pick before upload)
     if (slide.imagePath != null) {
       return Image.file(
         File(slide.imagePath!),
@@ -22,7 +38,19 @@ class StorySlideImage extends StatelessWidget {
       );
     }
 
+    // 3. Color placeholder fallback
     return _placeholder();
+  }
+
+  Widget _loading() {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: slide.placeholderColor ?? AppColors.chipUnselected,
+      child: const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      ),
+    );
   }
 
   Widget _placeholder() {

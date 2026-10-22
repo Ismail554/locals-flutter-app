@@ -64,23 +64,43 @@ class _SignupView extends StatelessWidget {
                 children: [
                   SignupFormFields(
                     obscurePassword: controller.state.obscurePassword,
+                    obscureConfirmPassword:
+                        controller.state.obscureConfirmPassword,
                     onNameChanged: controller.setName,
                     onEmailChanged: controller.setEmail,
                     onPasswordChanged: controller.setPassword,
+                    onConfirmPasswordChanged: controller.setConfirmPassword,
                     onTogglePassword: controller.togglePasswordVisibility,
+                    onToggleConfirmPassword:
+                        controller.toggleConfirmPasswordVisibility,
                   ),
+                  if (controller.state.errorMessage != null) ...[
+                    SizedBox(height: 12.h),
+                    Text(
+                      controller.state.errorMessage!,
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 13.sp,
+                      ),
+                    ),
+                  ],
                   SizedBox(height: 24.h),
                   PrimaryButton(
                     label: context.l10n.signupButton,
-                    onPressed: () => controller.createAccount(context),
+                    isLoading: controller.state.isLoading,
+                    onPressed: () {
+                      if (!controller.state.isLoading) {
+                        controller.createAccount(context);
+                      }
+                    },
                   ),
                   SizedBox(height: 24.h),
-                  const AuthDivider(),
-                  SizedBox(height: 24.h),
-                  GoogleSignInButton(
-                    onPressed: () => controller.signInWithGoogle(context),
-                  ),
-                  SizedBox(height: 32.h),
+                  // const AuthDivider(),
+                  // SizedBox(height: 24.h),
+                  // GoogleSignInButton(
+                  //   onPressed: () => controller.signInWithGoogle(context),
+                  // ),
+                  // SizedBox(height: 32.h),
                   SignupLoginFooter(
                     onLogin: () => controller.goToLogin(context),
                   ),

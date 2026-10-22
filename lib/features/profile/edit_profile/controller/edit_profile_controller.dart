@@ -10,6 +10,7 @@ class EditProfileController extends ChangeNotifier {
   EditProfileModel state = const EditProfileModel();
 
   final nameController = TextEditingController();
+  final emailController = TextEditingController();
   final locationController = TextEditingController();
   final currentPasswordController = TextEditingController();
   final newPasswordController = TextEditingController();
@@ -28,8 +29,14 @@ class EditProfileController extends ChangeNotifier {
   }) : avatarPickerService = avatarPickerService ?? AvatarPickerService();
 
   Future<void> load() async {
-    state = await repo.load();
+    state = state.copyWith(isLoading: true);
+    notifyListeners();
+
+    final loaded = await repo.load();
+    state = loaded.copyWith(isLoading: false);
+
     nameController.text = state.name;
+    emailController.text = state.email;
     locationController.text = state.location;
     notifyListeners();
   }
@@ -54,24 +61,36 @@ class EditProfileController extends ChangeNotifier {
     isSaving = true;
     notifyListeners();
 
-    await repo.saveProfile(
-      name: nameController.text.trim(),
-      location: locationController.text.trim(),
-      avatarImagePath: state.avatarImagePath,
-    );
+    try {
+      await repo.saveProfile(
+        name: nameController.text.trim(),
+        location: locationController.text.trim(),
+        avatarImagePath: state.avatarImagePath,
+      );
 
-    state = state.copyWith(
-      name: nameController.text.trim(),
-      location: locationController.text.trim(),
-    );
+      state = state.copyWith(
+        name: nameController.text.trim(),
+        location: locationController.text.trim(),
+      );
 
-    isSaving = false;
-    notifyListeners();
+      isSaving = false;
+      notifyListeners();
 
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.snackbarProfileUpdated)),
-    );
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.snackbarProfileUpdated)),
+      );
+    } catch (e) {
+      isSaving = false;
+      notifyListeners();
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to update profile. Please try again.'),
+        ),
+      );
+    }
   }
 
   Future<void> changePassword(BuildContext context) async {
@@ -135,6 +154,7 @@ class EditProfileController extends ChangeNotifier {
   @override
   void dispose() {
     nameController.dispose();
+    emailController.dispose();
     locationController.dispose();
     currentPasswordController.dispose();
     newPasswordController.dispose();

@@ -6,5 +6,27 @@ class AchievementsController extends ChangeNotifier {
   final AchievementsRepository repo;
   AchievementsModel state = const AchievementsModel();
 
-  AchievementsController(this.repo);
+  bool isLoading = false;
+  String? errorMessage;
+
+  AchievementsController(this.repo) {
+    _fetch();
+  }
+
+  Future<void> _fetch() async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      state = await repo.fetchAchievements();
+      errorMessage = null;
+    } catch (e) {
+      errorMessage = e.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> refresh() => _fetch();
 }

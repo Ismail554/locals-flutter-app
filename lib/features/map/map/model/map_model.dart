@@ -1,5 +1,5 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locals/shared/model/map_pin_info.dart';
-import 'package:locals/shared/model/map_pin_tag.dart';
 import '../../filters/model/filters_model.dart';
 import 'map_mission_args.dart';
 
@@ -8,9 +8,16 @@ class MapModel {
   final MapFiltersState filters;
   final bool hasUnreadNotifications;
   final List<MapPinInfo> pins;
+  final bool isLoadingPins;
   final String? selectedPinId;
   final MapActiveMission? activeMission;
   final MapActiveLocation? highlightedLocation;
+  final bool showRoute;
+  final Set<Polyline> polylines;
+  final List<MapActiveLocation>? routeStops;
+  final LatLng? initialCenter;
+  final double? initialZoom;
+  final String? errorMessage;
 
   const MapModel({
     this.searchQuery = '',
@@ -19,98 +26,14 @@ class MapModel {
     this.selectedPinId,
     this.activeMission,
     this.highlightedLocation,
-    this.pins = const [
-      MapPinInfo(
-        id: 'cafe_del_born',
-        name: 'Café del Born',
-        level: 12,
-        x: 0.22,
-        y: 0.18,
-        tag: MapPinTag.business,
-        visited: true,
-      ),
-      MapPinInfo(
-        id: 'parc_guell',
-        name: 'Parc Güell',
-        level: 8,
-        x: 0.72,
-        y: 0.14,
-        tag: MapPinTag.pointOfInterest,
-        visited: false,
-      ),
-      MapPinInfo(
-        id: 'forn_baluard',
-        name: 'Forn Baluard',
-        level: 6,
-        x: 0.48,
-        y: 0.28,
-        tag: MapPinTag.business,
-        visited: false,
-      ),
-      MapPinInfo(
-        id: 'la_merce_stop',
-        name: 'La Mercè Route',
-        level: 15,
-        x: 0.35,
-        y: 0.42,
-        tag: MapPinTag.sponsoredOrEvent,
-        visited: true,
-      ),
-      MapPinInfo(
-        id: 'bar_marsella',
-        name: 'Bar Marsella',
-        level: 10,
-        x: 0.62,
-        y: 0.38,
-        tag: MapPinTag.business,
-        visited: true,
-      ),
-      MapPinInfo(
-        id: 'sagrada',
-        name: 'Sagrada Família',
-        level: 18,
-        x: 0.18,
-        y: 0.55,
-        tag: MapPinTag.pointOfInterest,
-        visited: false,
-      ),
-      MapPinInfo(
-        id: 'bunkers',
-        name: 'Bunkers del Carmel',
-        level: 9,
-        x: 0.78,
-        y: 0.52,
-        tag: MapPinTag.pointOfInterest,
-        visited: false,
-      ),
-      MapPinInfo(
-        id: 'born_market',
-        name: 'Mercat del Born',
-        level: 5,
-        x: 0.42,
-        y: 0.62,
-        tag: MapPinTag.business,
-        visited: false,
-      ),
-      MapPinInfo(
-        id: 'modernist_trail',
-        name: 'Modernist Trail',
-        level: 14,
-        x: 0.58,
-        y: 0.72,
-        tag: MapPinTag.sponsoredOrEvent,
-        visited: false,
-      ),
-      MapPinInfo(
-        id: 'plaça_reial',
-        name: 'Plaça Reial',
-        level: 7,
-        x: 0.28,
-        y: 0.78,
-        tag: MapPinTag.pointOfInterest,
-        visited: false,
-      ),
-    ],
+    this.pins = const [],
+    this.isLoadingPins = false,
+    this.showRoute = false,
+    this.polylines = const {},
+    this.routeStops,
+    this.initialCenter,
+    this.initialZoom,
+    this.errorMessage,
   });
 
   MapModel copyWith({
@@ -118,12 +41,17 @@ class MapModel {
     MapFiltersState? filters,
     bool? hasUnreadNotifications,
     List<MapPinInfo>? pins,
+    bool? isLoadingPins,
     String? selectedPinId,
     bool clearSelectedPin = false,
     MapActiveMission? activeMission,
     bool clearMission = false,
     MapActiveLocation? highlightedLocation,
     bool clearHighlightedLocation = false,
+    bool? showRoute,
+    Set<Polyline>? polylines,
+    String? errorMessage,
+    bool clearError = false,
   }) {
     return MapModel(
       searchQuery: searchQuery ?? this.searchQuery,
@@ -131,13 +59,21 @@ class MapModel {
       hasUnreadNotifications:
           hasUnreadNotifications ?? this.hasUnreadNotifications,
       pins: pins ?? this.pins,
-      selectedPinId:
-          clearSelectedPin ? null : selectedPinId ?? this.selectedPinId,
-      activeMission:
-          clearMission ? null : activeMission ?? this.activeMission,
+      isLoadingPins: isLoadingPins ?? this.isLoadingPins,
+      selectedPinId: clearSelectedPin
+          ? null
+          : selectedPinId ?? this.selectedPinId,
+      activeMission: clearMission ? null : activeMission ?? this.activeMission,
       highlightedLocation: clearHighlightedLocation
           ? null
           : highlightedLocation ?? this.highlightedLocation,
+      showRoute: showRoute ?? this.showRoute,
+      polylines: polylines ?? this.polylines,
+      errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
     );
+  }
+
+  MapPinInfo? getPinById(String id) {
+    return pins.where((pin) => pin.id == id).firstOrNull;
   }
 }

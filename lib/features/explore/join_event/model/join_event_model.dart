@@ -6,6 +6,7 @@ class JoinEventRouteStop {
   final String category;
   final Color thumbnailColor;
   final String? locationId;
+  final String? imageUrl;
 
   const JoinEventRouteStop({
     required this.number,
@@ -13,7 +14,22 @@ class JoinEventRouteStop {
     required this.category,
     required this.thumbnailColor,
     this.locationId,
+    this.imageUrl,
   });
+
+  factory JoinEventRouteStop.fromApi(Map<String, dynamic> json) {
+    final place = json['place'] as Map<String, dynamic>? ?? {};
+    final categoryJson = place['category'] as Map<String, dynamic>?;
+
+    return JoinEventRouteStop(
+      number: json['order'] as int? ?? 0,
+      name: place['name'] as String? ?? '',
+      category: categoryJson?['name'] as String? ?? '',
+      thumbnailColor: const Color(0xFFD4C4B0),
+      locationId: place['id']?.toString(),
+      imageUrl: place['cover_photo'] as String?,
+    );
+  }
 }
 
 class JoinEventModel {
@@ -22,6 +38,7 @@ class JoinEventModel {
   final String title;
   final String dateLabel;
   final Color heroColor;
+  final String? heroImageUrl;
   final int totalStops;
   final int rewardPoints;
   final int progressCurrent;
@@ -34,6 +51,7 @@ class JoinEventModel {
     required this.title,
     required this.dateLabel,
     required this.heroColor,
+    this.heroImageUrl,
     required this.totalStops,
     required this.rewardPoints,
     required this.progressCurrent,
@@ -50,6 +68,7 @@ class JoinEventModel {
       title: title,
       dateLabel: dateLabel,
       heroColor: heroColor,
+      heroImageUrl: heroImageUrl,
       totalStops: totalStops,
       rewardPoints: rewardPoints,
       progressCurrent: progressCurrent ?? this.progressCurrent,
@@ -58,132 +77,56 @@ class JoinEventModel {
     );
   }
 
-  static const _laMerceStops = [
-    JoinEventRouteStop(
-      number: 1,
-      name: 'Café del Born',
-      category: 'Cafe',
-      thumbnailColor: Color(0xFFD4C4B0),
-      locationId: 'cafe_del_born',
-    ),
-    JoinEventRouteStop(
-      number: 2,
-      name: 'Bar Marsella',
-      category: 'Bar',
-      thumbnailColor: Color(0xFFB8C8D8),
-      locationId: 'bar_marsella',
-    ),
-    JoinEventRouteStop(
-      number: 3,
-      name: 'Forn Baluard',
-      category: 'Bakery',
-      thumbnailColor: Color(0xFFE8D8C8),
-      locationId: 'forn_baluard',
-    ),
-    JoinEventRouteStop(
-      number: 4,
-      name: 'Sagrada Família',
-      category: 'Monument',
-      thumbnailColor: Color(0xFFD0D8E0),
-    ),
-    JoinEventRouteStop(
-      number: 5,
-      name: 'Bunkers del Carmel',
-      category: 'Viewpoint',
-      thumbnailColor: Color(0xFFC8D8B8),
-    ),
-    JoinEventRouteStop(
-      number: 6,
-      name: 'Plaça Reial',
-      category: 'Square',
-      thumbnailColor: Color(0xFFB8A898),
-    ),
-  ];
+  factory JoinEventModel.fromApi(Map<String, dynamic> json) {
+    final startDate = json['start_date'] as String?;
+    final endDate = json['end_date'] as String?;
 
-  static const _laMerce = JoinEventModel(
-    id: 'la_merce',
-    sponsor: 'Ajuntament de Barcelona',
-    title: 'La Mercè',
-    dateLabel: 'SEP 22 - 25',
-    heroColor: Color(0xFF4A6A8A),
-    totalStops: 12,
-    rewardPoints: 1500,
-    progressCurrent: 0,
-    stops: _laMerceStops,
-  );
+    String dateLabel = 'ONGOING';
+    if (startDate != null && endDate != null) {
+      dateLabel =
+          '${_monthLabel(startDate)} – ${_monthLabel(endDate)}';
+    } else if (startDate != null) {
+      dateLabel = _monthLabel(startDate);
+    }
 
-  static const _tapasRoute = JoinEventModel(
-    id: 'tapas_route',
-    sponsor: 'Estrella Damm',
-    title: 'Tapas Route',
-    dateLabel: 'ONGOING',
-    heroColor: Color(0xFF8A7A6A),
-    totalStops: 8,
-    rewardPoints: 800,
-    progressCurrent: 2,
-    stops: [
-      JoinEventRouteStop(
-        number: 1,
-        name: 'Bar Marsella',
-        category: 'Bar',
-        thumbnailColor: Color(0xFFB8C8D8),
-        locationId: 'bar_marsella',
-      ),
-      JoinEventRouteStop(
-        number: 2,
-        name: 'Café del Born',
-        category: 'Cafe',
-        thumbnailColor: Color(0xFFD4C4B0),
-        locationId: 'cafe_del_born',
-      ),
-      JoinEventRouteStop(
-        number: 3,
-        name: 'Forn Baluard',
-        category: 'Bakery',
-        thumbnailColor: Color(0xFFE8D8C8),
-        locationId: 'forn_baluard',
-      ),
-    ],
-  );
+    final stopsRaw = json['stops'] as List? ?? [];
+    final stops = stopsRaw
+        .map((s) =>
+            JoinEventRouteStop.fromApi(s as Map<String, dynamic>))
+        .toList();
 
-  static const _modernistWeekend = JoinEventModel(
-    id: 'modernist_weekend',
-    sponsor: 'Casa Batlló',
-    title: 'Modernist Weekend',
-    dateLabel: 'OCT 12 - 13',
-    heroColor: Color(0xFF7A8A9A),
-    totalStops: 7,
-    rewardPoints: 600,
-    progressCurrent: 0,
-    stops: [
-      JoinEventRouteStop(
-        number: 1,
-        name: 'Casa Batlló',
-        category: 'Monument',
-        thumbnailColor: Color(0xFF9A8A7A),
-      ),
-      JoinEventRouteStop(
-        number: 2,
-        name: 'Sagrada Família',
-        category: 'Monument',
-        thumbnailColor: Color(0xFFD0D8E0),
-      ),
-      JoinEventRouteStop(
-        number: 3,
-        name: 'Parc Güell',
-        category: 'Park',
-        thumbnailColor: Color(0xFFC8D8B8),
-        locationId: 'parc_guell',
-      ),
-    ],
-  );
+    // Parse progress "0/6" → current = 0
+    final progressStr = json['user_progress'] as String? ?? '0/0';
+    final progressParts = progressStr.split('/');
+    final progressCurrent =
+        int.tryParse(progressParts.first) ?? 0;
 
-  static JoinEventModel byId(String id) {
-    return switch (id) {
-      'la_merce' => _laMerce,
-      'tapas_route' => _tapasRoute,
-      'modernist_weekend' => _modernistWeekend,
-      _ => _laMerce,
-    };
+    return JoinEventModel(
+      id: json['id'].toString(),
+      sponsor: json['organizer'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      dateLabel: dateLabel,
+      heroColor: const Color(0xFF4A6A8A),
+      heroImageUrl: json['cover_photo'] as String?,
+      totalStops: json['total_stops'] as int? ?? stops.length,
+      rewardPoints: json['reward_points'] as int? ?? 0,
+      progressCurrent: progressCurrent,
+      stops: stops,
+    );
+  }
+
+  static String _monthLabel(String isoDate) {
+    const months = [
+      'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+      'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
+    ];
+    try {
+      final parts = isoDate.split('-');
+      final month = months[int.parse(parts[1]) - 1];
+      final day = parts[2];
+      return '$month $day';
+    } catch (_) {
+      return isoDate;
+    }
   }
 }

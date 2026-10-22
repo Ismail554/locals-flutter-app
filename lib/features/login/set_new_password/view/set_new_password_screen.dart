@@ -13,12 +13,23 @@ import 'widgets/set_new_password_login_link.dart';
 import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SetNewPasswordScreen extends StatelessWidget {
-  const SetNewPasswordScreen({super.key});
+  final String email;
+  final String resetToken;
+
+  const SetNewPasswordScreen({
+    super.key,
+    required this.email,
+    required this.resetToken,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => SetNewPasswordController(SetNewPasswordRepositoryImpl()),
+      create: (_) => SetNewPasswordController(
+        SetNewPasswordRepositoryImpl(),
+        email: email,
+        resetToken: resetToken,
+      ),
       child: const _SetNewPasswordView(),
     );
   }
@@ -32,9 +43,7 @@ class _SetNewPasswordView extends StatelessWidget {
     final controller = context.watch<SetNewPasswordController>();
 
     if (controller.state.isSuccess) {
-      return const Scaffold(
-        body: PasswordChangedSuccessView(),
-      );
+      return const Scaffold(body: PasswordChangedSuccessView());
     }
 
     return Scaffold(
@@ -91,10 +100,25 @@ class _SetNewPasswordView extends StatelessWidget {
                   PasswordRequirementBox(
                     requirements: SetNewPasswordController.passwordRequirements,
                   ),
+                  if (controller.state.errorMessage != null) ...[
+                    SizedBox(height: 12.h),
+                    Text(
+                      controller.state.errorMessage!,
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 13.sp,
+                      ),
+                    ),
+                  ],
                   SizedBox(height: 32.h),
                   PrimaryButton(
                     label: context.l10n.setPasswordButton,
-                    onPressed: () => controller.resetPassword(context),
+                    isLoading: controller.state.isLoading,
+                    onPressed: () {
+                      if (!controller.state.isLoading) {
+                        controller.resetPassword(context);
+                      }
+                    },
                   ),
                   SizedBox(height: 24.h),
                   SetNewPasswordLoginLink(

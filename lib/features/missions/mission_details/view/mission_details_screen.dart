@@ -45,30 +45,35 @@ class _MissionDetailsView extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: MissionDetailsBackButton(
-                  onTap: () => context.pop(),
-                ),
+                child: MissionDetailsBackButton(onTap: () => context.pop()),
               ),
             ),
             SizedBox(height: 16.h),
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    MissionDetailsHeaderCard(mission: mission),
-                    SizedBox(height: 24.h),
-                    MissionDetailsProgressSection(
-                      current: mission.progressCurrent,
-                      total: mission.progressTotal,
-                      progress: mission.progress,
-                    ),
-                    SizedBox(height: 24.h),
-                    MissionDetailsStopsSection(stops: mission.stops),
-                  ],
+              child: RefreshIndicator(
+                onRefresh: controller.refresh,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      MissionDetailsHeaderCard(mission: mission),
+                      SizedBox(height: 24.h),
+                      MissionDetailsProgressSection(
+                        current: mission.progressCurrent,
+                        total: mission.progressTotal,
+                        progress: mission.progress,
+                      ),
+                      SizedBox(height: 24.h),
+                      MissionDetailsStopsSection(
+                        stops: mission.stops,
+                        onStopTap: (stop) => controller.openStop(context, stop),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

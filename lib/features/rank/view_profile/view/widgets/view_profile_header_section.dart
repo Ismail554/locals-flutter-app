@@ -8,6 +8,7 @@ class ViewProfileHeaderSection extends StatelessWidget {
   final String name;
   final int level;
   final String location;
+  final String? avatarUrl;
   final bool hasStory;
   final bool isStoryViewed;
   final VoidCallback? onAvatarTap;
@@ -17,6 +18,7 @@ class ViewProfileHeaderSection extends StatelessWidget {
     required this.name,
     required this.level,
     required this.location,
+    this.avatarUrl,
     required this.hasStory,
     this.isStoryViewed = false,
     this.onAvatarTap,
@@ -25,11 +27,19 @@ class ViewProfileHeaderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final avatarSize = 96.w;
-    final avatar = StoryAvatarPlaceholder(
-      size: avatarSize,
-      backgroundColor: AppColors.chipUnselected,
-      iconColor: AppColors.textSecondary,
-    );
+    final hasAvatar = avatarUrl != null && avatarUrl!.isNotEmpty;
+    final avatar = hasAvatar
+        ? CircleAvatar(
+            radius: avatarSize / 2,
+            backgroundColor: AppColors.chipUnselected,
+            backgroundImage: NetworkImage(avatarUrl!),
+            onBackgroundImageError: (_, __) {},
+          )
+        : StoryAvatarPlaceholder(
+            size: avatarSize,
+            backgroundColor: AppColors.chipUnselected,
+            iconColor: AppColors.textSecondary,
+          );
 
     return Column(
       children: [

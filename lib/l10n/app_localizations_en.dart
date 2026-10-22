@@ -167,6 +167,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get otpResend => 'Resend';
 
   @override
+  String get otpResendSuccess => 'A new code has been sent to your email.';
+
+  @override
   String get otpEmailVerifiedTitle => 'Email Verified';
 
   @override
@@ -291,6 +294,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exploreNewLocals => 'NEW LOCALS';
 
   @override
+  String get localShares => 'LOCAL SHARES';
+
+  @override
   String get exploreFeaturedLocations => 'FEATURED LOCATIONS';
 
   @override
@@ -357,13 +363,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventRouteComplete => 'Route complete';
 
   @override
+  String get sponsored => 'Sponsored';
+
+  @override
+  String get learnMore => 'Learn More';
+
+  @override
   String get restaurantLocalsSeal => 'locals\' seal';
+
+  @override
+  String get authConfirmPasswordLabel => 'Confirm Password';
 
   @override
   String get restaurantLocalSpot => 'Local spot';
 
   @override
-  String get restaurantBeenHere => 'I\'ve been here';
+  String get authConfirmPasswordHint => '********';
+
+  @override
+  String get restaurantBeenHere => 'Not Visited';
 
   @override
   String get restaurantBeenHereDone => 'I\'ve been here ✓';
@@ -373,6 +391,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restaurantPhotos => 'Photos';
+
+  @override
+  String get profileDetails => 'Profile Details';
+
+  @override
+  String get busniessOfTheMonth => 'Business of the month';
 
   @override
   String get restaurantVisitors => 'Visitors';
@@ -495,7 +519,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filtersBusinesses => 'Businesses';
 
   @override
-  String get filtersHerbs => 'Herbs';
+  String get filtersPoi => 'POI';
 
   @override
   String get filtersBoth => 'Both';
@@ -508,6 +532,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filtersApply => 'Apply filters';
+
+  @override
+  String get shareCardCaptionHint => 'Caption';
 
   @override
   String get mapExploring => 'EXPLORING';
@@ -562,6 +589,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rankScopeGlobal => 'Global';
+
+  @override
+  String get checkInButtonLabel => 'Check In';
+
+  @override
+  String get checkInTitle => 'Check In';
+
+  @override
+  String get checkInCaptionHint => 'Say something about this spot...';
+
+  @override
+  String get checkInSubmit => 'Submit Check-In';
+
+  @override
+  String get checkInCamera => 'Take Photo';
+
+  @override
+  String get checkInGallery => 'Choose from Gallery';
+
+  @override
+  String get checkInAddPhoto => 'Add a photo';
+
+  @override
+  String get checkInSuccessTitle => 'Checked In!';
+
+  @override
+  String checkInPointsEarned(int points) {
+    return 'You earned $points points';
+  }
+
+  @override
+  String get checkInMissionComplete => 'Mission Complete!';
+
+  @override
+  String get checkInAchievementsUnlocked => 'ACHIEVEMENTS UNLOCKED';
+
+  @override
+  String get checkInContinue => 'Continue';
 
   @override
   String get rankScopeFollowers => 'Followers';
@@ -721,6 +786,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPrivacy => 'Privacy';
+
+  @override
+  String get settingsDiscounts => 'Discounts';
 
   @override
   String get settingsEditProfile => 'Edit Profile';
@@ -919,6 +987,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filterCategoryOther => 'Other';
 
   @override
+  String get filterCategoryParksGardens => 'Parks and gardens';
+
+  @override
+  String get validationFailed => 'Validation failed';
+
+  @override
   String get snackbarLinkCopied => 'Link copied';
 
   @override
@@ -977,4 +1051,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shareCardChooseGallery => 'Choose from gallery';
+
+  @override
+  String get likes => 'LIKES';
+
+  @override
+  String get qrCodeScanTitle => 'QR Code Scan';
+
+  @override
+  String get qrScanInstruction => 'Position the QR code in the frame';
+
+  @override
+  String get positionQrCodeHere => 'Position QR code here';
+
+  @override
+  String get tapToScan => 'Tap to scan';
+
+  @override
+  String get qrVerified => 'QR Verified!';
+
+  @override
+  String get qrScanFailed => 'Scan Failed';
+
+  @override
+  String get qrTooFar => 'You\'re too far from the location';
+
+  @override
+  String get continueButton => 'Continue';
+
+  @override
+  String get checkInSuccess => 'You\'re checked in. Thank you for visiting!';
+
+  @override
+  String get checkInTooFar => 'You need to be closer to check in';
 }

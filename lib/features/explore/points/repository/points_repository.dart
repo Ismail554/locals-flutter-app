@@ -13,6 +13,10 @@ class PointsRepositoryImpl implements PointsRepository {
       points: args.points,
       cityName: args.cityName,
       cityProgress: args.cityProgress,
+      level: args.level,
+      totalPoints: args.totalPoints,
+      missionCompleted: args.missionCompleted,
+      unlockedAchievements: args.unlockedAchievements,
     );
   }
 }

@@ -27,7 +27,8 @@ class _AchievementsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<AchievementsController>().state;
+    final controller = context.watch<AchievementsController>();
+    final state = controller.state;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -45,35 +46,38 @@ class _AchievementsView extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                child: Column(
-                  children: [
-                    AchievementsProgressCard(
-                      unlockedCount: state.unlockedCount,
-                      totalCount: state.totalCount,
-                    ),
-                    SizedBox(height: 16.h),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final cardWidth =
-                            (constraints.maxWidth - 12.w) / 2;
-                        return Wrap(
-                          spacing: 12.w,
-                          runSpacing: 12.h,
-                          children: [
-                            for (final achievement in state.achievements)
-                              SizedBox(
-                                width: cardWidth,
-                                child: AchievementGridCard(
-                                  achievement: achievement,
+              child: RefreshIndicator(
+                onRefresh: controller.refresh,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+                  child: Column(
+                    children: [
+                      AchievementsProgressCard(
+                        unlockedCount: state.unlockedCount,
+                        totalCount: state.totalCount,
+                      ),
+                      SizedBox(height: 16.h),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final cardWidth = (constraints.maxWidth - 12.w) / 2;
+                          return Wrap(
+                            spacing: 12.w,
+                            runSpacing: 12.h,
+                            children: [
+                              for (final achievement in state.achievements)
+                                SizedBox(
+                                  width: cardWidth,
+                                  child: AchievementGridCard(
+                                    achievement: achievement,
+                                  ),
                                 ),
-                              ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -5,11 +5,13 @@ import 'package:locals/shared/theme/app_colors.dart';
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
+  final bool isLoading;
 
   const PrimaryButton({
     super.key,
     required this.label,
     required this.onPressed,
+    this.isLoading = false,
   });
 
   @override
@@ -17,7 +19,7 @@ class PrimaryButton extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onPressed,
+        onTap: isLoading ? null : onPressed,
         borderRadius: BorderRadius.circular(50.r),
         child: Ink(
           width: double.infinity,
@@ -29,16 +31,27 @@ class PrimaryButton extends StatelessWidget {
             ),
           ),
           child: Center(
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w500,
-                height: 1.44,
-              ),
-            ),
+            child: isLoading
+                ? SizedBox(
+                    height: 22.sp,
+                    width: 22.sp,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.white,
+                      ),
+                    ),
+                  )
+                : Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w500,
+                      height: 1.44,
+                    ),
+                  ),
           ),
         ),
       ),

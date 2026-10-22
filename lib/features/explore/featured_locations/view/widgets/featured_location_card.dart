@@ -36,16 +36,19 @@ class FeaturedLocationCard extends StatelessWidget {
             SizedBox(
               height: 180.h,
               width: double.infinity,
-              child: ColoredBox(
-                color: location.imageColor,
-                child: Center(
-                  child: Icon(
-                    Icons.image_outlined,
-                    color: AppColors.white.withValues(alpha: 0.5),
-                    size: 48.sp,
-                  ),
-                ),
-              ),
+              child: location.imageUrl != null
+                  ? Image.network(
+                      location.imageUrl!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      loadingBuilder: (_, child, progress) {
+                        if (progress == null) return child;
+                        return _placeholder();
+                      },
+                      errorBuilder: (_, __, ___) => _placeholder(),
+                    )
+                  : _placeholder(),
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 14.h),
@@ -92,6 +95,19 @@ class FeaturedLocationCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _placeholder() {
+    return ColoredBox(
+      color: location.imageColor,
+      child: Center(
+        child: Icon(
+          Icons.image_outlined,
+          color: AppColors.white.withValues(alpha: 0.5),
+          size: 48.sp,
         ),
       ),
     );

@@ -15,15 +15,12 @@ class OnboardLocationPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        NeumorphicIllustrationCard(
-          circular: true,
-          child: SizedBox(
-            width: 90.w,
-            height: 90.w,
-            child: Image.asset(
-              page.imageAsset,
-              fit: BoxFit.contain,
-            ),
+        SizedBox(
+          width: 100.w,
+          height: 100.w,
+          child: Image.asset(
+            page.imageAsset,
+            fit: BoxFit.contain,
           ),
         ),
         SizedBox(height: 20.h),

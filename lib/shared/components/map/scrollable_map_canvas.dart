@@ -60,15 +60,14 @@ class _ScrollableMapCanvasState extends State<ScrollableMapCanvas> {
         }
 
         if (focusPin != null) {
-          final pinX = focusPin.x * canvasWidth;
-          final pinY = focusPin.y * canvasHeight;
+          final pinX = focusPin.lat * canvasWidth;
+          final pinY = focusPin.lng * canvasHeight;
           tx = viewportWidth / 2 - pinX;
           ty = viewportHeight / 2 - pinY;
         }
       }
 
       _transformController.value = Matrix4.translationValues(tx, ty, 0);
-
       _centered = true;
     });
   }
@@ -108,7 +107,7 @@ class _ScrollableMapCanvasState extends State<ScrollableMapCanvas> {
                   child: MapPinsLayer(
                     pins: widget.pins,
                     selectedPinId: widget.selectedPinId,
-                    onPinTap: widget.onPinTap,
+                    onPinTap: widget.onPinTap,   // ← Passed correctly
                   ),
                 ),
               ],

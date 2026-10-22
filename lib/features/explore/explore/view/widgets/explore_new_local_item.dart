@@ -28,17 +28,25 @@ class ExploreNewLocalItem extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 56.w,
-              height: 56.w,
-              decoration: BoxDecoration(
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: Container(
+                width: 56.w,
+                height: 56.w,
                 color: local.imageColor,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Icon(
-                Icons.storefront_outlined,
-                color: AppColors.white.withValues(alpha: 0.7),
-                size: 24.sp,
+                child: local.imageUrl != null
+                    ? Image.network(
+                        local.imageUrl!,
+                        fit: BoxFit.cover,
+                        width: 56.w,
+                        height: 56.w,
+                        loadingBuilder: (_, child, progress) {
+                          if (progress == null) return child;
+                          return _placeholderIcon();
+                        },
+                        errorBuilder: (_, __, ___) => _placeholderIcon(),
+                      )
+                    : _placeholderIcon(),
               ),
             ),
             SizedBox(width: 12.w),
@@ -84,6 +92,14 @@ class ExploreNewLocalItem extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _placeholderIcon() {
+    return Icon(
+      Icons.storefront_outlined,
+      color: AppColors.white.withValues(alpha: 0.7),
+      size: 24.sp,
     );
   }
 }

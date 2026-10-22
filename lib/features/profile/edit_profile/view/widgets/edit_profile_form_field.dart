@@ -6,6 +6,7 @@ class EditProfileFormField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final bool obscureText;
+  final bool readOnly;
   final Widget? suffix;
   final TextInputType keyboardType;
 
@@ -14,6 +15,7 @@ class EditProfileFormField extends StatelessWidget {
     required this.label,
     required this.controller,
     this.obscureText = false,
+    this.readOnly = false,
     this.suffix,
     this.keyboardType = TextInputType.text,
   });
@@ -40,6 +42,7 @@ class EditProfileFormField extends StatelessWidget {
           child: TextField(
             controller: controller,
             obscureText: obscureText,
+            readOnly: readOnly,
             keyboardType: keyboardType,
             style: TextStyle(
               color: AppColors.actionPink,

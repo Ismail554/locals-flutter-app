@@ -20,14 +20,16 @@ class ShareCardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedArgs =
-        args ?? (GoRouterState.of(context).extra as ShareCardArgs?);
+    // Prefer passed args, then router extra, then build from current user
+    final resolvedArgs = args ??
+        (GoRouterState.of(context).extra as ShareCardArgs?) ??
+        ShareCardArgs.fromCurrentUser();
 
     return ChangeNotifierProvider(
       create: (_) => ShareCardController(
         ShareCardRepositoryImpl(),
         ExploreRepositoryImpl.instance,
-        resolvedArgs ?? const ShareCardArgs(),
+        resolvedArgs,
       ),
       child: const _ShareCardView(),
     );
@@ -72,6 +74,46 @@ class _ShareCardView extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
                 child: Column(
                   children: [
+                    // ─── Caption field ───────────────────────────────────────
+                    TextField(
+                      controller: controller.captionController,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: AppColors.black,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: context.l10n.shareCardCaptionHint,
+                        hintStyle: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14.sp,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.inputBackground,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 14.h,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(
+                            color: AppColors.actionPink,
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+
+                    // ─── Photo preview ───────────────────────────────────────
                     ShareCardPreview(
                       previewColor: state.previewColor,
                       isConfirmed: state.isConfirmed,
@@ -79,19 +121,24 @@ class _ShareCardView extends StatelessWidget {
                       onTap: () => controller.capturePhoto(context),
                     ),
                     SizedBox(height: 20.h),
+
+                    // ─── Stats row ───────────────────────────────────────────
                     ShareCardStatsRow(
                       level: state.level,
                       points: state.points,
                       cityPercent: state.cityPercent,
                     ),
                     SizedBox(height: 24.h),
+
+                    // ─── Actions ─────────────────────────────────────────────
                     ShareCardActions(
                       isConfirmed: state.isConfirmed,
                       hasImage: state.imagePath != null,
                       isSaving: state.isSaving,
                       isSaved: state.isSaved,
+                      isSubmitting: state.isSubmitting,
                       onRetake: () => controller.retake(context),
-                      onConfirm: controller.confirm,
+                      onConfirm: () => controller.confirm(context),
                       onAddToStory: () async =>
                           controller.addToStory(context),
                       onSaveImage: () => controller.saveImage(context),

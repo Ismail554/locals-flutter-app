@@ -27,6 +27,7 @@ class _BlockedListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<BlockedListController>();
+    final state = controller.state;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -44,18 +45,46 @@ class _BlockedListView extends StatelessWidget {
             Flexible(
               flex: 1,
               fit: FlexFit.tight,
-              child: ListView.separated(
-                padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
-                itemCount: controller.state.users.length,
-                separatorBuilder: (_, __) => SizedBox(height: 10.h),
-                itemBuilder: (context, index) {
-                  final user = controller.state.users[index];
-                  return BlockedUserItem(
-                    user: user,
-                    onUnblock: () => controller.unblock(user.id),
-                  );
-                },
-              ),
+              child: state.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : state.errorMessage != null && state.users.isEmpty
+                      ? Center(
+                          child: Text(
+                            state.errorMessage!,
+                            style: TextStyle(
+                              color: AppColors.levelGrey,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                        )
+                      : state.users.isEmpty
+                          ? Center(
+                              child: Text(
+                                context.l10n.blockedListTitle,
+                                style: TextStyle(
+                                  color: AppColors.levelGrey,
+                                  fontSize: 14.sp,
+                                ),
+                              ),
+                            )
+                          : RefreshIndicator(
+                              onRefresh: controller.refresh,
+                              child: ListView.separated(
+                                padding:
+                                    EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+                                itemCount: state.users.length,
+                                separatorBuilder: (_, __) =>
+                                    SizedBox(height: 10.h),
+                                itemBuilder: (context, index) {
+                                  final user = state.users[index];
+                                  return BlockedUserItem(
+                                    user: user,
+                                    onUnblock: () =>
+                                        controller.unblock(user.id),
+                                  );
+                                },
+                              ),
+                            ),
             ),
           ],
         ),

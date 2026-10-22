@@ -6,7 +6,11 @@ import 'package:locals/core/localization/l10n_extensions.dart';
 class ImageViewDialog {
   ImageViewDialog._();
 
-  static Future<void> show(BuildContext context, CheckInPhoto photo) {
+  static Future<void> show(
+    BuildContext context,
+    CheckInPhoto photo, {
+    ImageViewType viewType = ImageViewType.localShare, 
+  }) {
     return showGeneralDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -17,6 +21,7 @@ class ImageViewDialog {
         return CheckInImageView(
           photo: photo,
           onClose: () => Navigator.of(context).pop(),
+          viewType: viewType,        
         );
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {

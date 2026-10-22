@@ -17,8 +17,7 @@ class PrivacyDataScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) =>
-          PrivacyDataController(PrivacyDataRepositoryImpl())..load(),
+      create: (_) => PrivacyDataController(PrivacyDataRepositoryImpl())..load(),
       child: const _PrivacyDataView(),
     );
   }
@@ -34,44 +33,46 @@ class _PrivacyDataView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
-              child: ProfileScreenHeader(
-                title: context.l10n.privacyDataTitle,
-                onBack: () => context.pop(),
+        child: controller.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 0),
+                    child: ProfileScreenHeader(
+                      title: context.l10n.privacyDataTitle,
+                      onBack: () => context.pop(),
+                    ),
+                  ),
+                  SizedBox(height: 24.h),
+                  Flexible(
+                    flex: 1,
+                    fit: FlexFit.tight,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      child: Column(
+                        children: [
+                          PrivacyEncryptionBanner(
+                            title: context.l10n.privacyDataEncryptedTitle,
+                            subtitle: context.l10n.privacyDataEncryptedSubtitle,
+                          ),
+                          SizedBox(height: 16.h),
+                          PrivacyDeleteAccountButton(
+                            onTap: () => controller.confirmDeleteAccount(context),
+                          ),
+                          const Spacer(),
+                          PrivacyLegalLinks(
+                            onPrivacyPolicy: () =>
+                                controller.openPrivacyPolicy(context),
+                            onTermsOfUse: () => controller.openTermsOfUse(context),
+                          ),
+                          SizedBox(height: 32.h),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 24.h),
-            Flexible(
-              flex: 1,
-              fit: FlexFit.tight,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                child: Column(
-                  children: [
-                    PrivacyEncryptionBanner(
-                      title: context.l10n.privacyDataEncryptedTitle,
-                      subtitle: context.l10n.privacyDataEncryptedSubtitle,
-                    ),
-                    SizedBox(height: 16.h),
-                    PrivacyDeleteAccountButton(
-                      onTap: () => controller.confirmDeleteAccount(context),
-                    ),
-                    const Spacer(),
-                    PrivacyLegalLinks(
-                      onPrivacyPolicy: () =>
-                          controller.openPrivacyPolicy(context),
-                      onTermsOfUse: () => controller.openTermsOfUse(context),
-                    ),
-                    SizedBox(height: 32.h),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

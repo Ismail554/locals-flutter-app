@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/core/network/api_client.dart';
 import 'package:locals/core/media/image_save_service.dart';
 import 'package:locals/features/map/map/model/map_mission_args.dart';
 import '../../explore/model/explore_model.dart';
@@ -21,6 +24,9 @@ class ShareCardController extends ChangeNotifier {
   final ShareCardArgs args;
   ShareCardModel state;
 
+  /// Caption field controller — driven by the text field in the UI
+  final TextEditingController captionController = TextEditingController();
+
   ShareCardController(
     this.repo,
     this.exploreRepo,
@@ -29,10 +35,18 @@ class ShareCardController extends ChangeNotifier {
     ImageSaveService? imageSaveService,
   })  : storyUploadService = storyUploadService ?? StoryUploadService(),
         imageSaveService = imageSaveService ?? const ImageSaveService(),
-        state = repo.load(args);
+        state = repo.load(args) {
+    captionController.addListener(_onCaptionChanged);
+  }
+
+  void _onCaptionChanged() {
+    state = state.copyWith(caption: captionController.text);
+    notifyListeners();
+  }
 
   Future<void> capturePhoto(BuildContext context) async {
-    final imagePath = await Navigator.of(context, rootNavigator: true).push<String>(
+    final imagePath = await Navigator.of(context, rootNavigator: true)
+        .push<String>(
       MaterialPageRoute(
         fullscreenDialog: true,
         builder: (_) => const ShareCardCameraScreen(),
@@ -53,51 +67,113 @@ class ShareCardController extends ChangeNotifier {
     await capturePhoto(context);
   }
 
-  void confirm() {
-    if (state.imagePath == null) return;
-    state = state.copyWith(isConfirmed: true);
+  /// Submits the photo + caption as a real check-in
+  /// (`POST /social/checkins/`) and updates level/points/city%/achievements
+  /// from the live gamification response.
+  Future<void> confirm(BuildContext context) async {
+    if (state.imagePath == null || state.isSubmitting) return;
+
+    final placeId = args.placeId;
+    if (placeId == null || placeId.trim().isEmpty) {
+      state = state.copyWith(
+        submitError: 'This share card is not linked to a place.',
+      );
+      notifyListeners();
+      return;
+    }
+
+    state = state.copyWith(isSubmitting: true, clearSubmitError: true);
     notifyListeners();
+
+    try {
+      final imageFile = File(state.imagePath!);
+      if (!await imageFile.exists()) {
+        throw const ApiException('The selected image is no longer available.');
+      }
+
+      final result = await repo.submitCheckIn(
+        placeId: placeId,
+        imagePath: imageFile,
+        caption: state.caption.trim(),
+      );
+
+      state = state.copyWith(
+        isConfirmed: result.success,
+        isSubmitting: false,
+        level: result.newLevel,
+        points: result.newTotalPoints,
+        cityPercent: result.cityCompletionPercentage.round(),
+        unlockedAchievements: result.unlockedAchievements,
+        submitError: result.success ? null : result.message,
+        clearSubmitError: result.success,
+      );
+      notifyListeners();
+
+      if (context.mounted && result.success &&
+          result.unlockedAchievements.isNotEmpty) {
+        final titles =
+            result.unlockedAchievements.map((a) => a.title).join(', ');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Achievement unlocked: $titles')),
+        );
+      } else if (context.mounted && !result.success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result.message)),
+        );
+      }
+    } catch (error) {
+      final message = error is ApiException
+          ? error.message
+          : 'Check-in failed. Please try again.';
+      state = state.copyWith(isSubmitting: false, submitError: message);
+      notifyListeners();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    }
   }
 
   Future<void> addToStory(BuildContext context) async {
     if (state.imagePath != null) {
-      _addImageToStory(state.imagePath!);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.snackbarStoryAdded)),
-        );
-      }
+      await _uploadImageToStory(context, state.imagePath!);
       return;
     }
 
     final source = await _showMediaSourceSheet(context);
     if (!context.mounted || source == null) return;
 
-    final StorySlide? slide;
     if (source == ShareCardMediaSource.camera) {
-      slide = await _captureSlide(context);
+      await capturePhoto(context);
+      if (!context.mounted || state.imagePath == null) return;
+      await _uploadImageToStory(context, state.imagePath!);
     } else {
-      slide = await storyUploadService.pickFromGallery(context);
+      try {
+        final slide =
+            await storyUploadService.pickAndUpload(context, exploreRepo);
+        if (!context.mounted || slide == null) return;
+
+        if (slide.imagePath != null) _applyImage(slide.imagePath!);
+        exploreRepo.addSlideToYourStory(slide);
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to upload story. Please try again.'),
+            ),
+          );
+          return;
+        }
+      }
     }
 
-    if (!context.mounted || slide == null || slide.imagePath == null) return;
-
-    _applyImage(slide.imagePath!);
-    _addImageToStory(slide.imagePath!);
-
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.snackbarStoryAdded)),
-      );
-    }
   }
 
-  Future<ShareCardMediaSource?> _showMediaSourceSheet(
-    BuildContext context,
-  ) {
+  Future<ShareCardMediaSource?> _showMediaSourceSheet(BuildContext context) {
     return showModalBottomSheet<ShareCardMediaSource>(
       context: context,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (sheetContext) => SafeArea(
@@ -122,13 +198,6 @@ class ShareCardController extends ChangeNotifier {
     );
   }
 
-  Future<StorySlide?> _captureSlide(BuildContext context) async {
-    await capturePhoto(context);
-    final path = state.imagePath;
-    if (path == null) return null;
-    return storyUploadService.slideFromPath(path);
-  }
-
   void _applyImage(String imagePath) {
     state = state.copyWith(
       imagePath: imagePath,
@@ -138,11 +207,25 @@ class ShareCardController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _addImageToStory(String imagePath) {
-    final slide = storyUploadService.slideFromPath(imagePath);
-    exploreRepo.addSlideToYourStory(slide);
-    state = state.copyWith(isConfirmed: true);
-    notifyListeners();
+  Future<void> _uploadImageToStory(
+    BuildContext context,
+    String imagePath,
+  ) async {
+    try {
+      final slide = await exploreRepo.uploadStory(File(imagePath));
+      exploreRepo.addSlideToYourStory(slide);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.snackbarStoryAdded)),
+        );
+      }
+    } catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to upload story: $error')),
+        );
+      }
+    }
   }
 
   Future<void> saveImage(BuildContext context) async {
@@ -181,18 +264,27 @@ class ShareCardController extends ChangeNotifier {
 
   MapMissionArgs _defaultMapMissionArgs() {
     return const MapMissionArgs(
-      city: 'Barcelona',
-      completedCount: 5,
-      totalCount: 35,
+      city: '',
+      completedCount: 0,
+      totalCount: 0,
       activeLocation: MapActiveLocation(
-        locationId: 'cafe_del_born',
-        category: 'CAFE',
-        seal: "locals' seal",
-        name: 'Café del Born',
-        address: 'Carrer del Born 12',
-        points: 50,
-        imageColor: Color(0xFFD4C4B0),
+        locationId: '',
+        category: '',
+        seal: "",
+        name: '',
+        address: '',
+        points: 0,
+        imageColor: Color(0xFFD4C4B0), 
+        latitude: 41.3833, 
+        longitude: 2.1833,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    captionController.removeListener(_onCaptionChanged);
+    captionController.dispose();
+    super.dispose();
   }
 }

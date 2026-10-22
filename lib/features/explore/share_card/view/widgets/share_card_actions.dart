@@ -8,6 +8,7 @@ class ShareCardActions extends StatelessWidget {
   final bool hasImage;
   final bool isSaving;
   final bool isSaved;
+  final bool isSubmitting;
   final VoidCallback onRetake;
   final VoidCallback onConfirm;
   final VoidCallback onAddToStory;
@@ -20,6 +21,7 @@ class ShareCardActions extends StatelessWidget {
     required this.hasImage,
     required this.isSaving,
     required this.isSaved,
+    required this.isSubmitting,
     required this.onRetake,
     required this.onConfirm,
     required this.onAddToStory,
@@ -55,12 +57,14 @@ class ShareCardActions extends StatelessWidget {
               flex: 1,
               fit: FlexFit.tight,
               child: OutlinedButton.icon(
-                onPressed: onConfirm,
+                onPressed: hasImage && !isSubmitting ? onConfirm : null,
                 icon: Icon(
                   isConfirmed ? Icons.check_circle : Icons.check_circle_outline,
                   size: 18.sp,
                 ),
-                label: Text(context.l10n.shareCardConfirm),
+                label: Text(isSubmitting
+                  ? 'Submitting...'
+                  : context.l10n.shareCardConfirm),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: hasImage
                       ? AppColors.actionPink

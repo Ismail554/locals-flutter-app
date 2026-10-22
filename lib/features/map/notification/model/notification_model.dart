@@ -12,10 +12,23 @@ class NotificationItem {
     required this.message,
     required this.emoji,
     required this.timeAgo,
-    this.isRead = false,
+    required this.isRead,
   });
 
-  NotificationItem copyWith({bool? isRead}) {
+  factory NotificationItem.fromJson(Map<String, dynamic> json) {
+    return NotificationItem(
+      id: json['id'].toString(),
+      title: json['title'] ?? '',
+      message: json['message'] ?? '',
+      emoji: _emojiFromType(json['notification_type']),
+      timeAgo: _timeAgo(json['created_at']),
+      isRead: json['is_read'] ?? false,
+    );
+  }
+
+  NotificationItem copyWith({
+    bool? isRead,
+  }) {
     return NotificationItem(
       id: id,
       title: title,
@@ -25,57 +38,94 @@ class NotificationItem {
       isRead: isRead ?? this.isRead,
     );
   }
+
+  static String _emojiFromType(String? type) {
+    switch (type) {
+      case 'MISSION':
+        return '🎯';
+      case 'SYSTEM':
+        return '📣';
+      case 'CHECKIN':
+        return '📍';
+      case 'LEVEL_UP':
+        return '⭐';
+      default:
+        return '🔔';
+    }
+  }
+
+  static String _timeAgo(String? value) {
+    if (value == null) return '';
+
+    final date = DateTime.tryParse(value);
+
+    if (date == null) return '';
+
+    final diff = DateTime.now().difference(date.toLocal());
+
+    if (diff.inMinutes < 1) {
+      return 'Now';
+    }
+
+    if (diff.inHours < 1) {
+      return '${diff.inMinutes}m';
+    }
+
+    if (diff.inDays < 1) {
+      return '${diff.inHours}h';
+    }
+
+    if (diff.inDays < 30) {
+      return '${diff.inDays}d';
+    }
+
+    if (diff.inDays < 365) {
+      return '${(diff.inDays / 30).floor()}mo';
+    }
+
+    return '${(diff.inDays / 365).floor()}y';
+  }
 }
 
 class NotificationModel {
+  final int count;
+  final String? next;
+  final String? previous;
   final List<NotificationItem> items;
 
   const NotificationModel({
-    this.items = const [
-      NotificationItem(
-        id: '1',
-        title: 'Mission completed',
-        message: 'You finished Coffee Cartographer and earned +250 pts.',
-        emoji: '🎯',
-        timeAgo: '2h',
-      ),
-      NotificationItem(
-        id: '2',
-        title: 'Level up!',
-        message: "Congrats! You're now Level 15.",
-        emoji: '⭐',
-        timeAgo: '5h',
-      ),
-      NotificationItem(
-        id: '3',
-        title: 'New place nearby',
-        message: 'Café del Born is 0.3 km away.',
-        emoji: '📍',
-        timeAgo: '1d',
-        isRead: true,
-      ),
-      NotificationItem(
-        id: '4',
-        title: 'Check-in reminder',
-        message: "You haven't logged a visit in 3 days.",
-        emoji: '🆕',
-        timeAgo: '1d',
-        isRead: true,
-      ),
-      NotificationItem(
-        id: '5',
-        title: 'Weekend routes',
-        message: 'New themed routes available in Gràcia.',
-        emoji: '📣',
-        timeAgo: '2d',
-        isRead: true,
-      ),
-    ],
+    this.count = 0,
+    this.next,
+    this.previous,
+    this.items = const [],
   });
 
-  bool get hasUnread => items.any((item) => !item.isRead);
+  bool get hasUnread => items.any((e) => !e.isRead);
 
-  NotificationModel copyWith({List<NotificationItem>? items}) {
-    return NotificationModel(items: items ?? this.items);
+  bool get hasNextPage => next != null;
+
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    return NotificationModel(
+      count: json['count'] ?? 0,
+      next: json['next'],
+      previous: json['previous'],
+      items: (json['results'] as List<dynamic>? ?? [])
+          .map((e) => NotificationItem.fromJson(e))
+          .toList(),
+    );
+  }
+
+  NotificationModel copyWith({
+    int? count,
+    String? next,
+    String? previous,
+    List<NotificationItem>? items,
+  }) {
+    return NotificationModel(
+      count: count ?? this.count,
+      next: next ?? this.next,
+      previous: previous ?? this.previous,
+      items: items ?? this.items,
+    );
   }
 }

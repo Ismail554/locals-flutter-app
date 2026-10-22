@@ -14,12 +14,18 @@ import 'widgets/verify_account_otp_hint_text.dart';
 import 'package:locals/core/localization/l10n_extensions.dart';
 
 class VerifyAccountOtpScreen extends StatelessWidget {
-  const VerifyAccountOtpScreen({super.key});
+  /// Email passed from signup via GoRouter extra
+  final String email;
+
+  const VerifyAccountOtpScreen({super.key, required this.email});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => VerifyAccountOtpController(VerifyAccountOtpRepositoryImpl()),
+      create: (_) => VerifyAccountOtpController(
+        VerifyAccountOtpRepositoryImpl(),
+        email: email,
+      ),
       child: const _VerifyAccountOtpView(),
     );
   }
@@ -77,13 +83,30 @@ class _VerifyAccountOtpView extends StatelessWidget {
                   ),
                   SizedBox(height: 16.h),
                   const VerifyAccountOtpHintText(),
+                  if (controller.state.errorMessage != null) ...[
+                    SizedBox(height: 12.h),
+                    Text(
+                      controller.state.errorMessage!,
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 13.sp,
+                      ),
+                    ),
+                  ],
                   const Spacer(),
                   PrimaryButton(
                     label: context.l10n.otpVerifyButton,
-                    onPressed: () => controller.verifyOtp(context),
+                    isLoading: controller.state.isLoading,
+                    onPressed: () {
+                      if (!controller.state.isLoading) {
+                        controller.verifyOtp(context);
+                      }
+                    },
                   ),
                   SizedBox(height: 20.h),
-                  VerifyOtpResendRow(onResend: controller.resendCode),
+                  VerifyOtpResendRow(
+                    onResend: () => controller.resendCode(context),
+                  ),
                   SizedBox(height: 24.h),
                 ],
               ),

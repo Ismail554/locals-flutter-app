@@ -1,10 +1,25 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:locals/features/explore/events_progress_map/model/events_progress_map_args.dart';
 import 'package:locals/features/explore/restaurant_view_details/model/restaurant_view_details_args.dart';
+import 'package:locals/features/map/map/controller/location_service.dart';
+import 'package:locals/features/map/map/controller/route_service.dart';
+import 'package:locals/features/map/map/model/map_mission_args.dart';
+import 'package:locals/features/missions/check_in/view/checkin_bottom_sheet.dart';
+import 'package:locals/core/network/api_client.dart';
+import 'package:locals/core/navigation/navigation_session.dart';
+import 'package:locals/shared/components/pin_details_sheet.dart';
+import 'package:locals/shared/model/map_pin_info.dart';
+import 'package:locals/shared/model/map_pin_tag.dart';
+import 'package:locals/shared/theme/app_colors.dart';
 import '../../filters/model/filters_model.dart';
 import '../../search/repository/map_search_repository.dart';
 import '../model/map_screen_args.dart';
+import '../model/travel_mode.dart';
 import '../model/map_model.dart';
 import '../repository/map_repository.dart';
 
@@ -12,28 +27,360 @@ class MapController extends ChangeNotifier {
   final MapRepository repo;
   MapModel state;
 
+  Timer? _searchDebounce;
+  Timer? _visibleRegionDebounce;
+  String? _lastVisibleBoundsKey;
+  StreamSubscription<LatLng>? _locationSubscription;
+  bool isNearDestination = false;
+  bool isTrackingLive = false;
+  TravelMode travelMode;
+  bool get isFocusedMode => _isFocusedMode;
+
+  bool get _isFocusedMode =>
+      state.showRoute && state.highlightedLocation != null;
+
   MapController(this.repo, {MapScreenArgs? screenArgs})
-      : state = MapModel(
-          activeMission: screenArgs?.mission?.toActiveMission(),
-          selectedPinId: screenArgs?.focusedPinId,
-          highlightedLocation: screenArgs?.highlightedLocation,
+    : state = MapModel(
+        activeMission: screenArgs?.mission?.toActiveMission(),
+        selectedPinId: screenArgs?.focusedPinId,
+        highlightedLocation: screenArgs?.highlightedLocation,
+        showRoute: screenArgs?.showRoute ?? false,
+        initialCenter: screenArgs?.initialCenter,
+        initialZoom: screenArgs?.initialZoom,
+      ),
+      travelMode = screenArgs?.travelMode ?? TravelMode.walk {
+    _initContext();
+  }
+
+  Future<void> _initContext() async {
+    await _loadPlaces();
+
+    if (_isFocusedMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      await loadRoute();
+    }
+  }
+
+  Future<void> retry() => _loadPlaces();
+
+  /// Switches the active route's travel mode (walk / car / bus) and redraws
+  /// the polyline accordingly. The choice is persisted via [loadRoute] so it
+  /// survives an app restart.
+  void setTravelMode(TravelMode mode) {
+    if (travelMode == mode) return;
+    travelMode = mode;
+    notifyListeners();
+    loadRoute();
+  }
+
+  void loadVisibleRegion(LatLngBounds bounds) {
+    if (_isFocusedMode) return;
+    final boundsKey = [
+      bounds.southwest.latitude,
+      bounds.southwest.longitude,
+      bounds.northeast.latitude,
+      bounds.northeast.longitude,
+    ].map((value) => value.toStringAsFixed(5)).join(',');
+    if (boundsKey == _lastVisibleBoundsKey) return;
+    _lastVisibleBoundsKey = boundsKey;
+    _visibleRegionDebounce?.cancel();
+    _visibleRegionDebounce = Timer(const Duration(milliseconds: 350), () {
+      _loadPlaces(bounds: bounds);
+    });
+  }
+
+  void startLiveTracking() {
+    if (isTrackingLive) return;
+    isTrackingLive = true;
+
+    _locationSubscription?.cancel();
+    _locationSubscription = LocationService.locationStream().listen(
+      (currentLoc) {
+        final destination = state.highlightedLocation;
+        if (destination == null) return;
+
+        final destLatLng = LatLng(destination.latitude, destination.longitude);
+        final distance = Geolocator.distanceBetween(
+          currentLoc.latitude,
+          currentLoc.longitude,
+          destLatLng.latitude,
+          destLatLng.longitude,
         );
 
-  void setSearchQuery(String value) {
-    state = state.copyWith(searchQuery: value);
+        final nearNow = distance < 50;
+
+        if (nearNow != isNearDestination) {
+          isNearDestination = nearNow;
+          notifyListeners();
+        }
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        debugPrint('Live location error: $error');
+        stopLiveTracking();
+        state = state.copyWith(
+          errorMessage: 'Live location is unavailable. Please try again.',
+        );
+        notifyListeners();
+      },
+    );
     notifyListeners();
   }
 
-  void applyFilters(MapFiltersState filters) {
-    state = state.copyWith(filters: filters);
+  void stopLiveTracking() {
+    _locationSubscription?.cancel();
+    _locationSubscription = null;
+    isTrackingLive = false;
+    isNearDestination = false;
     notifyListeners();
   }
 
-  void onPinTap(String pinId) {
+  // ─── Places Loading ─────────────────────────────────────────────────────────
+
+  Future<void> loadRoute() async {
+    debugPrint("=== LOAD ROUTE ===");
+    if (!state.showRoute || state.highlightedLocation == null) return;
+
+    final location = state.highlightedLocation!;
+
+    try {
+      final current = await LocationService.currentLocation();
+      final destination = LatLng(location.latitude, location.longitude);
+
+      debugPrint("Current: ${current.latitude}, ${current.longitude}");
+      debugPrint(
+        "Destination: ${destination.latitude}, ${destination.longitude}",
+      );
+
+      final points = await RouteService.instance.getRoute(
+        origin: current,
+        destination: destination,
+        mode: travelMode,
+      );
+      if (points.isNotEmpty) {
+        state = state.copyWith(
+          polylines: {
+            Polyline(
+              polylineId: const PolylineId('route'),
+              points: points,
+              width: 8,
+              color: AppColors.primaryPink,
+              geodesic: false,
+              startCap: Cap.roundCap,
+              endCap: Cap.roundCap,
+            ),
+          },
+        );
+        debugPrint("✅ Real curved route drawn with ${points.length} points");
+      } else {
+        // Fallback straight line
+        state = state.copyWith(
+          polylines: {
+            Polyline(
+              polylineId: const PolylineId('route'),
+              points: [current, destination],
+              width: 6,
+              color: Colors.orange,
+            ),
+          },
+        );
+      }
+
+      // Remember this direction so it can be resumed after an app restart.
+      unawaited(
+        NavigationSession().save(
+          destination: location,
+          travelMode: travelMode,
+        ),
+      );
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Route Error: $e");
+      state = state.copyWith(
+        errorMessage: e is ApiException
+            ? e.message
+            : 'Unable to load directions. Please try again.',
+      );
+      notifyListeners();
+    }
+  }
+
+  Future<void> _loadPlaces({LatLngBounds? bounds}) async {
+    state = state.copyWith(isLoadingPins: true, clearError: true);
+    notifyListeners();
+
+    try {
+      List<MapPinInfo> pins = await repo.fetchPlaces(
+        search: state.searchQuery,
+        categorySlug: _resolveCategorySlug(),
+        placeType: _resolvePlaceType(),
+        visitStatus: _resolveVisitStatus(),
+        bounds: bounds,
+      );
+
+      // === Focused Mode (Mission, Featured Route, Single Place) ===
+      if (_isFocusedMode && state.highlightedLocation != null) {
+        final targetId = state.highlightedLocation!.resolvedLocationId;
+
+        pins = pins.where((pin) => pin.id == targetId).toList();
+
+        // Fallback: Create pin from highlighted location if not returned by API
+        if (pins.isEmpty) {
+          final loc = state.highlightedLocation!;
+          pins = [
+            MapPinInfo(
+              id: loc.resolvedLocationId,
+              name: loc.name,
+              level: 1, // required field
+              lat: loc.latitude,
+              lng: loc.longitude,
+              tag: _getPinTag(loc.category),
+              visited: false,
+              category: loc.category,
+              address: loc.address,
+              points: loc.points,
+              accentColor: loc.imageColor,
+            ),
+          ];
+        }
+      }
+
+      state = state.copyWith(pins: pins, isLoadingPins: false);
+      notifyListeners();
+
+      if (_isFocusedMode) {
+        await Future.delayed(const Duration(milliseconds: 800));
+        await loadRoute();
+      }
+    } catch (e) {
+      debugPrint('Places fetch error: $e');
+      state = state.copyWith(
+        isLoadingPins: false,
+        errorMessage: e is ApiException
+            ? e.message
+            : 'Unable to load places. Please check your connection and try again.',
+      );
+      notifyListeners();
+    }
+  }
+
+  void showRouteToPin(String pinId) {
+    final pin = state.getPinById(pinId);
+    if (pin == null) {
+      debugPrint("❌ Pin not found: $pinId");
+      return;
+    }
+
+    debugPrint("📍 Showing route to pin: ${pin.name}");
+
+    state = state.copyWith(
+      highlightedLocation: MapActiveLocation(
+        locationId: pin.id,
+        category: pin.category ?? 'PLACE',
+        seal: 'Local spot',
+        name: pin.name,
+        address: pin.address ?? '',
+        points: pin.points ?? 30,
+        imageColor: pin.accentColor ?? const Color(0xFFD4C4B0),
+        latitude: pin.lat,
+        longitude: pin.lng,
+      ),
+      showRoute: true,
+      selectedPinId: null,
+    );
+
+    notifyListeners();
+    loadRoute();
+  }
+
+  void openDirectionsFromPin(String pinId) {
+    final pin = state.getPinById(pinId);
+    if (pin == null) return;
+
+    state = state.copyWith(
+      highlightedLocation: MapActiveLocation(
+        locationId: pin.id,
+        category: pin.category ?? 'PLACE',
+        seal: 'Local spot',
+        name: pin.name,
+        address: pin.address ?? '',
+        points: pin.points ?? 30,
+        imageColor: pin.accentColor ?? const Color(0xFFD4C4B0),
+        latitude: pin.lat,
+        longitude: pin.lng,
+      ),
+      showRoute: true,
+      selectedPinId: null,
+    );
+
+    notifyListeners();
+    loadRoute();
+  }
+
+  MapPinTag _getPinTag(String category) {
+    final cat = category.toLowerCase();
+    if (cat.contains('cafe') || cat.contains('coffee')) {
+      return MapPinTag.business;
+    }
+    if (cat.contains('bar')) return MapPinTag.business;
+    if (cat.contains('restaurant') || cat.contains('food')) {
+      return MapPinTag.business;
+    }
+    if (cat.contains('event')) return MapPinTag.sponsoredOrEvent;
+    return MapPinTag.pointOfInterest;
+  }
+
+  // ─── Helpers ───────────────────────────────────────────────────────────────
+
+  String? _resolveCategorySlug() {
+    final selected = state.filters.selectedCategoryIds;
+    if (selected.isEmpty) return null;
+    return selected.first;
+  }
+
+  String? _resolvePlaceType() {
+    switch (state.filters.placeType) {
+      case PlaceTypeFilter.businesses:
+        return 'BUSINESS';
+      case PlaceTypeFilter.event:
+        return 'POI';
+      case PlaceTypeFilter.poi:
+        return null;
+    }
+  }
+
+  String? _resolveVisitStatus() {
+    switch (state.filters.visitStatus) {
+      case VisitStatusFilter.visited:
+        return 'VISITED';
+      case VisitStatusFilter.unvisited:
+        return 'UNVISITED';
+      case VisitStatusFilter.both:
+        return null;
+    }
+  }
+
+  // ─── Pin Interaction ────────────────────────────────────────────────────────
+
+  void onPinTap(BuildContext context, String pinId) {
+    final pin = state.getPinById(pinId);
+    if (pin == null) return;
+
     state = state.copyWith(
       selectedPinId: state.selectedPinId == pinId ? null : pinId,
     );
     notifyListeners();
+
+    _showPinDetailsBottomSheet(context, pin);
+  }
+
+  void _showPinDetailsBottomSheet(BuildContext context, MapPinInfo pin) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => PinDetailsSheet(pin: pin, controller: this),
+    );
   }
 
   void clearSelectedPin() {
@@ -41,6 +388,30 @@ class MapController extends ChangeNotifier {
     state = state.copyWith(clearSelectedPin: true);
     notifyListeners();
   }
+
+  // ─── Check-In ───────────────────────────────────────────────────────────────
+
+  Future<void> checkIn(BuildContext context) async {
+    final location =
+        state.highlightedLocation ?? state.activeMission?.activeLocation;
+    if (location == null) return;
+
+    final result = await showCheckInSheet(
+      context,
+      placeId: location.resolvedLocationId,
+      placeName: location.name,
+    );
+
+    if (result == null || !context.mounted) return;
+
+    await _loadPlaces();
+
+    if (result.missionCompleted && context.mounted) {
+      context.pop();
+    }
+  }
+
+  // ─── Navigation ─────────────────────────────────────────────────────────────
 
   Future<void> openSearch(BuildContext context) async {
     final result = await context.push<String>(
@@ -56,10 +427,7 @@ class MapController extends ChangeNotifier {
   Future<void> openFilters(BuildContext context) async {
     await context.push<MapFiltersState>(
       '/filters',
-      extra: FiltersArgs(
-        initial: state.filters,
-        onApply: applyFilters,
-      ),
+      extra: FiltersArgs(initial: state.filters, onApply: applyFilters),
     );
   }
 
@@ -76,9 +444,7 @@ class MapController extends ChangeNotifier {
 
     context.push(
       '/restaurant_view_details',
-      extra: RestaurantViewDetailsArgs(
-        locationId: location.resolvedLocationId,
-      ),
+      extra: RestaurantViewDetailsArgs(locationId: location.resolvedLocationId),
     );
   }
 
@@ -93,5 +459,36 @@ class MapController extends ChangeNotifier {
         completedStops: mission.completedCount,
       ),
     );
+  }
+
+  void openRestaurantDetails(BuildContext context, String locationId) {
+    context.push(
+      '/restaurant_view_details',
+      extra: RestaurantViewDetailsArgs(locationId: locationId),
+    );
+  }
+
+  void setSearchQuery(String value) {
+    state = state.copyWith(searchQuery: value);
+    notifyListeners();
+
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 400), () {
+      _loadPlaces();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _visibleRegionDebounce?.cancel();
+    _locationSubscription?.cancel();
+    super.dispose();
+  }
+
+  void applyFilters(MapFiltersState filters) {
+    state = state.copyWith(filters: filters);
+    notifyListeners();
+    _loadPlaces();
   }
 }

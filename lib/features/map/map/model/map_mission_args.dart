@@ -41,9 +41,17 @@ class MapActiveMission {
     this.eventId,
   });
 
-  double get progress => completedCount / totalCount;
+  /// Guarded against totalCount == 0 (would otherwise be 0/0 = NaN).
+  double get progress => totalCount <= 0 ? 0.0 : completedCount / totalCount;
 
-  int get percent => (progress * 100).round();
+  /// Guarded against NaN/Infinity (e.g. from totalCount == 0) — `.round()`
+  /// throws an UnsupportedError on those values. Also clamps to a sane
+  /// 0-100 range in case completedCount ever exceeds totalCount.
+  int get percent {
+    final value = progress * 100;
+    if (!value.isFinite) return 0;
+    return value.round().clamp(0, 100);
+  }
 }
 
 class MapActiveLocation {
@@ -54,6 +62,9 @@ class MapActiveLocation {
   final String address;
   final int points;
   final Color imageColor;
+  final String? imageUrl;
+  final double latitude;
+  final double longitude;
 
   const MapActiveLocation({
     this.locationId,
@@ -63,12 +74,15 @@ class MapActiveLocation {
     required this.address,
     required this.points,
     required this.imageColor,
+    this.imageUrl,
+    required this.latitude,
+    required this.longitude,
   });
 
-  String get resolvedLocationId =>
-      locationId ?? locationIdForName(name) ?? 'cafe_del_born';
+  String get resolvedLocationId => locationId ?? locationIdForName(name) ?? '';
 
-  String get mapPinId => mapPinIdForLocationId(locationId ?? locationIdForName(name));
+  String get mapPinId =>
+      mapPinIdForLocationId(locationId ?? locationIdForName(name));
 }
 
 const _locationIdsByName = <String, String>{
@@ -81,10 +95,8 @@ const _locationIdsByName = <String, String>{
 String? locationIdForName(String name) => _locationIdsByName[name];
 
 String mapPinIdForLocationId(String? locationId) {
-  if (locationId == null) return 'cafe_del_born';
+  if (locationId == null) return '';
   return _locationIdsById[locationId] ?? locationId;
 }
 
-const _locationIdsById = <String, String>{
-  'sagrada_familia': 'sagrada',
-};
+const _locationIdsById = <String, String>{'sagrada_familia': 'sagrada'};

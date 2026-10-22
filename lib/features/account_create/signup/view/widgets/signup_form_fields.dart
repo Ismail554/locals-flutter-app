@@ -6,18 +6,24 @@ import 'package:locals/core/localization/l10n_extensions.dart';
 
 class SignupFormFields extends StatelessWidget {
   final bool obscurePassword;
+  final bool obscureConfirmPassword;
   final ValueChanged<String> onNameChanged;
   final ValueChanged<String> onEmailChanged;
   final ValueChanged<String> onPasswordChanged;
+  final ValueChanged<String> onConfirmPasswordChanged;
   final VoidCallback onTogglePassword;
+  final VoidCallback onToggleConfirmPassword;
 
   const SignupFormFields({
     super.key,
     required this.obscurePassword,
+    required this.obscureConfirmPassword,
     required this.onNameChanged,
     required this.onEmailChanged,
     required this.onPasswordChanged,
+    required this.onConfirmPasswordChanged,
     required this.onTogglePassword,
+    required this.onToggleConfirmPassword,
   });
 
   @override
@@ -48,7 +54,27 @@ class SignupFormFields extends StatelessWidget {
           suffix: IconButton(
             onPressed: onTogglePassword,
             icon: Icon(
-              obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              obscurePassword
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+              color: AppColors.primaryPink,
+              size: 20.sp,
+            ),
+          ),
+        ),
+        SizedBox(height: 20.h),
+        AuthTextField(
+          label: context.l10n.authConfirmPasswordLabel,
+          hint: context.l10n.authConfirmPasswordHint,
+          prefixIcon: Icons.lock_outline,
+          obscureText: obscureConfirmPassword,
+          onChanged: onConfirmPasswordChanged,
+          suffix: IconButton(
+            onPressed: onToggleConfirmPassword,
+            icon: Icon(
+              obscureConfirmPassword
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
               color: AppColors.primaryPink,
               size: 20.sp,
             ),

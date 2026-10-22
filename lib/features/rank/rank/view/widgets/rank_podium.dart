@@ -23,11 +23,28 @@ class RankPodium extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final first = users.firstWhere((u) => u.rank == 1);
-    final second = users.firstWhere((u) => u.rank == 2);
-    final third = users.firstWhere((u) => u.rank == 3);
+    if (users.isEmpty) {
+      return SizedBox(
+        height: 240.h,
+        child: const Center(
+          child: Text(
+            'Loading top players...',
+            style: TextStyle(color: AppColors.textSecondary),
+          ),
+        ),
+      );
+    }
 
-    // Bar heights in logical pixels — no dependency on a fixed parent height
+    // Safe extraction with fallbacks
+    final first = users.where((u) => u.rank == 1).firstOrNull ??
+        const PodiumUser(rank: 1, name: '-', score: 0);
+
+    final second = users.where((u) => u.rank == 2).firstOrNull ??
+        const PodiumUser(rank: 2, name: '-', score: 0);
+
+    final third = users.where((u) => u.rank == 3).firstOrNull ??
+        const PodiumUser(rank: 3, name: '-', score: 0);
+
     const double barFirst = 170;
     const double barSecond = 120;
     const double barThird = 90;
@@ -47,8 +64,7 @@ class RankPodium extends StatelessWidget {
               hasStory: hasStory?.call(second) ?? false,
               isStoryViewed: isStoryViewed?.call(second) ?? false,
               onTap: onUserTap == null ? null : () => onUserTap!(second),
-              onAvatarTap:
-                  onAvatarTap == null ? null : () => onAvatarTap!(second),
+              onAvatarTap: onAvatarTap == null ? null : () => onAvatarTap!(second),
             ),
           ),
           SizedBox(width: 16.w),
@@ -63,8 +79,7 @@ class RankPodium extends StatelessWidget {
               hasStory: hasStory?.call(first) ?? false,
               isStoryViewed: isStoryViewed?.call(first) ?? false,
               onTap: onUserTap == null ? null : () => onUserTap!(first),
-              onAvatarTap:
-                  onAvatarTap == null ? null : () => onAvatarTap!(first),
+              onAvatarTap: onAvatarTap == null ? null : () => onAvatarTap!(first),
             ),
           ),
           SizedBox(width: 16.w),
@@ -79,8 +94,7 @@ class RankPodium extends StatelessWidget {
               hasStory: hasStory?.call(third) ?? false,
               isStoryViewed: isStoryViewed?.call(third) ?? false,
               onTap: onUserTap == null ? null : () => onUserTap!(third),
-              onAvatarTap:
-                  onAvatarTap == null ? null : () => onAvatarTap!(third),
+              onAvatarTap: onAvatarTap == null ? null : () => onAvatarTap!(third),
             ),
           ),
         ],
@@ -100,6 +114,7 @@ class _PodiumColumn extends StatelessWidget {
   final VoidCallback? onAvatarTap;
 
   const _PodiumColumn({
+    super.key,
     required this.user,
     required this.barHeight,
     required this.avatarSize,
@@ -122,60 +137,59 @@ class _PodiumColumn extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-        // Crown — only rank 1
-        if (isFirst) ...[
-          Image.asset(
-            AppAssets.rankTop,
-            width: 28.w,
-            height: 28.w,
-            fit: BoxFit.contain,
-          ),
-          SizedBox(height: 6.h),
-        ] else
-          // Reserve same vertical space so 2nd/3rd columns align properly
-          SizedBox(height: 34.h),
+              // Crown
+              if (isFirst) ...[
+                Image.asset(
+                  AppAssets.rankTop,
+                  width: 28.w,
+                  height: 28.w,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(height: 6.h),
+              ] else
+                SizedBox(height: 34.h),
 
-        // Avatar
-        GestureDetector(
-          onTap: hasStory ? onAvatarTap : onTap,
-          behavior: HitTestBehavior.opaque,
-          child: _PodiumAvatar(
-            size: avatarSize,
-            isFirst: isFirst,
-            hasStory: hasStory,
-            isStoryViewed: isStoryViewed,
-          ),
-        ),
-        SizedBox(height: 8.h),
+              // Avatar
+              GestureDetector(
+                onTap: hasStory ? onAvatarTap : onTap,
+                behavior: HitTestBehavior.opaque,
+                child: _PodiumAvatar(
+                  size: avatarSize,
+                  isFirst: isFirst,
+                  hasStory: hasStory,
+                  isStoryViewed: isStoryViewed,
+                ),
+              ),
+              SizedBox(height: 8.h),
 
-        // Name
-        Text(
-          user.name,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: AppColors.black,
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w500,
-            height: 1.2,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        SizedBox(height: 3.h),
+              // Name
+              Text(
+                user.name,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.black,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: 3.h),
 
-        // Score
-        Text(
-          _formatScore(user.score),
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: AppColors.textSub2,
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w400,
-            height: 1.2,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+              // Score
+              Text(
+                _formatScore(user.score),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.textSub2,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w400,
+                  height: 1.2,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
         ),
@@ -225,6 +239,7 @@ class _PodiumAvatar extends StatelessWidget {
   final bool isStoryViewed;
 
   const _PodiumAvatar({
+    super.key,
     required this.size,
     required this.isFirst,
     required this.hasStory,

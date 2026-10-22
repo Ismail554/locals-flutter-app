@@ -169,6 +169,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get otpResend => 'Reenviar';
 
   @override
+  String get otpResendSuccess => 'Se ha enviado un nuevo código a tu correo.';
+
+  @override
   String get otpEmailVerifiedTitle => 'Correo verificado';
 
   @override
@@ -293,6 +296,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get exploreNewLocals => 'NUEVOS LOCALES';
 
   @override
+  String get localShares => 'acciones locales';
+
+  @override
   String get exploreFeaturedLocations => 'LUGARES DESTACADOS';
 
   @override
@@ -359,13 +365,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get eventRouteComplete => 'Ruta completada';
 
   @override
+  String get sponsored => 'patrocinado';
+
+  @override
+  String get learnMore => 'Más información';
+
+  @override
   String get restaurantLocalsSeal => 'sello de locals';
+
+  @override
+  String get authConfirmPasswordLabel => 'Confirmar Contraseña';
 
   @override
   String get restaurantLocalSpot => 'Lugar local';
 
   @override
-  String get restaurantBeenHere => 'He estado aquí';
+  String get authConfirmPasswordHint => 'authConfirmPasswordHint';
+
+  @override
+  String get restaurantBeenHere => 'No visitado';
 
   @override
   String get restaurantBeenHereDone => 'He estado aquí ✓';
@@ -375,6 +393,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get restaurantPhotos => 'Fotos';
+
+  @override
+  String get profileDetails => 'Detalles del perfil';
+
+  @override
+  String get busniessOfTheMonth => 'Empresa del mes';
 
   @override
   String get restaurantVisitors => 'Visitantes';
@@ -497,7 +521,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get filtersBusinesses => 'Negocios';
 
   @override
-  String get filtersHerbs => 'Hierbas';
+  String get filtersPoi => 'Punto de interés';
 
   @override
   String get filtersBoth => 'Ambos';
@@ -510,6 +534,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get filtersApply => 'Aplicar filtros';
+
+  @override
+  String get shareCardCaptionHint => 'Subtítulo';
 
   @override
   String get mapExploring => 'EXPLORANDO';
@@ -566,6 +593,44 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get rankScopeGlobal => 'Global';
+
+  @override
+  String get checkInButtonLabel => 'Registrarse';
+
+  @override
+  String get checkInTitle => 'Registrar Visita';
+
+  @override
+  String get checkInCaptionHint => 'Cuéntanos algo sobre este lugar...';
+
+  @override
+  String get checkInSubmit => 'Confirmar Registro';
+
+  @override
+  String get checkInCamera => 'Tomar Foto';
+
+  @override
+  String get checkInGallery => 'Elegir de la Galería';
+
+  @override
+  String get checkInAddPhoto => 'Añade una foto';
+
+  @override
+  String get checkInSuccessTitle => '¡Registro Exitoso!';
+
+  @override
+  String checkInPointsEarned(int points) {
+    return 'Ganaste $points puntos';
+  }
+
+  @override
+  String get checkInMissionComplete => '¡Misión Completada!';
+
+  @override
+  String get checkInAchievementsUnlocked => 'LOGROS DESBLOQUEADOS';
+
+  @override
+  String get checkInContinue => 'Continuar';
 
   @override
   String get rankScopeFollowers => 'Seguidores';
@@ -725,6 +790,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsPrivacy => 'Privacidad';
+
+  @override
+  String get settingsDiscounts => 'Descuentos';
 
   @override
   String get settingsEditProfile => 'Editar perfil';
@@ -926,6 +994,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get filterCategoryOther => 'Otro';
 
   @override
+  String get filterCategoryParksGardens => 'Parques y jardines';
+
+  @override
+  String get validationFailed => 'Error de validación';
+
+  @override
   String get snackbarLinkCopied => 'Enlace copiado';
 
   @override
@@ -985,4 +1059,37 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get shareCardChooseGallery => 'Elegir de la galería';
+
+  @override
+  String get likes => 'Gustos';
+
+  @override
+  String get qrCodeScanTitle => 'Escáner de Código QR';
+
+  @override
+  String get qrScanInstruction => 'Coloca el código QR en el marco';
+
+  @override
+  String get positionQrCodeHere => 'Posiciona el código QR aquí';
+
+  @override
+  String get tapToScan => 'Toca para escanear';
+
+  @override
+  String get qrVerified => '¡QR Verificado!';
+
+  @override
+  String get qrScanFailed => 'Escaneo Fallido';
+
+  @override
+  String get qrTooFar => 'Estás demasiado lejos de la ubicación';
+
+  @override
+  String get continueButton => 'Continuar';
+
+  @override
+  String get checkInSuccess => 'Has hecho check-in. ¡Gracias por visitarnos!';
+
+  @override
+  String get checkInTooFar => 'Debes estar más cerca para hacer check-in';
 }

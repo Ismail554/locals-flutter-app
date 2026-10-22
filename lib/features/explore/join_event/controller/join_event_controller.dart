@@ -9,19 +9,42 @@ import '../../restaurant_view_details/model/restaurant_view_details_args.dart';
 class JoinEventController extends ChangeNotifier {
   final JoinEventRepository repo;
   final JoinEventArgs args;
-  JoinEventModel event;
 
-  JoinEventController(this.repo, this.args) : event = repo.load(args.eventId);
+  JoinEventModel? event;
+  bool isLoading = true;
+  String? errorMessage;
+
+  JoinEventController(this.repo, this.args) {
+    _load();
+  }
+
+  Future<void> _load() async {
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      event = await repo.load(args.eventId);
+    } catch (e) {
+      print('Join event load error: $e');
+      errorMessage = 'Failed to load event. Please try again.';
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> refresh() => _load();
 
   void joinEvent(BuildContext context) {
-    if (event.isJoined) return;
+    if (event == null || event!.isJoined) return;
 
-    event = event.copyWith(isJoined: true);
+    event = event!.copyWith(isJoined: true);
     notifyListeners();
 
     context.push(
       '/events_progress_map',
-      extra: EventsProgressMapArgs(eventId: event.id),
+      extra: EventsProgressMapArgs(eventId: event!.id),
     );
   }
 

@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:locals/features/explore/explore/view/local_shares_screen.dart';
+import 'package:locals/features/explore/restaurant_view_details/model/qr_checkin_result.dart';
+import 'package:locals/features/explore/restaurant_view_details/model/qr_discount_result.dart';
+import 'package:locals/features/explore/restaurant_view_details/view/qr_discount_status_screen.dart';
+import 'package:locals/features/explore/restaurant_view_details/view/qr_scan_screen.dart';
+import 'package:locals/features/explore/restaurant_view_details/view/qr_scan_status_screen.dart';
 import 'app_scaffold.dart';
 import '../features/splash/view/splash_screen.dart';
 import '../features/onboard/view/onboard_screen.dart';
@@ -60,37 +66,41 @@ final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/splash',
   routes: [
-    GoRoute(
-      path: '/splash',
-      builder: (context, state) => const SplashScreen(),
-    ),
+    GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(
       path: '/onboard',
       builder: (context, state) => const OnboardScreen(),
     ),
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
-    ),
+    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
     GoRoute(
       path: '/request_otp',
       builder: (context, state) => const RequestOtpScreen(),
     ),
     GoRoute(
       path: '/verify_otp',
-      builder: (context, state) => const VerifyOtpScreen(),
+      builder: (context, state) {
+        final email = state.extra as String? ?? '';
+        return VerifyOtpScreen(email: email);
+      },
     ),
+
     GoRoute(
       path: '/set_new_password',
-      builder: (context, state) => const SetNewPasswordScreen(),
+      builder: (context, state) {
+        final args = state.extra as Map<String, String>? ?? {};
+        return SetNewPasswordScreen(
+          email: args['email'] ?? '',
+          resetToken: args['reset_token'] ?? '',
+        );
+      },
     ),
-    GoRoute(
-      path: '/signup',
-      builder: (context, state) => const SignupScreen(),
-    ),
+    GoRoute(path: '/signup', builder: (context, state) => const SignupScreen()),
     GoRoute(
       path: '/verify_account_otp',
-      builder: (context, state) => const VerifyAccountOtpScreen(),
+      builder: (context, state) {
+        final email = state.extra as String? ?? '';
+        return VerifyAccountOtpScreen(email: email);
+      },
     ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
@@ -100,9 +110,7 @@ final appRouter = GoRouter(
           path: '/map',
           pageBuilder: (context, state) {
             final screenArgs = MapScreenArgs.fromExtra(state.extra);
-            return NoTransitionPage(
-              child: MapScreen(screenArgs: screenArgs),
-            );
+            return NoTransitionPage(child: MapScreen(screenArgs: screenArgs));
           },
         ),
         GoRoute(
@@ -151,6 +159,17 @@ final appRouter = GoRouter(
       builder: (context, state) {
         final args = state.extra as RestaurantViewDetailsArgs?;
         return RestaurantViewDetailsScreen(args: args);
+      },
+    ),
+    GoRoute(
+      path: "/l/:id",
+
+      builder: (context, state) {
+        return RestaurantViewDetailsScreen(
+          args: RestaurantViewDetailsArgs(
+            locationId: state.pathParameters["id"]!,
+          ),
+        );
       },
     ),
     GoRoute(
@@ -293,12 +312,30 @@ final appRouter = GoRouter(
       },
     ),
     GoRoute(
+      path: '/local_shares',
+      builder: (context, state) => const LocalSharesScreen(),
+    ),
+    GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
       path: '/story_view',
       builder: (context, state) {
         final args = state.extra! as StoryViewerArgs;
         return StoryViewScreen(args: args);
       },
+    ),
+    GoRoute(
+      path: '/qr-scan',
+      builder: (context, state) => const QRScanScreen(),
+    ),
+    GoRoute(
+      path: '/qr-discount-result',
+      builder: (context, state) =>
+          QRDiscountStatusScreen(result: state.extra as QRDiscountResult),
+    ),
+    GoRoute(
+      path: '/qr-scan-status',
+      builder: (context, state) =>
+          QRScanStatusScreen(result: state.extra as QRCheckInResult),
     ),
   ],
 );

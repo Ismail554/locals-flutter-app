@@ -1,4 +1,4 @@
-enum PlaceTypeFilter { businesses, herbs, both }
+enum PlaceTypeFilter { businesses, poi, event }
 
 enum VisitStatusFilter { visited, unvisited, both }
 
@@ -21,7 +21,7 @@ class MapFiltersState {
 
   const MapFiltersState({
     required this.selectedCategoryIds,
-    this.placeType = PlaceTypeFilter.both,
+    this.placeType = PlaceTypeFilter.poi,
     this.visitStatus = VisitStatusFilter.unvisited,
   });
 
@@ -41,13 +41,13 @@ class MapFiltersState {
 
   static const defaults = MapFiltersState(
     selectedCategoryIds: {},
-    placeType: PlaceTypeFilter.both,
+    placeType: PlaceTypeFilter.poi,
     visitStatus: VisitStatusFilter.both,
   );
 
   static const cleared = MapFiltersState(
     selectedCategoryIds: {},
-    placeType: PlaceTypeFilter.both,
+    placeType: PlaceTypeFilter.poi,
     visitStatus: VisitStatusFilter.both,
   );
 
