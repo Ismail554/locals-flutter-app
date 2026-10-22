@@ -34,5 +34,8 @@ class FCMService {
     }
   }
 
-  static String _deviceType() => 'android';
+  static String _deviceType() {
+    if (kIsWeb) return 'web';
+    return defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android';
+  }
 }

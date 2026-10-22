@@ -37,8 +37,15 @@ class NotificationService {
     await _initializeLocalNotification();
   }
 
-  Future<void> _requestPermission() async {
+Future<void> _requestPermission() async {
     await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    // Fixed method name for showing foreground notifications on iOS
+    await _messaging.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
       sound: true,
@@ -47,7 +54,18 @@ class NotificationService {
 
   Future<void> _initializeLocalNotification() async {
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const settings = InitializationSettings(android: androidSettings);
+    
+    // Configured for iOS (Darwin) platform
+    const darwinSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
+    const settings = InitializationSettings(
+      android: androidSettings,
+      iOS: darwinSettings,
+    );
 
     await _localNotifications.initialize(
       settings: settings,
@@ -91,6 +109,11 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
         ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
       ),
       payload: jsonEncode(message.data),
     );
@@ -108,13 +131,26 @@ class NotificationService {
   }
 
   Future<void> _printToken() async {
+  try {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      // Wait for APNs token to be set on iOS
+      String? apnsToken = await _messaging.getAPNSToken();
+      if (apnsToken == null) {
+        debugPrint('APNs token is not ready yet. Skipping FCM token retrieval.');
+        return;
+      }
+    }
+
     final token = await _messaging.getToken();
     debugPrint('FCM TOKEN => $token');
 
     _messaging.onTokenRefresh.listen((newToken) {
       debugPrint('TOKEN REFRESH => $newToken');
     });
+  } catch (e) {
+    debugPrint('Error getting FCM token: $e');
   }
+}
 
   void _handleNotificationTap(String? payload) {
     if (payload == null || payload.isEmpty) {
