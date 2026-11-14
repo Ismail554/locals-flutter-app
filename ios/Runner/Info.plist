@@ -24,16 +24,18 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>Locals needs camera access so you can capture photos.</string>
+	<string>Locals requires camera access so you can take photos for your profile and share experiences with the community.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app needs your location to show directions.</string>
+	<string>Locals requires location access to show nearby attractions, local guides, and provide accurate navigation.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs your location to show directions.</string>
+	<string>Locals requires location access to show nearby attractions, local guides, and provide accurate navigation.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Locals needs permission to save photos.</string>
+	<string>Locals requires permission to save captured photos and memories to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Locals needs access to your photo library.</string>
+	<string>Locals requires access to your photo library so you can select and upload photos for your profile and posts.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
